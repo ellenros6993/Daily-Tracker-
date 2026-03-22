@@ -539,6 +539,22 @@ export default function App() {
   const [localSettings, setLocalSettings] = useState(() => getSettings());
   useEffect(() => { setLocalSettings(settings); }, [JSON.stringify(settings)]);
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("dat-onboarded"));
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authMode, setAuthMode] = useState("signin"); // "signin" | "signup"
+  const [authError, setAuthError] = useState(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [syncStatus, setSyncStatus] = useState(null); // null | "syncing" | "done" | "error"
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try {
+      const s = JSON.parse(localStorage.getItem("dat-session") || "null");
+      return s && new Date(s.expires_at * 1000) > new Date();
+    } catch { return false; }
+  });
+  const [currentUser, setCurrentUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("dat-session") || "null")?.user || null; }
+    catch { return null; }
+  });
   const [onboardStep, setOnboardStep] = useState(0);
   const [onboardData, setOnboardData] = useState({ userName: "", goalWeight: "", startWeight: "", deadline: "", caloriesMin: "", caloriesMax: "", proteinMin: "", stepsMin: "" });
 
@@ -564,6 +580,156 @@ export default function App() {
     const merged = { ...settings, ...newSettings };
     setSettings(merged);
     localStorage.setItem("dat-settings", JSON.stringify(merged));
+  }
+
+  // ── Supabase helpers (inline — no SDK) ──
+  const SB_URL = process.env.REACT_APP_SUPABASE_URL || "";
+  const SB_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY || "";
+  const sbConfigured = !!(SB_URL && SB_KEY);
+
+  async function sbFetch(path, options = {}) {
+    const session = JSON.parse(localStorage.getItem("dat-session") || "null");
+    const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SB_KEY,
+        "Authorization": `Bearer ${session?.access_token || SB_KEY}`,
+        "Prefer": options.prefer || "return=representation",
+        ...options.headers,
+      },
+      ...options,
+    });
+    if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.message || res.statusText); }
+    return res.status === 204 ? null : res.json();
+  }
+
+  async function sbAuth(path, body) {
+    const res = await fetch(`${SB_URL}/auth/v1/${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": SB_KEY },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error_description || data.msg || "Auth error");
+    return data;
+  }
+
+  async function handleAuth() {
+    if (!sbConfigured) { setAuthError("Supabase not configured — add REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY to Vercel env vars"); return; }
+    setAuthLoading(true); setAuthError(null);
+    try {
+      const data = authMode === "signup"
+        ? await sbAuth("signup", { email: authEmail, password: authPassword })
+        : await sbAuth("token?grant_type=password", { email: authEmail, password: authPassword });
+      const session = data.session || data;
+      localStorage.setItem("dat-session", JSON.stringify(session));
+      setIsLoggedIn(true);
+      setCurrentUser(session.user);
+      haptic("success");
+      await syncToCloud();
+    } catch (e) { setAuthError(e.message); }
+    finally { setAuthLoading(false); }
+  }
+
+  async function syncToCloud() {
+    if (!isLoggedIn) return;
+    setSyncStatus("syncing");
+    try {
+      const session = JSON.parse(localStorage.getItem("dat-session") || "null");
+      const userId = session?.user?.id;
+      if (!userId) throw new Error("No user ID");
+
+      // Collect all meal foods by date from localStorage
+      const mealFoodEntries = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k?.startsWith("dat-meal-foods-")) {
+          const date = k.replace("dat-meal-foods-", "");
+          try {
+            const mf = JSON.parse(localStorage.getItem(k) || "{}");
+            Object.entries(mf).forEach(([slot, foods]) => {
+              if (foods.length > 0) mealFoodEntries.push({ user_id: userId, date, slot, foods, updated_at: new Date().toISOString() });
+            });
+          } catch {}
+        }
+      }
+
+      await Promise.all([
+        // Push logs
+        ...logs.map(l => sbFetch("logs", { method: "POST", prefer: "resolution=merge-duplicates,return=representation", body: JSON.stringify({ user_id: userId, date: l.date, data: l, updated_at: new Date().toISOString() }) })),
+        // Push meal foods
+        ...mealFoodEntries.map(entry => sbFetch("meal_foods", { method: "POST", prefer: "resolution=merge-duplicates,return=representation", body: JSON.stringify(entry) })),
+        // Push settings
+        sbFetch("users", { method: "POST", prefer: "resolution=merge-duplicates,return=representation", body: JSON.stringify({ id: userId, settings, updated_at: new Date().toISOString() }) }),
+        // Push personal foods
+        sbFetch(`personal_foods?user_id=eq.${userId}`, { method: "DELETE", prefer: "" }).then(() =>
+          personalFoods.length > 0 ? sbFetch("personal_foods", { method: "POST", body: JSON.stringify(personalFoods.map(f => ({ user_id: userId, food_data: f }))) }) : null
+        ),
+      ].filter(Boolean));
+
+      setSyncStatus("done");
+      setTimeout(() => setSyncStatus(null), 3000);
+    } catch (e) {
+      console.error("Sync error:", e);
+      setSyncStatus("error");
+      setTimeout(() => setSyncStatus(null), 4000);
+    }
+  }
+
+  async function pullFromCloud() {
+    if (!isLoggedIn) return;
+    setSyncStatus("syncing");
+    try {
+      const session = JSON.parse(localStorage.getItem("dat-session") || "null");
+      const userId = session?.user?.id;
+      if (!userId) throw new Error("No user ID");
+
+      const [logsData, mealFoodsData, settingsData, personalFoodsData] = await Promise.all([
+        sbFetch(`logs?user_id=eq.${userId}&order=date.asc`),
+        sbFetch(`meal_foods?user_id=eq.${userId}&order=date.asc`),
+        sbFetch(`users?id=eq.${userId}&select=settings`),
+        sbFetch(`personal_foods?user_id=eq.${userId}`),
+      ]);
+
+      // Apply to local state
+      if (logsData?.length > 0) {
+        const pulled = logsData.map(r => r.data);
+        setLogs(pulled);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(pulled));
+      }
+      if (mealFoodsData?.length > 0) {
+        const byDate = {};
+        mealFoodsData.forEach(({ date, slot, foods }) => {
+          if (!byDate[date]) byDate[date] = {};
+          byDate[date][slot] = foods;
+        });
+        Object.entries(byDate).forEach(([date, mf]) => {
+          localStorage.setItem(`dat-meal-foods-${date}`, JSON.stringify(mf));
+        });
+      }
+      if (settingsData?.[0]?.settings) {
+        saveSettings(settingsData[0].settings);
+      }
+      if (personalFoodsData?.length > 0) {
+        const foods = personalFoodsData.map(r => r.food_data);
+        setPersonalFoods(foods);
+        localStorage.setItem("dat-personal-foods", JSON.stringify(foods));
+      }
+
+      setSyncStatus("done");
+      setTimeout(() => setSyncStatus(null), 3000);
+    } catch (e) {
+      console.error("Pull error:", e);
+      setSyncStatus("error");
+      setTimeout(() => setSyncStatus(null), 4000);
+    }
+  }
+
+  function handleSignOut() {
+    localStorage.removeItem("dat-session");
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    haptic("light");
   }
 
   function addWater() {
@@ -1752,6 +1918,11 @@ export default function App() {
                 </div>
               );
             })()}
+            {isLoggedIn && (
+              <div onClick={syncToCloud} title="Sync to cloud" style={{ cursor: "pointer", fontSize: 14, lineHeight: 1 }}>
+                {syncStatus === "syncing" ? "⟳" : syncStatus === "done" ? "✅" : syncStatus === "error" ? "⚠️" : "☁️"}
+              </div>
+            )}
             <button onClick={() => setDarkMode(d => !d)} style={{ background: "none", border: "1px solid #1e2d40", borderRadius: 8, padding: "4px 8px", color: "#475569", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: 11 }}>
               {darkMode ? <Sun size={13} /> : <Moon size={13} />}
             </button>
@@ -4021,6 +4192,54 @@ export default function App() {
                   <strong style={{ color: "#60a5fa" }}>Android:</strong> Tap menu → "Add to Home Screen" or "Install App"<br/>
                   <strong style={{ color: "#60a5fa" }}>Desktop:</strong> Click the install icon in your browser's address bar
                 </div>
+              </div>
+
+              {/* Cloud Sync */}
+              <div className="stat-card" style={{ borderColor: "#1e3a5f44" }}>
+                <div style={{ fontSize: 9, color: "#60a5fa", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 14 }}>☁️ CLOUD SYNC</div>
+                {isLoggedIn ? (
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#34d399" }} />
+                      <span style={{ fontSize: 12, color: "#94a3b8" }}>Signed in as <strong style={{ color: "#e2e8f0" }}>{currentUser?.email}</strong></span>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                      <button onClick={syncToCloud} disabled={syncStatus === "syncing"}
+                        style={{ flex: 1, background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", border: "none", color: "#fff", padding: "10px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                        {syncStatus === "syncing" ? "⟳ Syncing..." : syncStatus === "done" ? "✓ Synced!" : "↑ Push to Cloud"}
+                      </button>
+                      <button onClick={pullFromCloud} disabled={syncStatus === "syncing"}
+                        style={{ flex: 1, background: "#0f1623", border: "1px solid #1e3a5f", color: "#60a5fa", padding: "10px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                        ↓ Pull from Cloud
+                      </button>
+                    </div>
+                    {syncStatus === "error" && <div style={{ fontSize: 11, color: "#f87171", marginBottom: 8 }}>Sync failed — check connection and Supabase env vars</div>}
+                    <button onClick={handleSignOut} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "7px 14px", borderRadius: 8, fontSize: 11, cursor: "pointer", fontFamily: "'DM Mono',monospace" }}>Sign Out</button>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ fontSize: 11, color: "#475569", marginBottom: 14, lineHeight: 1.6 }}>
+                      Sync your data across devices. Free — requires Supabase env vars in Vercel.
+                    </div>
+                    <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                      {["signin", "signup"].map(m => (
+                        <button key={m} onClick={() => { setAuthMode(m); setAuthError(null); }}
+                          style={{ flex: 1, background: authMode === m ? "#0f1623" : "none", border: `1px solid ${authMode === m ? "#3b82f6" : "#1e2d40"}`, color: authMode === m ? "#60a5fa" : "#475569", padding: "7px", borderRadius: 8, fontSize: 11, cursor: "pointer", fontFamily: "'DM Mono',monospace" }}>
+                          {m === "signin" ? "Sign In" : "Sign Up"}
+                        </button>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+                      <input type="email" placeholder="Email address" value={authEmail} onChange={e => setAuthEmail(e.target.value)} style={{ width: "100%", boxSizing: "border-box" }} />
+                      <input type="password" placeholder="Password" value={authPassword} onChange={e => setAuthPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleAuth()} style={{ width: "100%", boxSizing: "border-box" }} />
+                    </div>
+                    {authError && <div style={{ fontSize: 11, color: "#f87171", marginBottom: 10, padding: "8px", background: "#1a0a0a", borderRadius: 6 }}>{authError}</div>}
+                    <button onClick={handleAuth} disabled={authLoading || !authEmail || !authPassword}
+                      style={{ width: "100%", background: authLoading ? "#0f1623" : "linear-gradient(135deg,#1d4ed8,#3b82f6)", border: "none", color: "#fff", padding: "12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                      {authLoading ? "⟳ Loading..." : authMode === "signin" ? "Sign In & Sync" : "Create Account & Sync"}
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div style={{ fontSize: 10, color: "#1e2d40", textAlign: "center", fontFamily: "'DM Mono',monospace", paddingBottom: 8 }}>
