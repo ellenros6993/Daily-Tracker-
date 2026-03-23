@@ -393,7 +393,7 @@ async function parseMealScreenshot(base64Image, mealType, mediaType = "image/jpe
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 1000,
       messages: [{ role: "user", content: [
         { type: "image", source: { type: "base64", media_type: mediaType, data: base64Image } },
@@ -412,7 +412,7 @@ async function parseScaleScreenshot(base64Image) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 300,
       messages: [{ role: "user", content: [
         { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64Image } },
@@ -648,6 +648,7 @@ export default function App() {
   const [personalFoods, setPersonalFoods] = useState(() => {
     try {
       const stored = JSON.parse(localStorage.getItem("dat-personal-foods") || "[]");
+      // Merge preloaded foods — add any that aren't already in the DB
       const storedIds = new Set(stored.map(f => f.id));
       const toAdd = PRELOADED_FOODS.filter(f => !storedIds.has(f.id));
       return [...stored, ...toAdd];
@@ -655,6 +656,15 @@ export default function App() {
   });
   const [manualFoodForm, setManualFoodForm] = useState({ name: "", calories: "", protein: "", carbs: "", fat: "", fiber: "", sugar: "", servingSize: "1 serving" });
   const [showManualEntry, setShowManualEntry] = useState(false);
+
+    try {
+      const stored = JSON.parse(localStorage.getItem("dat-personal-foods") || "[]");
+      // Merge preloaded foods — add any that aren't already in the DB
+      const storedIds = new Set(stored.map(f => f.id));
+      const toAdd = PRELOADED_FOODS.filter(f => !storedIds.has(f.id));
+      return [...stored, ...toAdd];
+    } catch { return PRELOADED_FOODS; }
+  });
   const [nutritionDate, setNutritionDate] = useState(getLocalDateStr());
 
   function navigateNutritionDate(newDate) {
@@ -880,7 +890,7 @@ export default function App() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
+            model: "claude-sonnet-4-6",
             max_tokens: 400,
             messages: [{ role: "user", content: `Nutrition facts for "${query}". Reply with ONLY this JSON and nothing else:\n{"name":"${query}","brand":"","calories":0,"protein":0,"carbs":0,"fat":0,"servingSize":"1 serving","estimated":true}\nFill in the real numbers. No explanation, no markdown, just the JSON object.` }]
           })
@@ -958,7 +968,7 @@ export default function App() {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                model: "claude-sonnet-4-20250514",
+                model: "claude-sonnet-4-6",
                 max_tokens: 50,
                 messages: [{ role: "user", content: [
                   { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
@@ -1006,7 +1016,7 @@ export default function App() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
+            model: "claude-sonnet-4-6",
             max_tokens: 400,
             messages: [{ role: "user", content: `Barcode: ${barcode}. Estimate nutrition per serving for this product. Respond ONLY with valid JSON:\n{"name":"product name","brand":"","calories":number,"protein":number,"carbs":number,"fat":number,"servingSize":"description","estimated":true}` }]
           })
@@ -2213,16 +2223,6 @@ export default function App() {
                   );
                 })()}
               </div>
-
-              {/* Share */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share Progress</div>
-                <div style={{ fontSize: 10, color: "#475569", marginBottom: 10, lineHeight: 1.4 }}>Copy your stats as a text snippet</div>
-                <button onClick={shareStats}
-                  style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  📤 Share Stats
-                </button>
-              </div>
             </div>
 
             {/* Water Tracker */}
@@ -2378,6 +2378,28 @@ export default function App() {
                 </div>
               );
             })()}
+
+            {/* Share Progress */}
+            <div className="stat-card fade-up-4" style={{ padding: "12px 14px" }}>
+              <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share Progress</div>
+              <div style={{ fontSize: 10, color: "#475569", marginBottom: 10, lineHeight: 1.4 }}>Copy your stats as a text snippet</div>
+              <button onClick={shareStats} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                📤 Share Stats
+              </button>
+            </div>
+
+            {/* Daily Reminders */}
+            <div className="stat-card fade-up-4" style={{ padding: "10px 14px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Bell size={13} style={{ color: notifEnabled ? "#10b981" : "#334155" }} />
+                  <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Daily Reminders</div>
+                </div>
+                <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "5px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                  {notifEnabled ? "On ✓" : "Enable"}
+                </button>
+              </div>
+            </div>
 
             {/* Settings & Targets */}
             <div className="stat-card fade-up-4" style={{ padding: "10px 14px" }}>
@@ -2658,17 +2680,7 @@ export default function App() {
                     <span style={{ fontSize: 9, color: calColor, fontFamily: "'DM Mono',monospace", width: 60, textAlign: "right" }}>{totalCals}/{CALORIES_MAX}</span>
                   </div>
                 </div>
-                <button className="save-btn" style={{ marginTop: 12, fontSize: 13, padding: "8px 20px" }}
-                  onClick={() => {
-                    const idx = logs.findIndex(l => l.date === nutritionDate);
-                    const updatedForm = { ...form, date: nutritionDate, calories: String(totalCals), protein: String(totalPro) };
-                    const newLog = { ...updatedForm, score: calcScore(updatedForm) };
-                    const newLogs = idx >= 0 ? logs.map((l, i) => i === idx ? newLog : l) : [...logs, newLog].sort((a, b) => a.date.localeCompare(b.date));
-                    setLogs(newLogs); setForm(updatedForm); setSaved(true);
-                    haptic("success"); setTimeout(() => setSaved(false), 2000);
-                  }}>
-                  {saved ? "✓ Saved" : nutritionDate === getLocalDateStr() ? "↻ Auto-saving · Tap to force save" : "Save to Log"}
-                </button>
+                <div style={{ marginTop: 4, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "right" }}>✓ Auto-saved</div>
               </div>
 
               {/* Manual Macro Input */}
