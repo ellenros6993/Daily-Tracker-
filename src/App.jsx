@@ -489,26 +489,17 @@ export default function App() {
 
       // Inject historical days if not already present
       const historicalDays = [
-        { date: "2026-03-19", calories: "1440", protein: "128", fiber: "7", sugar: "25", steps: "", training: "", weight: "", bodyFat: "", muscleMass: "", visceralFat: "" },
-        { date: "2026-03-20", calories: "1445", protein: "126", fiber: "40", sugar: "38", steps: "", training: "", weight: "", bodyFat: "", muscleMass: "", visceralFat: "" },
-        { date: "2026-03-21", calories: "", protein: "", steps: "9294", training: "", weight: "205.0", bodyFat: "44.5", muscleMass: "107.2", visceralFat: "17" },
+        { date: "2026-03-19", calories: "1440", protein: "128", fiber: "7", sugar: "25", steps: "8353", training: "", weight: "", bodyFat: "", muscleMass: "", visceralFat: "" },
+        { date: "2026-03-20", calories: "1445", protein: "126", fiber: "40", sugar: "38", steps: "9100", training: "", weight: "", bodyFat: "", muscleMass: "", visceralFat: "" },
+        { date: "2026-03-21", calories: "1874", protein: "139", steps: "9472", training: "", weight: "205.0", bodyFat: "44.5", muscleMass: "107.2", visceralFat: "17" },
       ];
       historicalDays.forEach(day => {
         const existing = fixed.find(l => l.date === day.date);
         if (!existing) {
           fixed.push({ ...day, score: calcScore(day) });
         } else {
-          // For March 21 specifically, force-correct the weight data
-          if (day.date === "2026-03-21") {
-            existing.weight = "205.0";
-            existing.bodyFat = "44.5";
-            existing.muscleMass = "107.2";
-            existing.visceralFat = "17";
-            if (day.steps && !existing.steps) existing.steps = day.steps;
-          } else {
-            // Merge — fill in any missing fields without overwriting existing data
-            Object.keys(day).forEach(k => { if (day[k] && !existing[k]) existing[k] = day[k]; });
-          }
+          // Force-merge all fields from historical data (overwrite blanks AND update steps/nutrition)
+          Object.keys(day).forEach(k => { if (day[k]) existing[k] = day[k]; });
           existing.score = calcScore(existing);
         }
       });
@@ -3281,6 +3272,10 @@ export default function App() {
               {/* Step Count */}
               <div className="stat-card">
                 <div className="section-title" style={{ fontSize: 16 }}>STEP COUNT</div>
+                <div style={{ marginBottom: 10 }}>
+                  <div className="field-label" style={{ marginBottom: 4 }}>Date</div>
+                  <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ maxWidth: 200, marginBottom: 10 }} />
+                </div>
                 <div style={{ marginBottom: 10 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                     <div className="field-label" style={{ marginBottom: 0 }}>Steps Today</div>
