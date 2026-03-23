@@ -274,7 +274,7 @@ function generateReportHTML(weekStart, weekLogs, allLogs) {
 </head>
 <body>
 <h1>WEEKLY REPORT</h1>
-<div class="sub">${weekLabel} · 210 → 160 lb · Aug 23 Wedding</div>
+<div class="sub">${weekLabel} · Daily Accountability Tracker</div>
 
 <h2>WEIGHT</h2>
 <div class="grid">
@@ -1056,6 +1056,45 @@ export default function App() {
   const [notifEnabled, setNotifEnabled] = useState(() => localStorage.getItem("dat-notif") === "true");
   const confettiRef = useRef(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("dat-dark") !== "light");
+
+  // Sleep tracker
+  const [sleepData, setSleepData] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-sleep") || "{}"); } catch { return {}; } });
+  function getSleepToday() { return sleepData[getLocalDateStr()] || { hours: "", quality: 0 }; }
+  function saveSleep(field, val) {
+    const today = getLocalDateStr();
+    const updated = { ...sleepData, [today]: { ...getSleepToday(), [field]: val } };
+    setSleepData(updated);
+    localStorage.setItem("dat-sleep", JSON.stringify(updated));
+  }
+
+  // Cycle tracker
+  const [cycleEnabled, setCycleEnabled] = useState(() => localStorage.getItem("dat-cycle-enabled") === "true");
+  const [cycleData, setCycleData] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-cycle") || "{}"); } catch { return {}; } });
+  // cycleData shape: { periodDates: ["2026-03-01", ...], symptoms: { "2026-03-01": ["cramps","bloating",...] } }
+  function saveCycleData(updated) { setCycleData(updated); localStorage.setItem("dat-cycle", JSON.stringify(updated)); }
+  function togglePeriodDay(dateStr) {
+    const dates = cycleData.periodDates || [];
+    const updated = dates.includes(dateStr) ? dates.filter(d => d !== dateStr) : [...dates, dateStr].sort();
+    saveCycleData({ ...cycleData, periodDates: updated });
+  }
+  function toggleSymptom(dateStr, symptom) {
+    const symptoms = { ...(cycleData.symptoms || {}) };
+    const daySx = symptoms[dateStr] || [];
+    symptoms[dateStr] = daySx.includes(symptom) ? daySx.filter(s => s !== symptom) : [...daySx, symptom];
+    saveCycleData({ ...cycleData, symptoms });
+  }
+  function getCycleDay(dateStr) {
+    const dates = (cycleData.periodDates || []).filter(d => d <= dateStr).sort();
+    if (!dates.length) return null;
+    // Find last period start (gap > 1 day = new cycle)
+    let lastStart = dates[0];
+    for (let i = 1; i < dates.length; i++) {
+      const diff = getDaysBetween(dates[i-1], dates[i]);
+      if (diff > 2) lastStart = dates[i];
+    }
+    return getDaysBetween(lastStart, dateStr) + 1;
+  }
+  const CYCLE_SYMPTOMS = ["Cramps","Bloating","Headache","Fatigue","Spotting","Mood swings","Cravings","Backache"];
   const [milestone, setMilestone] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPulling, setIsPulling] = useState(false);
@@ -1857,11 +1896,7 @@ export default function App() {
                   </>
                 ) : <div style={{ color: "#1e2d40", fontSize: 10, marginTop: 8 }}>—</div>}
               </div>
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Wedding</div>
-                <div className="big-num" style={{ fontSize: 26, color: daysLeft < 30 ? "#f87171" : "#10b981" }}>{cDays}</div>
-                <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>{daysLeft <= 30 ? "days" : "weeks"}</div>
-              </div>
+
             </div>
             )}
 
@@ -2188,25 +2223,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Settings quick-access */}
-            <div className="stat-card fade-up-4" style={{ padding: "10px 14px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <Settings2 size={14} style={{ color: "#475569" }} />
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Settings & Targets</div>
-                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>
-                      {S_CALORIES_MIN}–{S_CALORIES_MAX} kcal · ≥{S_PROTEIN_MIN}g protein · ≥{S_STEPS_MIN.toLocaleString()} steps
-                    </div>
-                  </div>
-                </div>
-                <button onClick={() => navigateTo("Settings")}
-                  style={{ background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
-                  Edit <ChevronRight size={11} />
-                </button>
-              </div>
-            </div>
-
             {/* Water Tracker */}
             <div className="stat-card fade-up-4" style={{ padding: "14px 16px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
@@ -2278,6 +2294,117 @@ export default function App() {
                 </button>
               </div>
             </div>
+
+            {/* Sleep Tracker */}
+            {(() => {
+              const sleep = getSleepToday();
+              const qualityLabels = ["","😴 Poor","😕 Fair","😊 Okay","😌 Good","🌟 Great"];
+              const qualityColors = ["","#f87171","#fb923c","#fbbf24","#34d399","#10b981"];
+              return (
+                <div className="stat-card fade-up-4" style={{ padding: "14px 16px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                    <span style={{ fontSize: 16 }}>😴</span>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Sleep</div>
+                    {sleep.hours && <span style={{ marginLeft: "auto", fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#60a5fa" }}>{sleep.hours}h</span>}
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div>
+                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>HOURS SLEPT</div>
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        {[4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10].map(h => (
+                          <button key={h} onClick={() => { saveSleep("hours", sleep.hours === h ? "" : h); haptic("light"); }}
+                            style={{ padding: "5px 8px", borderRadius: 7, fontSize: 11, fontFamily: "'DM Mono',monospace", cursor: "pointer", border: `1px solid ${sleep.hours === h ? "#3b82f6" : "#1e2d40"}`, background: sleep.hours === h ? "#1d4ed8" : "#0f1623", color: sleep.hours === h ? "#fff" : "#475569", fontWeight: sleep.hours === h ? 700 : 400 }}>
+                            {h}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>QUALITY</div>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        {[1,2,3,4,5].map(q => (
+                          <button key={q} onClick={() => { saveSleep("quality", sleep.quality === q ? 0 : q); haptic("light"); }}
+                            style={{ flex: 1, padding: "8px 4px", borderRadius: 8, fontSize: 13, cursor: "pointer", border: `1px solid ${sleep.quality === q ? qualityColors[q] : "#1e2d40"}`, background: sleep.quality === q ? qualityColors[q] + "22" : "#0f1623", color: sleep.quality === q ? qualityColors[q] : "#334155" }}>
+                            {"⭐".repeat(q)}
+                          </button>
+                        ))}
+                      </div>
+                      {sleep.quality > 0 && <div style={{ marginTop: 6, fontSize: 11, color: qualityColors[sleep.quality], fontFamily: "'DM Mono',monospace", textAlign: "center" }}>{qualityLabels[sleep.quality]}</div>}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Cycle Tracker */}
+            {cycleEnabled && (() => {
+              const today = getLocalDateStr();
+              const periodDates = cycleData.periodDates || [];
+              const todaySymptoms = (cycleData.symptoms || {})[today] || [];
+              const cycleDay = getCycleDay(today);
+              const onPeriod = periodDates.includes(today);
+              return (
+                <div className="stat-card fade-up-4" style={{ padding: "14px 16px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                    <span style={{ fontSize: 16 }}>🌙</span>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Cycle</div>
+                    {cycleDay && <span style={{ marginLeft: "auto", fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Day {cycleDay}</span>}
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <button onClick={() => { togglePeriodDay(today); haptic("light"); }}
+                      style={{ padding: "10px 14px", borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${onPeriod ? "#f4355088" : "#1e2d40"}`, background: onPeriod ? "#f4355022" : "#0f1623", color: onPeriod ? "#f43550" : "#475569", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                      🩸 {onPeriod ? "Period today ✓" : "Log period day"}
+                    </button>
+                    <div>
+                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>SYMPTOMS TODAY</div>
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        {CYCLE_SYMPTOMS.map(s => {
+                          const active = todaySymptoms.includes(s);
+                          return (
+                            <button key={s} onClick={() => { toggleSymptom(today, s); haptic("light"); }}
+                              style={{ padding: "5px 9px", borderRadius: 20, fontSize: 10, cursor: "pointer", border: `1px solid ${active ? "#a855f7" : "#1e2d40"}`, background: active ? "#a855f722" : "#0f1623", color: active ? "#c084fc" : "#334155", fontFamily: "'DM Mono',monospace" }}>
+                              {s}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    {periodDates.length > 0 && (() => {
+                      // Show last few period days as mini calendar strip
+                      const recent = periodDates.slice(-7);
+                      return (
+                        <div style={{ borderTop: "1px solid #131929", paddingTop: 10 }}>
+                          <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>RECENT PERIOD DAYS</div>
+                          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                            {recent.map(d => <span key={d} style={{ fontSize: 10, color: "#f43550", fontFamily: "'DM Mono',monospace", background: "#f4355011", border: "1px solid #f4355033", borderRadius: 6, padding: "2px 7px" }}>{d.slice(5)}</span>)}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Settings & Targets */}
+            <div className="stat-card fade-up-4" style={{ padding: "10px 14px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Settings2 size={14} style={{ color: "#475569" }} />
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Settings & Targets</div>
+                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>
+                      {S_CALORIES_MIN}–{S_CALORIES_MAX} kcal · ≥{S_PROTEIN_MIN}g protein · ≥{S_STEPS_MIN.toLocaleString()} steps
+                    </div>
+                  </div>
+                </div>
+                <button onClick={() => navigateTo("Settings")}
+                  style={{ background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                  Edit <ChevronRight size={11} />
+                </button>
+              </div>
+            </div>
+
           </div>
         )}
 
@@ -4078,6 +4205,21 @@ export default function App() {
               }} style={{ background: "linear-gradient(135deg,#059669,#10b981)", border: "none", color: "#fff", padding: "14px", borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                 ✓ Save Settings
               </button>
+
+              {/* App Features */}
+              <div className="stat-card">
+                <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 16 }}>APP FEATURES</div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>🌙 Cycle Tracker</div>
+                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>Show cycle & period tracking on Dashboard</div>
+                  </div>
+                  <button onClick={() => { const next = !cycleEnabled; setCycleEnabled(next); localStorage.setItem("dat-cycle-enabled", next); haptic("light"); }}
+                    style={{ background: cycleEnabled ? "linear-gradient(135deg,#7c3aed,#a855f7)" : "#0f1623", border: `1px solid ${cycleEnabled ? "#a855f755" : "#1e2d40"}`, color: cycleEnabled ? "#fff" : "#475569", padding: "6px 16px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                    {cycleEnabled ? "On ✓" : "Off"}
+                  </button>
+                </div>
+              </div>
 
               {/* Danger zone */}
               <div className="stat-card" style={{ borderColor: "#7f1d1d33" }}>
