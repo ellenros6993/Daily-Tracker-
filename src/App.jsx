@@ -657,10 +657,6 @@ export default function App() {
   const [manualFoodForm, setManualFoodForm] = useState({ name: "", calories: "", protein: "", carbs: "", fat: "", fiber: "", sugar: "", servingSize: "1 serving" });
   const [showManualEntry, setShowManualEntry] = useState(false);
 
-  const [saveMealName, setSaveMealName] = useState("");
-  const [saveMealSlot, setSaveMealSlot] = useState(null);
-  const [loadMealPreview, setLoadMealPreview] = useState(null);
-  const [personalFoods, setPersonalFoods] = useState(() => {
     try {
       const stored = JSON.parse(localStorage.getItem("dat-personal-foods") || "[]");
       // Merge preloaded foods — add any that aren't already in the DB
@@ -669,8 +665,6 @@ export default function App() {
       return [...stored, ...toAdd];
     } catch { return PRELOADED_FOODS; }
   });
-  const [manualFoodForm, setManualFoodForm] = useState({ name: "", calories: "", protein: "", carbs: "", fat: "", fiber: "", sugar: "", servingSize: "1 serving" });
-  const [showManualEntry, setShowManualEntry] = useState(false);
   const [nutritionDate, setNutritionDate] = useState(getLocalDateStr());
 
   function navigateNutritionDate(newDate) {
