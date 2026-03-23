@@ -2563,26 +2563,22 @@ export default function App() {
                   })()}
 
                   {/* Vertical timeline */}
-                  <div style={{ position: "relative", paddingLeft: 40 }}>
-                    {/* Vertical line */}
-                    <div style={{ position: "absolute", left: 14, top: 8, bottom: 8, width: 2, background: "linear-gradient(to bottom, #10b981, #131929)", borderRadius: 1 }} />
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {[...weighIns].reverse().map((w, i) => {
                       const prev = i < weighIns.length - 1 ? [...weighIns].reverse()[i + 1] : null;
                       const delta = prev ? (parseFloat(w.weight) - parseFloat(prev.weight)).toFixed(1) : null;
                       const isFirst = i === 0;
-                      const nodeColor = delta === null ? "#10b981" : parseFloat(delta) < 0 ? "#34d399" : parseFloat(delta) > 0 ? "#f87171" : "#475569";
+                      const deltaColor = delta === null ? "#10b981" : parseFloat(delta) < 0 ? "#34d399" : parseFloat(delta) > 0 ? "#f87171" : "#475569";
                       return (
-                        <div key={w.date} className="timeline-node" style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: i < weighIns.length - 1 ? 18 : 0, animation: `fadeUp 0.3s ${i * 0.04}s ease both` }}>
-                          {/* Node dot */}
-                          <div style={{ position: "absolute", left: 8, width: 14, height: 14, borderRadius: "50%", background: isFirst ? "linear-gradient(135deg,#059669,#10b981)" : nodeColor + "33", border: `2px solid ${nodeColor}`, boxShadow: isFirst ? `0 0 10px ${nodeColor}88` : "none", marginTop: 2, flexShrink: 0 }} />
-                          {/* Content */}
-                          <div style={{ flex: 1, background: isFirst ? "#0f1623" : "transparent", borderRadius: 8, padding: isFirst ? "10px 12px" : "2px 0", border: isFirst ? "1px solid #1e2d40" : "none" }}>
-                            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
-                              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                        <div key={w.date} className="timeline-node" style={{ display: "flex", alignItems: "center", gap: 12, background: isFirst ? "#0f1623" : "transparent", borderRadius: 10, padding: "10px 14px", border: isFirst ? "1px solid #1e2d40" : "1px solid transparent", animation: `fadeUp 0.3s ${i * 0.04}s ease both` }}>
+                          <div style={{ width: 4, height: 40, borderRadius: 2, background: isFirst ? "linear-gradient(to bottom,#059669,#34d399)" : "#1e2d40", flexShrink: 0 }} />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+                              <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                                 <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: isFirst ? 28 : 20, color: isFirst ? "#10b981" : "#94a3b8", lineHeight: 1 }}>{w.weight}</span>
                                 <span style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>lb</span>
                                 {delta !== null && (
-                                  <span style={{ fontSize: 11, fontFamily: "'Bebas Neue',sans-serif", color: parseFloat(delta) < 0 ? "#34d399" : "#f87171" }}>
+                                  <span style={{ fontSize: 11, fontFamily: "'Bebas Neue',sans-serif", color: deltaColor }}>
                                     {parseFloat(delta) > 0 ? "+" : ""}{delta}
                                   </span>
                                 )}
@@ -2590,7 +2586,7 @@ export default function App() {
                               <span style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{w.date}</span>
                             </div>
                             {(w.bodyFat || w.muscleMass) && (
-                              <div style={{ display: "flex", gap: 10, marginTop: 4, flexWrap: "wrap" }}>
+                              <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
                                 {w.bodyFat && <span style={{ fontSize: 9, color: "#a78bfa", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>}
                                 {w.muscleMass && <span style={{ fontSize: 9, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>Muscle {w.muscleMass}lb</span>}
                               </div>
