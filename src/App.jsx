@@ -564,18 +564,20 @@ export default function App() {
     { id: "L",     label: "L",  ml: 1000 },
     { id: "gal",   label: "gal",ml: 3785 },
   ];
+  // Water goal stored in ml (default 2000ml = 2L)
+  const [waterGoalMlState, setWaterGoalMlState] = useState(() => parseInt(localStorage.getItem("dat-water-goal-ml") || "2000"));
+  function saveWaterGoalMl(ml) { setWaterGoalMlState(ml); localStorage.setItem("dat-water-goal-ml", ml); }
   function waterUnitMl() { return WATER_UNITS.find(u => u.id === waterUnit)?.ml || 1000; }
   function waterTotalMl() { return waterCups * waterUnitMl(); }
-  function waterGoalMl() { return S_WATER_GOAL * waterUnitMl(); }
-  function waterDisplayVal() {
-    const ml = waterTotalMl();
+  function waterGoalDisplay() {
+    const ml = waterGoalMlState;
     if (waterUnit === "halfL") return parseFloat((ml / 500).toFixed(1));
     if (waterUnit === "L")     return parseFloat((ml / 1000).toFixed(2));
     if (waterUnit === "gal")   return parseFloat((ml / 3785).toFixed(2));
     return ml;
   }
-  function waterGoalDisplay() {
-    const ml = waterGoalMl();
+  function waterDisplayVal() {
+    const ml = waterTotalMl();
     if (waterUnit === "halfL") return parseFloat((ml / 500).toFixed(1));
     if (waterUnit === "L")     return parseFloat((ml / 1000).toFixed(2));
     if (waterUnit === "gal")   return parseFloat((ml / 3785).toFixed(2));
@@ -2231,13 +2233,28 @@ export default function App() {
                   </button>
                 ))}
               </div>
+              {/* Goal editor */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1 }}>GOAL:</div>
+                {WATER_UNITS.map(u => (
+                  <button key={u.id} onClick={() => saveWaterGoalMl(waterGoalMlState - u.ml)}
+                    style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 14, alignItems: "center", justifyContent: "center" }}>{"-"}</button>
+                ))}
+                <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#60a5fa", minWidth: 40, textAlign: "center" }}>
+                  {waterGoalDisplay()} <span style={{ fontSize: 11, color: "#334155" }}>{WATER_UNITS.find(u => u.id === waterUnit)?.label}</span>
+                </div>
+                {WATER_UNITS.map(u => (
+                  <button key={u.id} onClick={() => saveWaterGoalMl(waterGoalMlState + u.ml)}
+                    style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 14, alignItems: "center", justifyContent: "center" }}>{"+"}</button>
+                ))}
+              </div>
               {/* Progress bar */}
               <div className="bar-bg" style={{ marginBottom: 10 }}>
                 <div className="bar-fill" style={{ width: `${Math.min(100, Math.round((waterDisplayVal() / waterGoalDisplay()) * 100))}%`, background: waterDisplayVal() >= waterGoalDisplay() ? "#34d399" : "#3b82f6" }} />
               </div>
               {/* Dot visualizer (up to 12) */}
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 10 }}>
-                {Array.from({ length: Math.min(S_WATER_GOAL, 12) }, (_, i) => (
+                {Array.from({ length: Math.min(Math.round(waterGoalMlState / waterUnitMl()), 12) }, (_, i) => (
                   <div key={i} onClick={() => { if (i < waterCups) removeWater(); else addWater(); }}
                     style={{ width: 26, height: 26, borderRadius: 6, background: i < waterCups ? "#1d4ed8" : "#131929", border: `1px solid ${i < waterCups ? "#3b82f6" : "#1e2d40"}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, transition: "all 0.15s" }}>
                     {i < waterCups ? "💧" : ""}
@@ -2249,36 +2266,6 @@ export default function App() {
                 <button onClick={removeWater} style={{ flex: 1, background: "#0f1623", border: "1px solid #1e2d40", color: "#60a5fa", padding: "8px", borderRadius: 8, cursor: "pointer", fontSize: 18 }}>−</button>
                 <button onClick={addWater} style={{ flex: 1, background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", border: "none", color: "#fff", padding: "8px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>
                   + {WATER_UNITS.find(u => u.id === waterUnit)?.label}
-                </button>
-              </div>
-            </div>
-
-            {/* Notifications + CSV export */}
-            <div className="stat-card fade-up-4" style={{ padding: "12px 14px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <Bell size={14} style={{ color: notifEnabled ? "#10b981" : "#334155" }} />
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Daily Reminders</div>
-                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>8pm nudge if not logged</div>
-                  </div>
-                </div>
-                <button onClick={async () => {
-                  if (!notifEnabled) {
-                    const perm = await Notification.requestPermission();
-                    if (perm === "granted") { setNotifEnabled(true); haptic("success"); }
-                  } else { setNotifEnabled(false); }
-                }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, transition: "all 0.2s" }}>
-                  {notifEnabled ? "On ✓" : "Enable"}
-                </button>
-                <button onClick={() => {
-                  const headers = ["Date","Weight","Body Fat","Calories","Protein","Steps","Training","Score"];
-                  const rows = logs.map(l => [l.date,l.weight||"",l.bodyFat||"",l.calories||"",l.protein||"",l.steps||"",l.training||"",l.score||0]);
-                  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
-                  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download = "dat-logs.csv"; a.click();
-                  haptic("success");
-                }} style={{ background: "transparent", border: "1px solid #1e2d40", color: "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s" }}>
-                  <Download size={12} /> Export CSV
                 </button>
               </div>
             </div>
