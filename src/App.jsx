@@ -657,7 +657,6 @@ export default function App() {
   const [manualFoodForm, setManualFoodForm] = useState({ name: "", calories: "", protein: "", carbs: "", fat: "", fiber: "", sugar: "", servingSize: "1 serving" });
   const [showManualEntry, setShowManualEntry] = useState(false);
 
-  const [savedMeals, setSavedMeals] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-saved-meals") || "[]"); } catch { return []; } });
   const [saveMealName, setSaveMealName] = useState("");
   const [saveMealSlot, setSaveMealSlot] = useState(null);
   const [loadMealPreview, setLoadMealPreview] = useState(null);
