@@ -1847,7 +1847,6 @@ export default function App() {
         ))}
       </div>
 
-      <>
       <div className="page-pad" style={{ padding: "28px", maxWidth: 960 }}>
         <div className={pageVisible ? "page-enter" : "page-exit"} key={tab}>
 
@@ -2243,14 +2242,14 @@ export default function App() {
                 <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1 }}>GOAL:</div>
                 {WATER_UNITS.map(u => (
                   <button key={u.id} onClick={() => saveWaterGoalMl(waterGoalMlState - u.ml)}
-                    style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 14, alignItems: "center", justifyContent: "center" }}>−</button>
+                    style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 14, alignItems: "center", justifyContent: "center" }}>{"-"}</button>
                 ))}
                 <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#60a5fa", minWidth: 40, textAlign: "center" }}>
                   {waterGoalDisplay()} <span style={{ fontSize: 11, color: "#334155" }}>{WATER_UNITS.find(u => u.id === waterUnit)?.label}</span>
                 </div>
                 {WATER_UNITS.map(u => (
                   <button key={u.id} onClick={() => saveWaterGoalMl(waterGoalMlState + u.ml)}
-                    style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 14, alignItems: "center", justifyContent: "center" }}>+</button>
+                    style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 14, alignItems: "center", justifyContent: "center" }}>{"+"}</button>
                 ))}
               </div>
               {/* Progress bar */}
@@ -4328,7 +4327,6 @@ export default function App() {
           </div>
         );
       })()}
-      </>
 
     </div>
   );
