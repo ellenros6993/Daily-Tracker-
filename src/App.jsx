@@ -2452,40 +2452,23 @@ export default function App() {
                 <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ maxWidth: 200 }} />
               </div>
 
-              {/* RENPHO card — same style as meal cards on Nutrition page */}
+              {/* Body Metrics — manual input */}
               <div className="stat-card">
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, letterSpacing: 2, color: scaleResult ? "#34d399" : "#e2e8f0" }}>⚖️ RENPHO Scale</div>
-                  {scaleResult && <span style={{ color: "#34d399", fontSize: 10, letterSpacing: 1 }}>✓ SCANNED</span>}
-                </div>
-                {!scaleUpload ? (
-                  <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px dashed #1e2d40", borderRadius: 10, padding: "28px 16px", cursor: "pointer", color: "#334155", fontSize: 11, gap: 8 }}
-                    onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); handleScaleUpload(e.dataTransfer.files[0]); }}>
-                    <span style={{ fontSize: 28 }}>📸</span>
-                    <span>Drop screenshot or tap to upload</span>
-                    <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleScaleUpload(e.target.files[0])} />
-                  </label>
-                ) : (
+                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, letterSpacing: 2, color: "#e2e8f0", marginBottom: 16 }}>⚖️ Body Metrics</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <div>
-                    <img src={scaleUpload} alt="scale" style={{ width: "100%", maxHeight: 180, objectFit: "cover", borderRadius: 10, marginBottom: 10, opacity: scaleParsing ? 0.4 : 1 }} />
-                    {scaleParsing && <div style={{ color: "#10b981", fontSize: 11, marginBottom: 8 }}>⟳ Reading scale data...</div>}
-                    {scaleError && <div style={{ color: "#f87171", fontSize: 11, marginBottom: 8 }}>{scaleError}</div>}
-                    {scaleResult && (
-                      <div style={{ background: "#0f1623", borderRadius: 10, padding: 12, marginBottom: 10 }}>
-                        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-                          {scaleResult.weight && <div><span className="chip">Weight</span> <span style={{ color: "#10b981" }}>{scaleResult.weight} lb</span></div>}
-                          {scaleResult.bodyFat && <div><span className="chip">Body Fat</span> <span style={{ color: "#10b981" }}>{scaleResult.bodyFat}%</span></div>}
-                          {scaleResult.muscleMass && <div><span className="chip">Muscle</span> <span style={{ color: "#10b981" }}>{scaleResult.muscleMass} lb</span></div>}
-                          {scaleResult.visceralFat && <div><span className="chip">Visceral Fat</span> <span style={{ color: "#10b981" }}>{scaleResult.visceralFat}</span></div>}
-                        </div>
-                      </div>
-                    )}
-                    <label style={{ color: "#475569", fontSize: 10, cursor: "pointer", letterSpacing: 1 }}>
-                      ↑ REPLACE
-                      <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => { setScaleUpload(null); setScaleResult(null); handleScaleUpload(e.target.files[0]); }} />
-                    </label>
+                    <div className="field-label" style={{ marginBottom: 5 }}>Weight (lbs)</div>
+                    <input type="number" placeholder="e.g. 205.0" step="0.1" value={form.weight} onChange={e => setForm(f => ({ ...f, weight: e.target.value }))} />
                   </div>
-                )}
+                  <div>
+                    <div className="field-label" style={{ marginBottom: 5 }}>Body Fat %</div>
+                    <input type="number" placeholder="e.g. 44.5" step="0.1" value={form.bodyFat} onChange={e => setForm(f => ({ ...f, bodyFat: e.target.value }))} />
+                  </div>
+                  <div>
+                    <div className="field-label" style={{ marginBottom: 5 }}>Lean Muscle Mass (lbs)</div>
+                    <input type="number" placeholder="e.g. 107.2" step="0.1" value={form.muscleMass} onChange={e => setForm(f => ({ ...f, muscleMass: e.target.value }))} />
+                  </div>
+                </div>
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
