@@ -1847,6 +1847,7 @@ export default function App() {
         ))}
       </div>
 
+      <>
       <div className="page-pad" style={{ padding: "28px", maxWidth: 960 }}>
         <div className={pageVisible ? "page-enter" : "page-exit"} key={tab}>
 
@@ -4327,6 +4328,7 @@ export default function App() {
           </div>
         );
       })()}
+      </>
 
     </div>
   );
