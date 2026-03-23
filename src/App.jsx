@@ -686,7 +686,7 @@ export default function App() {
       if (idx >= 0) return prevLogs.map((l, i) => i === idx ? updated : l);
       return [...prevLogs, updated].sort((a, b) => a.date.localeCompare(b.date));
     });
-  }, [mealFoods]);
+  }, [mealFoods, manualMacros]);
   useEffect(() => { localStorage.setItem("dat-saved-meals", JSON.stringify(savedMeals)); }, [savedMeals]);
   useEffect(() => { localStorage.setItem("dat-personal-foods", JSON.stringify(personalFoods)); }, [personalFoods]);
 
@@ -1884,21 +1884,23 @@ export default function App() {
                 <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lb down</div>
               </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>To Goal</div>
+                <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>Progress</div>
                 {latestWeight ? (
                   <>
-                    <svg width={84} height={84} style={{ margin: "2px auto" }}>
-                      <circle cx="42" cy="42" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
-                      <circle cx="42" cy="42" r={ARC_R} fill="none"
-                        stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
-                        strokeWidth="5" strokeLinecap="round"
-                        strokeDasharray={`${arcDash} ${ARC_CIRC}`}
-                        transform="rotate(-90 42 42)"
-                        style={{ transition: "stroke-dasharray 1s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                      <text x="42" y="38" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="14" fontFamily="'Bebas Neue',sans-serif">{cRem}</text>
-                      <text x="42" y="54" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lb left</text>
-                    </svg>
-                    <div style={{ color: "#334155", fontSize: 9, fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{_pct}% complete</div>
+                    <div style={{ position: "relative", width: 84, height: 84, margin: "2px auto" }}>
+                      <svg width={84} height={84}>
+                        <circle cx="42" cy="42" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
+                        <circle cx="42" cy="42" r={ARC_R} fill="none"
+                          stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
+                          strokeWidth="5" strokeLinecap="round"
+                          strokeDasharray={`${arcDash} ${ARC_CIRC}`}
+                          transform="rotate(-90 42 42)"
+                          style={{ transition: "stroke-dasharray 1s cubic-bezier(0.34,1.56,0.64,1)" }} />
+                        <text x="42" y="36" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="16" fontFamily="'Bebas Neue',sans-serif">{cLost > 0 ? cLost : "—"}</text>
+                        <text x="42" y="52" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lb lost</text>
+                      </svg>
+                    </div>
+                    <div style={{ color: "#334155", fontSize: 9, fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{_pct}% to goal</div>
                   </>
                 ) : <div style={{ color: "#1e2d40", fontSize: 10, marginTop: 8 }}>—</div>}
               </div>
@@ -2215,17 +2217,6 @@ export default function App() {
                 })()}
               </div>
 
-              {/* Share */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share Progress</div>
-                <div style={{ fontSize: 10, color: "#475569", marginBottom: 10, lineHeight: 1.4 }}>Copy your stats as a text snippet</div>
-                <button onClick={shareStats}
-                  style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  📤 Share Stats
-                </button>
-              </div>
-            </div>
-
             {/* Water Tracker */}
             <div className="stat-card fade-up-4" style={{ padding: "14px 16px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
@@ -2279,36 +2270,6 @@ export default function App() {
                 <button onClick={removeWater} style={{ flex: 1, background: "#0f1623", border: "1px solid #1e2d40", color: "#60a5fa", padding: "8px", borderRadius: 8, cursor: "pointer", fontSize: 18 }}>−</button>
                 <button onClick={addWater} style={{ flex: 1, background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", border: "none", color: "#fff", padding: "8px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>
                   + {WATER_UNITS.find(u => u.id === waterUnit)?.label}
-                </button>
-              </div>
-            </div>
-
-            {/* Notifications + CSV export */}
-            <div className="stat-card fade-up-4" style={{ padding: "12px 14px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <Bell size={14} style={{ color: notifEnabled ? "#10b981" : "#334155" }} />
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Daily Reminders</div>
-                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>8pm nudge if not logged</div>
-                  </div>
-                </div>
-                <button onClick={async () => {
-                  if (!notifEnabled) {
-                    const perm = await Notification.requestPermission();
-                    if (perm === "granted") { setNotifEnabled(true); haptic("success"); }
-                  } else { setNotifEnabled(false); }
-                }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, transition: "all 0.2s" }}>
-                  {notifEnabled ? "On ✓" : "Enable"}
-                </button>
-                <button onClick={() => {
-                  const headers = ["Date","Weight","Body Fat","Calories","Protein","Steps","Training","Score"];
-                  const rows = logs.map(l => [l.date,l.weight||"",l.bodyFat||"",l.calories||"",l.protein||"",l.steps||"",l.training||"",l.score||0]);
-                  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
-                  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download = "dat-logs.csv"; a.click();
-                  haptic("success");
-                }} style={{ background: "transparent", border: "1px solid #1e2d40", color: "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s" }}>
-                  <Download size={12} /> Export CSV
                 </button>
               </div>
             </div>
@@ -2409,6 +2370,46 @@ export default function App() {
                 </div>
               );
             })()}
+
+            {/* Share Progress */}
+            <div className="stat-card fade-up-4" style={{ padding: "12px 14px" }}>
+              <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share Progress</div>
+              <div style={{ fontSize: 10, color: "#475569", marginBottom: 10, lineHeight: 1.4 }}>Copy your stats as a text snippet</div>
+              <button onClick={shareStats}
+                style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                📤 Share Stats
+              </button>
+            </div>
+
+            {/* Daily Reminders + CSV */}
+            <div className="stat-card fade-up-4" style={{ padding: "12px 14px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <Bell size={14} style={{ color: notifEnabled ? "#10b981" : "#334155" }} />
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Daily Reminders</div>
+                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>8pm nudge if not logged</div>
+                  </div>
+                </div>
+                <button onClick={async () => {
+                  if (!notifEnabled) {
+                    const perm = await Notification.requestPermission();
+                    if (perm === "granted") { setNotifEnabled(true); haptic("success"); }
+                  } else { setNotifEnabled(false); }
+                }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, transition: "all 0.2s" }}>
+                  {notifEnabled ? "On ✓" : "Enable"}
+                </button>
+                <button onClick={() => {
+                  const headers = ["Date","Weight","Body Fat","Calories","Protein","Steps","Training","Score"];
+                  const rows = logs.map(l => [l.date,l.weight||"",l.bodyFat||"",l.calories||"",l.protein||"",l.steps||"",l.training||"",l.score||0]);
+                  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+                  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download = "dat-logs.csv"; a.click();
+                  haptic("success");
+                }} style={{ background: "transparent", border: "1px solid #1e2d40", color: "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s" }}>
+                  <Download size={12} /> Export CSV
+                </button>
+              </div>
+            </div>
 
             {/* Settings & Targets */}
             <div className="stat-card fade-up-4" style={{ padding: "10px 14px" }}>
@@ -3321,20 +3322,6 @@ export default function App() {
                 <div style={{ marginBottom: 10 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                     <div className="field-label" style={{ marginBottom: 0 }}>Steps Today</div>
-                    {(() => {
-                      const yesterday = (() => { const d = new Date(); d.setDate(d.getDate() - 1); return getLocalDateStr(d); })();
-                      const yLog = logs.find(l => l.date === yesterday);
-                      const ySteps = yLog?.steps;
-                      const todayHasSteps = !!form.steps;
-                      return ySteps && !todayHasSteps ? (
-                        <button onClick={() => { setForm(f => ({ ...f, steps: ySteps })); haptic("light"); }}
-                          style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "3px 10px", borderRadius: 6, fontSize: 10, fontFamily: "'DM Mono',monospace", cursor: "pointer", transition: "all 0.15s" }}
-                          onMouseEnter={e => { e.target.style.borderColor = "#10b981"; e.target.style.color = "#10b981"; }}
-                          onMouseLeave={e => { e.target.style.borderColor = "#1e2d40"; e.target.style.color = "#475569"; }}>
-                          ↑ Fill yesterday's ({parseInt(ySteps).toLocaleString()})
-                        </button>
-                      ) : null;
-                    })()}
                   </div>
                   <input type="number" placeholder="8500" value={form.steps} onChange={e => setForm(f => ({ ...f, steps: e.target.value }))} />
                 </div>
