@@ -4279,6 +4279,8 @@ export default function App() {
         })()}
 
         </div>
+      </div>
+      </div>
 
       {/* ── ONBOARDING OVERLAY ── */}
       {showOnboarding && (() => {
@@ -4326,7 +4328,6 @@ export default function App() {
         );
       })()}
 
-      </div>
     </div>
   );
 }
