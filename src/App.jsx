@@ -564,18 +564,20 @@ export default function App() {
     { id: "L",     label: "L",  ml: 1000 },
     { id: "gal",   label: "gal",ml: 3785 },
   ];
+  // Water goal stored in ml (default 2000ml = 2L)
+  const [waterGoalMlState, setWaterGoalMlState] = useState(() => parseInt(localStorage.getItem("dat-water-goal-ml") || "2000"));
+  function saveWaterGoalMl(ml) { setWaterGoalMlState(ml); localStorage.setItem("dat-water-goal-ml", ml); }
   function waterUnitMl() { return WATER_UNITS.find(u => u.id === waterUnit)?.ml || 1000; }
   function waterTotalMl() { return waterCups * waterUnitMl(); }
-  function waterGoalMl() { return S_WATER_GOAL * waterUnitMl(); }
-  function waterDisplayVal() {
-    const ml = waterTotalMl();
+  function waterGoalDisplay() {
+    const ml = waterGoalMlState;
     if (waterUnit === "halfL") return parseFloat((ml / 500).toFixed(1));
     if (waterUnit === "L")     return parseFloat((ml / 1000).toFixed(2));
     if (waterUnit === "gal")   return parseFloat((ml / 3785).toFixed(2));
     return ml;
   }
-  function waterGoalDisplay() {
-    const ml = waterGoalMl();
+  function waterDisplayVal() {
+    const ml = waterTotalMl();
     if (waterUnit === "halfL") return parseFloat((ml / 500).toFixed(1));
     if (waterUnit === "L")     return parseFloat((ml / 1000).toFixed(2));
     if (waterUnit === "gal")   return parseFloat((ml / 3785).toFixed(2));
@@ -630,6 +632,15 @@ export default function App() {
     } catch { return {}; }
   });
   const [activeMealSlot, setActiveMealSlot] = useState(null);
+  const [showManualMacros, setShowManualMacros] = useState(false);
+  const [manualMacros, setManualMacros] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-manual-macros") || "{}"); } catch { return {}; } });
+  function getManualToday() { return manualMacros[getLocalDateStr()] || {}; }
+  function saveManualMacro(field, val) {
+    const today = getLocalDateStr();
+    const updated = { ...manualMacros, [today]: { ...getManualToday(), [field]: val } };
+    setManualMacros(updated);
+    localStorage.setItem("dat-manual-macros", JSON.stringify(updated));
+  }
   const [savedMeals, setSavedMeals] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-saved-meals") || "[]"); } catch { return []; } });
   const [saveMealName, setSaveMealName] = useState("");
   const [saveMealSlot, setSaveMealSlot] = useState(null);
@@ -759,12 +770,16 @@ export default function App() {
   }
 
   function getAllDayTotals() {
-    return MEAL_SLOTS.reduce((acc, slot) => {
+    const manual = getManualToday();
+    const fromFoods = MEAL_SLOTS.reduce((acc, slot) => {
       const t = getMealTotals(slot);
       return { calories: acc.calories + t.calories, protein: acc.protein + t.protein };
     }, { calories: 0, protein: 0 });
+    return {
+      calories: fromFoods.calories + (parseInt(manual.calories) || 0),
+      protein: fromFoods.protein + (parseInt(manual.protein) || 0),
+    };
   }
-
   function copyYesterdayMeals() {
     const prevDate = (() => { const d = new Date(nutritionDate + "T12:00:00"); d.setDate(d.getDate() - 1); return getLocalDateStr(d); })();
     const isViewingTomorrow = nutritionDate > getLocalDateStr();
@@ -1894,57 +1909,54 @@ export default function App() {
             {/* Projection + Streak + Pace + Weekly Ring */}
             <div className="grid2" style={{ gap: 8 }}>
               <div className="stat-card fade-up-1" style={{ padding: "12px 14px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Projected Aug 23</div>
-                {projected ? (
-                  <>
-                    <div className={`big-num ${parseFloat(projected) <= GOAL_WEIGHT ? "projected-good" : parseFloat(projected) <= GOAL_WEIGHT + 5 ? "projected-ok" : "projected-bad"}`} style={{ fontSize: 26 }}>{projected}</div>
-                    <div style={{ color: "#475569", fontSize: 10, marginTop: 2 }}>{parseFloat(projected) <= GOAL_WEIGHT ? "✓ On track" : `${(parseFloat(projected) - GOAL_WEIGHT).toFixed(1)} lb over`}</div>
-                    {/* Pace calculator */}
-                    {(() => {
-                      const cur = latestWeight ? parseFloat(latestWeight.weight) : null;
-                      if (!cur) return null;
-                      const dLeft = getDeadlineDays();
-                      const weeksLeft = dLeft / 7;
-                      const needed = weeksLeft > 0 ? ((cur - GOAL_WEIGHT) / weeksLeft).toFixed(2) : null;
-                      const recentRate = weighIns.length >= 2 ? (() => {
-                        const last2 = weighIns.slice(-Math.min(7, weighIns.length));
-                        const days = getDaysBetween(last2[0].date, last2[last2.length-1].date);
-                        return days > 0 ? (((parseFloat(last2[0].weight) - parseFloat(last2[last2.length-1].weight)) / days) * 7).toFixed(2) : null;
-                      })() : null;
-                      return (
-                        <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #131929" }}>
-                          <div style={{ fontSize: 9, color: "#334155", letterSpacing: 1, fontFamily: "'DM Mono',monospace", marginBottom: 6 }}>PACE CALCULATOR</div>
-                          <div style={{ display: "flex", gap: 12 }}>
-                            <div>
-                              <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Need/wk</div>
-                              <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#fbbf24" }}>{needed || "—"}<span style={{ fontSize: 11, color: "#334155" }}>lb</span></div>
-                            </div>
-                            {recentRate && <div>
-                              <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Current/wk</div>
-                              <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: parseFloat(recentRate) >= parseFloat(needed) ? "#34d399" : "#f87171" }}>{recentRate}<span style={{ fontSize: 11, color: "#334155" }}>lb</span></div>
-                            </div>}
+                <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Avg Weekly Loss</div>
+                {(() => {
+                  if (weighIns.length < 2) return <div style={{ color: "#1e2d40", marginTop: 6, fontSize: 11 }}>Need 2+ weigh-ins</div>;
+                  const first = weighIns[0];
+                  const last = weighIns[weighIns.length - 1];
+                  const totalLost = parseFloat(first.weight) - parseFloat(last.weight);
+                  const totalDays = getDaysBetween(first.date, last.date);
+                  const avgPerWeek = totalDays > 0 ? (totalLost / totalDays * 7) : 0;
+                  const isGood = avgPerWeek > 0;
+                  const weeksTracked = Math.max(1, Math.round(totalDays / 7));
+                  return (
+                    <>
+                      <div className="big-num" style={{ fontSize: 26, color: isGood ? "#34d399" : "#f87171" }}>
+                        {isGood ? "-" : "+"}{Math.abs(avgPerWeek).toFixed(2)}
+                      </div>
+                      <div style={{ color: "#475569", fontSize: 10, marginTop: 2 }}>lb / week avg</div>
+                      <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #131929" }}>
+                        <div style={{ fontSize: 9, color: "#334155", letterSpacing: 1, fontFamily: "'DM Mono',monospace", marginBottom: 6 }}>ALL-TIME</div>
+                        <div style={{ display: "flex", gap: 12 }}>
+                          <div>
+                            <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Total lost</div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#34d399" }}>{totalLost.toFixed(1)}<span style={{ fontSize: 11, color: "#334155" }}>lb</span></div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Over</div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#60a5fa" }}>{weeksTracked}<span style={{ fontSize: 11, color: "#334155" }}>wk</span></div>
                           </div>
                         </div>
-                      );
-                    })()}
-                    {weighIns.length >= 2 && (() => {
-                      const pts = weighIns.slice(-8);
-                      const vals = pts.map(w => parseFloat(w.weight));
-                      const minV = Math.min(...vals), maxV = Math.max(...vals);
-                      const W = 120, H = 28;
-                      const x = (i) => (i / (pts.length - 1)) * W;
-                      const y = (v) => H - ((v - minV) / (maxV - minV || 1)) * H;
-                      const d = pts.map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(parseFloat(p.weight)).toFixed(1)}`).join(" ");
-                      return (
-                        <svg width={W} height={H + 4} style={{ marginTop: 8, display: "block", overflow: "visible" }}>
-                          <defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#059669" /><stop offset="100%" stopColor="#34d399" /></linearGradient></defs>
-                          <path d={d} fill="none" stroke="url(#sg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          {pts.map((p, i) => <circle key={i} cx={x(i)} cy={y(parseFloat(p.weight))} r="2" fill="#10b981" />)}
-                        </svg>
-                      );
-                    })()}
-                  </>
-                ) : <div style={{ color: "#1e2d40", marginTop: 6, fontSize: 11 }}>Need 2+ weigh-ins</div>}
+                      </div>
+                      {weighIns.length >= 2 && (() => {
+                        const pts = weighIns.slice(-8);
+                        const vals = pts.map(w => parseFloat(w.weight));
+                        const minV = Math.min(...vals), maxV = Math.max(...vals);
+                        const W = 120, H = 28;
+                        const x = (i) => (i / (pts.length - 1)) * W;
+                        const y = (v) => H - ((v - minV) / (maxV - minV || 1)) * H;
+                        const d = pts.map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(parseFloat(p.weight)).toFixed(1)}`).join(" ");
+                        return (
+                          <svg width={W} height={H + 4} style={{ marginTop: 8, display: "block", overflow: "visible" }}>
+                            <defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#059669" /><stop offset="100%" stopColor="#34d399" /></linearGradient></defs>
+                            <path d={d} fill="none" stroke="url(#sg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            {pts.map((p, i) => <circle key={i} cx={x(i)} cy={y(parseFloat(p.weight))} r="2" fill="#10b981" />)}
+                          </svg>
+                        );
+                      })()}
+                    </>
+                  );
+                })()}
               </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Streak</div>
@@ -2234,13 +2246,28 @@ export default function App() {
                   </button>
                 ))}
               </div>
+              {/* Goal editor */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1 }}>GOAL:</div>
+                {WATER_UNITS.map(u => (
+                  <button key={u.id} onClick={() => saveWaterGoalMl(waterGoalMlState - u.ml)}
+                    style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 14, alignItems: "center", justifyContent: "center" }}>−</button>
+                ))}
+                <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#60a5fa", minWidth: 40, textAlign: "center" }}>
+                  {waterGoalDisplay()} <span style={{ fontSize: 11, color: "#334155" }}>{WATER_UNITS.find(u => u.id === waterUnit)?.label}</span>
+                </div>
+                {WATER_UNITS.map(u => (
+                  <button key={u.id} onClick={() => saveWaterGoalMl(waterGoalMlState + u.ml)}
+                    style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 14, alignItems: "center", justifyContent: "center" }}>+</button>
+                ))}
+              </div>
               {/* Progress bar */}
               <div className="bar-bg" style={{ marginBottom: 10 }}>
                 <div className="bar-fill" style={{ width: `${Math.min(100, Math.round((waterDisplayVal() / waterGoalDisplay()) * 100))}%`, background: waterDisplayVal() >= waterGoalDisplay() ? "#34d399" : "#3b82f6" }} />
               </div>
               {/* Dot visualizer (up to 12) */}
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 10 }}>
-                {Array.from({ length: Math.min(S_WATER_GOAL, 12) }, (_, i) => (
+                {Array.from({ length: Math.min(Math.round(waterGoalMlState / waterUnitMl()), 12) }, (_, i) => (
                   <div key={i} onClick={() => { if (i < waterCups) removeWater(); else addWater(); }}
                     style={{ width: 26, height: 26, borderRadius: 6, background: i < waterCups ? "#1d4ed8" : "#131929", border: `1px solid ${i < waterCups ? "#3b82f6" : "#1e2d40"}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, transition: "all 0.15s" }}>
                     {i < waterCups ? "💧" : ""}
@@ -2322,7 +2349,12 @@ export default function App() {
                       </div>
                       {sleep.quality > 0 && <div style={{ marginTop: 6, fontSize: 11, color: qualityColors[sleep.quality], fontFamily: "'DM Mono',monospace", textAlign: "center" }}>{qualityLabels[sleep.quality]}</div>}
                     </div>
-                  </div>
+                    <div>
+                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>NOTES (OPTIONAL)</div>
+                      <textarea value={sleep.note || ""} onChange={e => saveSleep("note", e.target.value)}
+                        placeholder="How did you sleep? Any dreams, interruptions..."
+                        style={{ width: "100%", boxSizing: "border-box", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 8, color: "#e2e8f0", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "8px 10px", resize: "none", minHeight: 60, outline: "none" }} />
+                    </div>
                 </div>
               );
             })()}
@@ -2677,17 +2709,47 @@ export default function App() {
                     <span style={{ fontSize: 9, color: calColor, fontFamily: "'DM Mono',monospace", width: 60, textAlign: "right" }}>{totalCals}/{CALORIES_MAX}</span>
                   </div>
                 </div>
-                <button className="save-btn" style={{ marginTop: 12, fontSize: 13, padding: "8px 20px" }}
-                  onClick={() => {
-                    const idx = logs.findIndex(l => l.date === nutritionDate);
-                    const updatedForm = { ...form, date: nutritionDate, calories: String(totalCals), protein: String(totalPro) };
-                    const newLog = { ...updatedForm, score: calcScore(updatedForm) };
-                    const newLogs = idx >= 0 ? logs.map((l, i) => i === idx ? newLog : l) : [...logs, newLog].sort((a, b) => a.date.localeCompare(b.date));
-                    setLogs(newLogs); setForm(updatedForm); setSaved(true);
-                    haptic("success"); setTimeout(() => setSaved(false), 2000);
-                  }}>
-                  {saved ? "✓ Saved" : nutritionDate === getLocalDateStr() ? "↻ Auto-saving · Tap to force save" : "Save to Log"}
-                </button>
+                <div style={{ marginTop: 4, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "right" }}>✓ Auto-saved</div>
+              </div>
+
+              {/* Manual Macro Input */}
+              <div className="stat-card" style={{ padding: 0, overflow: "hidden" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer" }} onClick={() => setShowManualMacros(v => !v)}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 14 }}>✏️</span>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Manual Macro Entry</div>
+                    {Object.keys(getManualToday()).length > 0 && <span style={{ fontSize: 10, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>✓ Entered</span>}
+                  </div>
+                  <span style={{ color: "#475569", fontSize: 14, transition: "transform 0.2s", display: "inline-block", transform: showManualMacros ? "rotate(90deg)" : "rotate(0deg)" }}>›</span>
+                </div>
+                {showManualMacros && (
+                  <div style={{ padding: "0 16px 16px", borderTop: "1px solid #131929" }}>
+                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", margin: "12px 0 10px", letterSpacing: 1 }}>ENTER YOUR TOTALS FOR TODAY</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                      {[
+                        { key: "calories", label: "Calories", unit: "kcal", color: "#fbbf24" },
+                        { key: "protein",  label: "Protein",  unit: "g",    color: "#34d399" },
+                        { key: "carbs",    label: "Carbs",    unit: "g",    color: "#60a5fa" },
+                        { key: "fat",      label: "Fat",      unit: "g",    color: "#f87171" },
+                        { key: "fiber",    label: "Fiber",    unit: "g",    color: "#a78bfa" },
+                        { key: "sugar",    label: "Sugar",    unit: "g",    color: "#fb923c" },
+                      ].map(({ key, label, unit, color }) => {
+                        const manual = getManualToday();
+                        return (
+                          <div key={key}>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>{label} <span style={{ color }}>{unit}</span></div>
+                            <input type="number" placeholder="0" value={manual[key] || ""}
+                              onChange={e => saveManualMacro(key, e.target.value)}
+                              style={{ width: "100%", boxSizing: "border-box" }} />
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{ marginTop: 12, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace" }}>
+                      These totals will be added to your tracked foods for the day.
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Meal slots */}
