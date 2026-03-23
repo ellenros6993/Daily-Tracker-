@@ -393,7 +393,7 @@ async function parseMealScreenshot(base64Image, mealType, mediaType = "image/jpe
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-6",
+      model: "claude-sonnet-4-20250514",
       max_tokens: 1000,
       messages: [{ role: "user", content: [
         { type: "image", source: { type: "base64", media_type: mediaType, data: base64Image } },
@@ -412,7 +412,7 @@ async function parseScaleScreenshot(base64Image) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-6",
+      model: "claude-sonnet-4-20250514",
       max_tokens: 300,
       messages: [{ role: "user", content: [
         { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64Image } },
@@ -564,20 +564,18 @@ export default function App() {
     { id: "L",     label: "L",  ml: 1000 },
     { id: "gal",   label: "gal",ml: 3785 },
   ];
-  // Water goal stored in ml (default 2000ml = 2L)
-  const [waterGoalMlState, setWaterGoalMlState] = useState(() => parseInt(localStorage.getItem("dat-water-goal-ml") || "2000"));
-  function saveWaterGoalMl(ml) { setWaterGoalMlState(ml); localStorage.setItem("dat-water-goal-ml", ml); }
   function waterUnitMl() { return WATER_UNITS.find(u => u.id === waterUnit)?.ml || 1000; }
   function waterTotalMl() { return waterCups * waterUnitMl(); }
-  function waterGoalDisplay() {
-    const ml = waterGoalMlState;
+  function waterGoalMl() { return S_WATER_GOAL * waterUnitMl(); }
+  function waterDisplayVal() {
+    const ml = waterTotalMl();
     if (waterUnit === "halfL") return parseFloat((ml / 500).toFixed(1));
     if (waterUnit === "L")     return parseFloat((ml / 1000).toFixed(2));
     if (waterUnit === "gal")   return parseFloat((ml / 3785).toFixed(2));
     return ml;
   }
-  function waterDisplayVal() {
-    const ml = waterTotalMl();
+  function waterGoalDisplay() {
+    const ml = waterGoalMl();
     if (waterUnit === "halfL") return parseFloat((ml / 500).toFixed(1));
     if (waterUnit === "L")     return parseFloat((ml / 1000).toFixed(2));
     if (waterUnit === "gal")   return parseFloat((ml / 3785).toFixed(2));
@@ -632,15 +630,6 @@ export default function App() {
     } catch { return {}; }
   });
   const [activeMealSlot, setActiveMealSlot] = useState(null);
-  const [showManualMacros, setShowManualMacros] = useState(false);
-  const [manualMacros, setManualMacros] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-manual-macros") || "{}"); } catch { return {}; } });
-  function getManualToday() { return manualMacros[getLocalDateStr()] || {}; }
-  function saveManualMacro(field, val) {
-    const today = getLocalDateStr();
-    const updated = { ...manualMacros, [today]: { ...getManualToday(), [field]: val } };
-    setManualMacros(updated);
-    localStorage.setItem("dat-manual-macros", JSON.stringify(updated));
-  }
   const [savedMeals, setSavedMeals] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-saved-meals") || "[]"); } catch { return []; } });
   const [saveMealName, setSaveMealName] = useState("");
   const [saveMealSlot, setSaveMealSlot] = useState(null);
@@ -686,7 +675,7 @@ export default function App() {
       if (idx >= 0) return prevLogs.map((l, i) => i === idx ? updated : l);
       return [...prevLogs, updated].sort((a, b) => a.date.localeCompare(b.date));
     });
-  }, [mealFoods, manualMacros]);
+  }, [mealFoods]);
   useEffect(() => { localStorage.setItem("dat-saved-meals", JSON.stringify(savedMeals)); }, [savedMeals]);
   useEffect(() => { localStorage.setItem("dat-personal-foods", JSON.stringify(personalFoods)); }, [personalFoods]);
 
@@ -770,16 +759,12 @@ export default function App() {
   }
 
   function getAllDayTotals() {
-    const manual = getManualToday();
-    const fromFoods = MEAL_SLOTS.reduce((acc, slot) => {
+    return MEAL_SLOTS.reduce((acc, slot) => {
       const t = getMealTotals(slot);
       return { calories: acc.calories + t.calories, protein: acc.protein + t.protein };
     }, { calories: 0, protein: 0 });
-    return {
-      calories: fromFoods.calories + (parseInt(manual.calories) || 0),
-      protein: fromFoods.protein + (parseInt(manual.protein) || 0),
-    };
   }
+
   function copyYesterdayMeals() {
     const prevDate = (() => { const d = new Date(nutritionDate + "T12:00:00"); d.setDate(d.getDate() - 1); return getLocalDateStr(d); })();
     const isViewingTomorrow = nutritionDate > getLocalDateStr();
@@ -881,7 +866,7 @@ export default function App() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "claude-sonnet-4-6",
+            model: "claude-sonnet-4-20250514",
             max_tokens: 400,
             messages: [{ role: "user", content: `Nutrition facts for "${query}". Reply with ONLY this JSON and nothing else:\n{"name":"${query}","brand":"","calories":0,"protein":0,"carbs":0,"fat":0,"servingSize":"1 serving","estimated":true}\nFill in the real numbers. No explanation, no markdown, just the JSON object.` }]
           })
@@ -959,7 +944,7 @@ export default function App() {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                model: "claude-sonnet-4-6",
+                model: "claude-sonnet-4-20250514",
                 max_tokens: 50,
                 messages: [{ role: "user", content: [
                   { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
@@ -1007,7 +992,7 @@ export default function App() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "claude-sonnet-4-6",
+            model: "claude-sonnet-4-20250514",
             max_tokens: 400,
             messages: [{ role: "user", content: `Barcode: ${barcode}. Estimate nutrition per serving for this product. Respond ONLY with valid JSON:\n{"name":"product name","brand":"","calories":number,"protein":number,"carbs":number,"fat":number,"servingSize":"description","estimated":true}` }]
           })
@@ -1884,23 +1869,21 @@ export default function App() {
                 <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lb down</div>
               </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>Progress</div>
+                <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>To Goal</div>
                 {latestWeight ? (
                   <>
-                    <div style={{ position: "relative", width: 84, height: 84, margin: "2px auto" }}>
-                      <svg width={84} height={84}>
-                        <circle cx="42" cy="42" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
-                        <circle cx="42" cy="42" r={ARC_R} fill="none"
-                          stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
-                          strokeWidth="5" strokeLinecap="round"
-                          strokeDasharray={`${arcDash} ${ARC_CIRC}`}
-                          transform="rotate(-90 42 42)"
-                          style={{ transition: "stroke-dasharray 1s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                        <text x="42" y="36" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="16" fontFamily="'Bebas Neue',sans-serif">{cLost > 0 ? cLost : "—"}</text>
-                        <text x="42" y="52" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lb lost</text>
-                      </svg>
-                    </div>
-                    <div style={{ color: "#334155", fontSize: 9, fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{_pct}% to goal</div>
+                    <svg width={84} height={84} style={{ margin: "2px auto" }}>
+                      <circle cx="42" cy="42" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
+                      <circle cx="42" cy="42" r={ARC_R} fill="none"
+                        stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
+                        strokeWidth="5" strokeLinecap="round"
+                        strokeDasharray={`${arcDash} ${ARC_CIRC}`}
+                        transform="rotate(-90 42 42)"
+                        style={{ transition: "stroke-dasharray 1s cubic-bezier(0.34,1.56,0.64,1)" }} />
+                      <text x="42" y="38" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="14" fontFamily="'Bebas Neue',sans-serif">{cRem}</text>
+                      <text x="42" y="54" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lb left</text>
+                    </svg>
+                    <div style={{ color: "#334155", fontSize: 9, fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{_pct}% complete</div>
                   </>
                 ) : <div style={{ color: "#1e2d40", fontSize: 10, marginTop: 8 }}>—</div>}
               </div>
@@ -2217,6 +2200,17 @@ export default function App() {
                 })()}
               </div>
 
+              {/* Share */}
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
+                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share Progress</div>
+                <div style={{ fontSize: 10, color: "#475569", marginBottom: 10, lineHeight: 1.4 }}>Copy your stats as a text snippet</div>
+                <button onClick={shareStats}
+                  style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  📤 Share Stats
+                </button>
+              </div>
+            </div>
+
             {/* Water Tracker */}
             <div className="stat-card fade-up-4" style={{ padding: "14px 16px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
@@ -2237,28 +2231,13 @@ export default function App() {
                   </button>
                 ))}
               </div>
-              {/* Goal editor */}
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1 }}>GOAL:</div>
-                {WATER_UNITS.map(u => (
-                  <button key={u.id} onClick={() => saveWaterGoalMl(waterGoalMlState - u.ml)}
-                    style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 14, alignItems: "center", justifyContent: "center" }}>{"-"}</button>
-                ))}
-                <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#60a5fa", minWidth: 40, textAlign: "center" }}>
-                  {waterGoalDisplay()} <span style={{ fontSize: 11, color: "#334155" }}>{WATER_UNITS.find(u => u.id === waterUnit)?.label}</span>
-                </div>
-                {WATER_UNITS.map(u => (
-                  <button key={u.id} onClick={() => saveWaterGoalMl(waterGoalMlState + u.ml)}
-                    style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 14, alignItems: "center", justifyContent: "center" }}>{"+"}</button>
-                ))}
-              </div>
               {/* Progress bar */}
               <div className="bar-bg" style={{ marginBottom: 10 }}>
                 <div className="bar-fill" style={{ width: `${Math.min(100, Math.round((waterDisplayVal() / waterGoalDisplay()) * 100))}%`, background: waterDisplayVal() >= waterGoalDisplay() ? "#34d399" : "#3b82f6" }} />
               </div>
               {/* Dot visualizer (up to 12) */}
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 10 }}>
-                {Array.from({ length: Math.min(Math.round(waterGoalMlState / waterUnitMl()), 12) }, (_, i) => (
+                {Array.from({ length: Math.min(S_WATER_GOAL, 12) }, (_, i) => (
                   <div key={i} onClick={() => { if (i < waterCups) removeWater(); else addWater(); }}
                     style={{ width: 26, height: 26, borderRadius: 6, background: i < waterCups ? "#1d4ed8" : "#131929", border: `1px solid ${i < waterCups ? "#3b82f6" : "#1e2d40"}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, transition: "all 0.15s" }}>
                     {i < waterCups ? "💧" : ""}
@@ -2270,6 +2249,36 @@ export default function App() {
                 <button onClick={removeWater} style={{ flex: 1, background: "#0f1623", border: "1px solid #1e2d40", color: "#60a5fa", padding: "8px", borderRadius: 8, cursor: "pointer", fontSize: 18 }}>−</button>
                 <button onClick={addWater} style={{ flex: 1, background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", border: "none", color: "#fff", padding: "8px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>
                   + {WATER_UNITS.find(u => u.id === waterUnit)?.label}
+                </button>
+              </div>
+            </div>
+
+            {/* Notifications + CSV export */}
+            <div className="stat-card fade-up-4" style={{ padding: "12px 14px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <Bell size={14} style={{ color: notifEnabled ? "#10b981" : "#334155" }} />
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Daily Reminders</div>
+                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>8pm nudge if not logged</div>
+                  </div>
+                </div>
+                <button onClick={async () => {
+                  if (!notifEnabled) {
+                    const perm = await Notification.requestPermission();
+                    if (perm === "granted") { setNotifEnabled(true); haptic("success"); }
+                  } else { setNotifEnabled(false); }
+                }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, transition: "all 0.2s" }}>
+                  {notifEnabled ? "On ✓" : "Enable"}
+                </button>
+                <button onClick={() => {
+                  const headers = ["Date","Weight","Body Fat","Calories","Protein","Steps","Training","Score"];
+                  const rows = logs.map(l => [l.date,l.weight||"",l.bodyFat||"",l.calories||"",l.protein||"",l.steps||"",l.training||"",l.score||0]);
+                  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+                  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download = "dat-logs.csv"; a.click();
+                  haptic("success");
+                }} style={{ background: "transparent", border: "1px solid #1e2d40", color: "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s" }}>
+                  <Download size={12} /> Export CSV
                 </button>
               </div>
             </div>
@@ -2309,12 +2318,6 @@ export default function App() {
                         ))}
                       </div>
                       {sleep.quality > 0 && <div style={{ marginTop: 6, fontSize: 11, color: qualityColors[sleep.quality], fontFamily: "'DM Mono',monospace", textAlign: "center" }}>{qualityLabels[sleep.quality]}</div>}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>NOTES (OPTIONAL)</div>
-                      <textarea value={sleep.note || ""} onChange={e => saveSleep("note", e.target.value)}
-                        placeholder="How did you sleep? Any dreams, interruptions..."
-                        style={{ width: "100%", boxSizing: "border-box", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 8, color: "#e2e8f0", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "8px 10px", resize: "none", minHeight: 60, outline: "none" }} />
                     </div>
                   </div>
                 </div>
@@ -2371,46 +2374,6 @@ export default function App() {
               );
             })()}
 
-            {/* Share Progress */}
-            <div className="stat-card fade-up-4" style={{ padding: "12px 14px" }}>
-              <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share Progress</div>
-              <div style={{ fontSize: 10, color: "#475569", marginBottom: 10, lineHeight: 1.4 }}>Copy your stats as a text snippet</div>
-              <button onClick={shareStats}
-                style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                📤 Share Stats
-              </button>
-            </div>
-
-            {/* Daily Reminders + CSV */}
-            <div className="stat-card fade-up-4" style={{ padding: "12px 14px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <Bell size={14} style={{ color: notifEnabled ? "#10b981" : "#334155" }} />
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Daily Reminders</div>
-                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>8pm nudge if not logged</div>
-                  </div>
-                </div>
-                <button onClick={async () => {
-                  if (!notifEnabled) {
-                    const perm = await Notification.requestPermission();
-                    if (perm === "granted") { setNotifEnabled(true); haptic("success"); }
-                  } else { setNotifEnabled(false); }
-                }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, transition: "all 0.2s" }}>
-                  {notifEnabled ? "On ✓" : "Enable"}
-                </button>
-                <button onClick={() => {
-                  const headers = ["Date","Weight","Body Fat","Calories","Protein","Steps","Training","Score"];
-                  const rows = logs.map(l => [l.date,l.weight||"",l.bodyFat||"",l.calories||"",l.protein||"",l.steps||"",l.training||"",l.score||0]);
-                  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
-                  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download = "dat-logs.csv"; a.click();
-                  haptic("success");
-                }} style={{ background: "transparent", border: "1px solid #1e2d40", color: "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s" }}>
-                  <Download size={12} /> Export CSV
-                </button>
-              </div>
-            </div>
-
             {/* Settings & Targets */}
             <div className="stat-card fade-up-4" style={{ padding: "10px 14px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
@@ -2453,23 +2416,40 @@ export default function App() {
                 <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ maxWidth: 200 }} />
               </div>
 
-              {/* Body Metrics — manual input */}
+              {/* RENPHO card — same style as meal cards on Nutrition page */}
               <div className="stat-card">
-                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, letterSpacing: 2, color: "#e2e8f0", marginBottom: 16 }}>⚖️ Body Metrics</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  <div>
-                    <div className="field-label" style={{ marginBottom: 5 }}>Weight (lbs)</div>
-                    <input type="number" placeholder="e.g. 205.0" step="0.1" value={form.weight} onChange={e => setForm(f => ({ ...f, weight: e.target.value }))} />
-                  </div>
-                  <div>
-                    <div className="field-label" style={{ marginBottom: 5 }}>Body Fat %</div>
-                    <input type="number" placeholder="e.g. 44.5" step="0.1" value={form.bodyFat} onChange={e => setForm(f => ({ ...f, bodyFat: e.target.value }))} />
-                  </div>
-                  <div>
-                    <div className="field-label" style={{ marginBottom: 5 }}>Lean Muscle Mass (lbs)</div>
-                    <input type="number" placeholder="e.g. 107.2" step="0.1" value={form.muscleMass} onChange={e => setForm(f => ({ ...f, muscleMass: e.target.value }))} />
-                  </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, letterSpacing: 2, color: scaleResult ? "#34d399" : "#e2e8f0" }}>⚖️ RENPHO Scale</div>
+                  {scaleResult && <span style={{ color: "#34d399", fontSize: 10, letterSpacing: 1 }}>✓ SCANNED</span>}
                 </div>
+                {!scaleUpload ? (
+                  <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px dashed #1e2d40", borderRadius: 10, padding: "28px 16px", cursor: "pointer", color: "#334155", fontSize: 11, gap: 8 }}
+                    onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); handleScaleUpload(e.dataTransfer.files[0]); }}>
+                    <span style={{ fontSize: 28 }}>📸</span>
+                    <span>Drop screenshot or tap to upload</span>
+                    <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleScaleUpload(e.target.files[0])} />
+                  </label>
+                ) : (
+                  <div>
+                    <img src={scaleUpload} alt="scale" style={{ width: "100%", maxHeight: 180, objectFit: "cover", borderRadius: 10, marginBottom: 10, opacity: scaleParsing ? 0.4 : 1 }} />
+                    {scaleParsing && <div style={{ color: "#10b981", fontSize: 11, marginBottom: 8 }}>⟳ Reading scale data...</div>}
+                    {scaleError && <div style={{ color: "#f87171", fontSize: 11, marginBottom: 8 }}>{scaleError}</div>}
+                    {scaleResult && (
+                      <div style={{ background: "#0f1623", borderRadius: 10, padding: 12, marginBottom: 10 }}>
+                        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                          {scaleResult.weight && <div><span className="chip">Weight</span> <span style={{ color: "#10b981" }}>{scaleResult.weight} lb</span></div>}
+                          {scaleResult.bodyFat && <div><span className="chip">Body Fat</span> <span style={{ color: "#10b981" }}>{scaleResult.bodyFat}%</span></div>}
+                          {scaleResult.muscleMass && <div><span className="chip">Muscle</span> <span style={{ color: "#10b981" }}>{scaleResult.muscleMass} lb</span></div>}
+                          {scaleResult.visceralFat && <div><span className="chip">Visceral Fat</span> <span style={{ color: "#10b981" }}>{scaleResult.visceralFat}</span></div>}
+                        </div>
+                      </div>
+                    )}
+                    <label style={{ color: "#475569", fontSize: 10, cursor: "pointer", letterSpacing: 1 }}>
+                      ↑ REPLACE
+                      <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => { setScaleUpload(null); setScaleResult(null); handleScaleUpload(e.target.files[0]); }} />
+                    </label>
+                  </div>
+                )}
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -2564,22 +2544,26 @@ export default function App() {
                   })()}
 
                   {/* Vertical timeline */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ position: "relative", paddingLeft: 40 }}>
+                    {/* Vertical line */}
+                    <div style={{ position: "absolute", left: 14, top: 8, bottom: 8, width: 2, background: "linear-gradient(to bottom, #10b981, #131929)", borderRadius: 1 }} />
                     {[...weighIns].reverse().map((w, i) => {
                       const prev = i < weighIns.length - 1 ? [...weighIns].reverse()[i + 1] : null;
                       const delta = prev ? (parseFloat(w.weight) - parseFloat(prev.weight)).toFixed(1) : null;
                       const isFirst = i === 0;
-                      const deltaColor = delta === null ? "#10b981" : parseFloat(delta) < 0 ? "#34d399" : parseFloat(delta) > 0 ? "#f87171" : "#475569";
+                      const nodeColor = delta === null ? "#10b981" : parseFloat(delta) < 0 ? "#34d399" : parseFloat(delta) > 0 ? "#f87171" : "#475569";
                       return (
-                        <div key={w.date} className="timeline-node" style={{ display: "flex", alignItems: "center", gap: 12, background: isFirst ? "#0f1623" : "transparent", borderRadius: 10, padding: "10px 14px", border: isFirst ? "1px solid #1e2d40" : "1px solid transparent", animation: `fadeUp 0.3s ${i * 0.04}s ease both` }}>
-                          <div style={{ width: 4, height: 40, borderRadius: 2, background: isFirst ? "linear-gradient(to bottom,#059669,#34d399)" : "#1e2d40", flexShrink: 0 }} />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-                              <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                        <div key={w.date} className="timeline-node" style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: i < weighIns.length - 1 ? 18 : 0, animation: `fadeUp 0.3s ${i * 0.04}s ease both` }}>
+                          {/* Node dot */}
+                          <div style={{ position: "absolute", left: 8, width: 14, height: 14, borderRadius: "50%", background: isFirst ? "linear-gradient(135deg,#059669,#10b981)" : nodeColor + "33", border: `2px solid ${nodeColor}`, boxShadow: isFirst ? `0 0 10px ${nodeColor}88` : "none", marginTop: 2, flexShrink: 0 }} />
+                          {/* Content */}
+                          <div style={{ flex: 1, background: isFirst ? "#0f1623" : "transparent", borderRadius: 8, padding: isFirst ? "10px 12px" : "2px 0", border: isFirst ? "1px solid #1e2d40" : "none" }}>
+                            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
+                              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
                                 <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: isFirst ? 28 : 20, color: isFirst ? "#10b981" : "#94a3b8", lineHeight: 1 }}>{w.weight}</span>
                                 <span style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>lb</span>
                                 {delta !== null && (
-                                  <span style={{ fontSize: 11, fontFamily: "'Bebas Neue',sans-serif", color: deltaColor }}>
+                                  <span style={{ fontSize: 11, fontFamily: "'Bebas Neue',sans-serif", color: parseFloat(delta) < 0 ? "#34d399" : "#f87171" }}>
                                     {parseFloat(delta) > 0 ? "+" : ""}{delta}
                                   </span>
                                 )}
@@ -2587,7 +2571,7 @@ export default function App() {
                               <span style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{w.date}</span>
                             </div>
                             {(w.bodyFat || w.muscleMass) && (
-                              <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+                              <div style={{ display: "flex", gap: 10, marginTop: 4, flexWrap: "wrap" }}>
                                 {w.bodyFat && <span style={{ fontSize: 9, color: "#a78bfa", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>}
                                 {w.muscleMass && <span style={{ fontSize: 9, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>Muscle {w.muscleMass}lb</span>}
                               </div>
@@ -2690,47 +2674,17 @@ export default function App() {
                     <span style={{ fontSize: 9, color: calColor, fontFamily: "'DM Mono',monospace", width: 60, textAlign: "right" }}>{totalCals}/{CALORIES_MAX}</span>
                   </div>
                 </div>
-                <div style={{ marginTop: 4, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "right" }}>✓ Auto-saved</div>
-              </div>
-
-              {/* Manual Macro Input */}
-              <div className="stat-card" style={{ padding: 0, overflow: "hidden" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer" }} onClick={() => setShowManualMacros(v => !v)}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 14 }}>✏️</span>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Manual Macro Entry</div>
-                    {Object.keys(getManualToday()).length > 0 && <span style={{ fontSize: 10, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>✓ Entered</span>}
-                  </div>
-                  <span style={{ color: "#475569", fontSize: 14, transition: "transform 0.2s", display: "inline-block", transform: showManualMacros ? "rotate(90deg)" : "rotate(0deg)" }}>›</span>
-                </div>
-                {showManualMacros && (
-                  <div style={{ padding: "0 16px 16px", borderTop: "1px solid #131929" }}>
-                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", margin: "12px 0 10px", letterSpacing: 1 }}>ENTER YOUR TOTALS FOR TODAY</div>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                      {[
-                        { key: "calories", label: "Calories", unit: "kcal", color: "#fbbf24" },
-                        { key: "protein",  label: "Protein",  unit: "g",    color: "#34d399" },
-                        { key: "carbs",    label: "Carbs",    unit: "g",    color: "#60a5fa" },
-                        { key: "fat",      label: "Fat",      unit: "g",    color: "#f87171" },
-                        { key: "fiber",    label: "Fiber",    unit: "g",    color: "#a78bfa" },
-                        { key: "sugar",    label: "Sugar",    unit: "g",    color: "#fb923c" },
-                      ].map(({ key, label, unit, color }) => {
-                        const manual = getManualToday();
-                        return (
-                          <div key={key}>
-                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>{label} <span style={{ color }}>{unit}</span></div>
-                            <input type="number" placeholder="0" value={manual[key] || ""}
-                              onChange={e => saveManualMacro(key, e.target.value)}
-                              style={{ width: "100%", boxSizing: "border-box" }} />
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div style={{ marginTop: 12, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace" }}>
-                      These totals will be added to your tracked foods for the day.
-                    </div>
-                  </div>
-                )}
+                <button className="save-btn" style={{ marginTop: 12, fontSize: 13, padding: "8px 20px" }}
+                  onClick={() => {
+                    const idx = logs.findIndex(l => l.date === nutritionDate);
+                    const updatedForm = { ...form, date: nutritionDate, calories: String(totalCals), protein: String(totalPro) };
+                    const newLog = { ...updatedForm, score: calcScore(updatedForm) };
+                    const newLogs = idx >= 0 ? logs.map((l, i) => i === idx ? newLog : l) : [...logs, newLog].sort((a, b) => a.date.localeCompare(b.date));
+                    setLogs(newLogs); setForm(updatedForm); setSaved(true);
+                    haptic("success"); setTimeout(() => setSaved(false), 2000);
+                  }}>
+                  {saved ? "✓ Saved" : nutritionDate === getLocalDateStr() ? "↻ Auto-saving · Tap to force save" : "Save to Log"}
+                </button>
               </div>
 
               {/* Meal slots */}
@@ -3322,6 +3276,20 @@ export default function App() {
                 <div style={{ marginBottom: 10 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                     <div className="field-label" style={{ marginBottom: 0 }}>Steps Today</div>
+                    {(() => {
+                      const yesterday = (() => { const d = new Date(); d.setDate(d.getDate() - 1); return getLocalDateStr(d); })();
+                      const yLog = logs.find(l => l.date === yesterday);
+                      const ySteps = yLog?.steps;
+                      const todayHasSteps = !!form.steps;
+                      return ySteps && !todayHasSteps ? (
+                        <button onClick={() => { setForm(f => ({ ...f, steps: ySteps })); haptic("light"); }}
+                          style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "3px 10px", borderRadius: 6, fontSize: 10, fontFamily: "'DM Mono',monospace", cursor: "pointer", transition: "all 0.15s" }}
+                          onMouseEnter={e => { e.target.style.borderColor = "#10b981"; e.target.style.color = "#10b981"; }}
+                          onMouseLeave={e => { e.target.style.borderColor = "#1e2d40"; e.target.style.color = "#475569"; }}>
+                          ↑ Fill yesterday's ({parseInt(ySteps).toLocaleString()})
+                        </button>
+                      ) : null;
+                    })()}
                   </div>
                   <input type="number" placeholder="8500" value={form.steps} onChange={e => setForm(f => ({ ...f, steps: e.target.value }))} />
                 </div>
