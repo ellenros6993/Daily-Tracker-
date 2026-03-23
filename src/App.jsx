@@ -2355,6 +2355,7 @@ export default function App() {
                         placeholder="How did you sleep? Any dreams, interruptions..."
                         style={{ width: "100%", boxSizing: "border-box", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 8, color: "#e2e8f0", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "8px 10px", resize: "none", minHeight: 60, outline: "none" }} />
                     </div>
+                  </div>
                 </div>
               );
             })()}
