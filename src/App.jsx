@@ -393,7 +393,7 @@ async function parseMealScreenshot(base64Image, mealType, mediaType = "image/jpe
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 1000,
       messages: [{ role: "user", content: [
         { type: "image", source: { type: "base64", media_type: mediaType, data: base64Image } },
@@ -412,7 +412,7 @@ async function parseScaleScreenshot(base64Image) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 300,
       messages: [{ role: "user", content: [
         { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64Image } },
@@ -881,7 +881,7 @@ export default function App() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
+            model: "claude-sonnet-4-6",
             max_tokens: 400,
             messages: [{ role: "user", content: `Nutrition facts for "${query}". Reply with ONLY this JSON and nothing else:\n{"name":"${query}","brand":"","calories":0,"protein":0,"carbs":0,"fat":0,"servingSize":"1 serving","estimated":true}\nFill in the real numbers. No explanation, no markdown, just the JSON object.` }]
           })
@@ -959,7 +959,7 @@ export default function App() {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                model: "claude-sonnet-4-20250514",
+                model: "claude-sonnet-4-6",
                 max_tokens: 50,
                 messages: [{ role: "user", content: [
                   { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
@@ -1007,7 +1007,7 @@ export default function App() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
+            model: "claude-sonnet-4-6",
             max_tokens: 400,
             messages: [{ role: "user", content: `Barcode: ${barcode}. Estimate nutrition per serving for this product. Respond ONLY with valid JSON:\n{"name":"product name","brand":"","calories":number,"protein":number,"carbs":number,"fat":number,"servingSize":"description","estimated":true}` }]
           })
