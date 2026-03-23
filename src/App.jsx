@@ -632,6 +632,31 @@ export default function App() {
     } catch { return {}; }
   });
   const [activeMealSlot, setActiveMealSlot] = useState(null);
+  const [showManualMacros, setShowManualMacros] = useState(false);
+  const [manualMacros, setManualMacros] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-manual-macros") || "{}"); } catch { return {}; } });
+  function getManualToday() { return manualMacros[getLocalDateStr()] || {}; }
+  function saveManualMacro(field, val) {
+    const today = getLocalDateStr();
+    const updated = { ...manualMacros, [today]: { ...getManualToday(), [field]: val } };
+    setManualMacros(updated);
+    localStorage.setItem("dat-manual-macros", JSON.stringify(updated));
+  }
+  const [savedMeals, setSavedMeals] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-saved-meals") || "[]"); } catch { return []; } });
+  const [saveMealName, setSaveMealName] = useState("");
+  const [saveMealSlot, setSaveMealSlot] = useState(null);
+  const [loadMealPreview, setLoadMealPreview] = useState(null);
+  const [personalFoods, setPersonalFoods] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("dat-personal-foods") || "[]");
+      // Merge preloaded foods — add any that aren't already in the DB
+      const storedIds = new Set(stored.map(f => f.id));
+      const toAdd = PRELOADED_FOODS.filter(f => !storedIds.has(f.id));
+      return [...stored, ...toAdd];
+    } catch { return PRELOADED_FOODS; }
+  });
+  const [manualFoodForm, setManualFoodForm] = useState({ name: "", calories: "", protein: "", carbs: "", fat: "", fiber: "", sugar: "", servingSize: "1 serving" });
+  const [showManualEntry, setShowManualEntry] = useState(false);
+
   const [savedMeals, setSavedMeals] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-saved-meals") || "[]"); } catch { return []; } });
   const [saveMealName, setSaveMealName] = useState("");
   const [saveMealSlot, setSaveMealSlot] = useState(null);
@@ -677,7 +702,7 @@ export default function App() {
       if (idx >= 0) return prevLogs.map((l, i) => i === idx ? updated : l);
       return [...prevLogs, updated].sort((a, b) => a.date.localeCompare(b.date));
     });
-  }, [mealFoods]);
+  }, [mealFoods, manualMacros]);
   useEffect(() => { localStorage.setItem("dat-saved-meals", JSON.stringify(savedMeals)); }, [savedMeals]);
   useEffect(() => { localStorage.setItem("dat-personal-foods", JSON.stringify(personalFoods)); }, [personalFoods]);
 
@@ -761,12 +786,16 @@ export default function App() {
   }
 
   function getAllDayTotals() {
-    return MEAL_SLOTS.reduce((acc, slot) => {
+    const manual = getManualToday();
+    const fromFoods = MEAL_SLOTS.reduce((acc, slot) => {
       const t = getMealTotals(slot);
       return { calories: acc.calories + t.calories, protein: acc.protein + t.protein };
     }, { calories: 0, protein: 0 });
+    return {
+      calories: fromFoods.calories + (parseInt(manual.calories) || 0),
+      protein: fromFoods.protein + (parseInt(manual.protein) || 0),
+    };
   }
-
   function copyYesterdayMeals() {
     const prevDate = (() => { const d = new Date(nutritionDate + "T12:00:00"); d.setDate(d.getDate() - 1); return getLocalDateStr(d); })();
     const isViewingTomorrow = nutritionDate > getLocalDateStr();
@@ -2306,6 +2335,12 @@ export default function App() {
                       </div>
                       {sleep.quality > 0 && <div style={{ marginTop: 6, fontSize: 11, color: qualityColors[sleep.quality], fontFamily: "'DM Mono',monospace", textAlign: "center" }}>{qualityLabels[sleep.quality]}</div>}
                     </div>
+                    <div>
+                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>NOTES (OPTIONAL)</div>
+                      <textarea value={sleep.note || ""} onChange={e => saveSleep("note", e.target.value)}
+                        placeholder="How did you sleep? Any dreams, interruptions..."
+                        style={{ width: "100%", boxSizing: "border-box", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 8, color: "#e2e8f0", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "8px 10px", resize: "none", minHeight: 60, outline: "none" }} />
+                    </div>
                   </div>
                 </div>
               );
@@ -2403,40 +2438,23 @@ export default function App() {
                 <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ maxWidth: 200 }} />
               </div>
 
-              {/* RENPHO card — same style as meal cards on Nutrition page */}
+              {/* Body Metrics — manual input */}
               <div className="stat-card">
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, letterSpacing: 2, color: scaleResult ? "#34d399" : "#e2e8f0" }}>⚖️ RENPHO Scale</div>
-                  {scaleResult && <span style={{ color: "#34d399", fontSize: 10, letterSpacing: 1 }}>✓ SCANNED</span>}
-                </div>
-                {!scaleUpload ? (
-                  <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px dashed #1e2d40", borderRadius: 10, padding: "28px 16px", cursor: "pointer", color: "#334155", fontSize: 11, gap: 8 }}
-                    onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); handleScaleUpload(e.dataTransfer.files[0]); }}>
-                    <span style={{ fontSize: 28 }}>📸</span>
-                    <span>Drop screenshot or tap to upload</span>
-                    <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleScaleUpload(e.target.files[0])} />
-                  </label>
-                ) : (
+                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, letterSpacing: 2, color: "#e2e8f0", marginBottom: 16 }}>⚖️ Body Metrics</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <div>
-                    <img src={scaleUpload} alt="scale" style={{ width: "100%", maxHeight: 180, objectFit: "cover", borderRadius: 10, marginBottom: 10, opacity: scaleParsing ? 0.4 : 1 }} />
-                    {scaleParsing && <div style={{ color: "#10b981", fontSize: 11, marginBottom: 8 }}>⟳ Reading scale data...</div>}
-                    {scaleError && <div style={{ color: "#f87171", fontSize: 11, marginBottom: 8 }}>{scaleError}</div>}
-                    {scaleResult && (
-                      <div style={{ background: "#0f1623", borderRadius: 10, padding: 12, marginBottom: 10 }}>
-                        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-                          {scaleResult.weight && <div><span className="chip">Weight</span> <span style={{ color: "#10b981" }}>{scaleResult.weight} lb</span></div>}
-                          {scaleResult.bodyFat && <div><span className="chip">Body Fat</span> <span style={{ color: "#10b981" }}>{scaleResult.bodyFat}%</span></div>}
-                          {scaleResult.muscleMass && <div><span className="chip">Muscle</span> <span style={{ color: "#10b981" }}>{scaleResult.muscleMass} lb</span></div>}
-                          {scaleResult.visceralFat && <div><span className="chip">Visceral Fat</span> <span style={{ color: "#10b981" }}>{scaleResult.visceralFat}</span></div>}
-                        </div>
-                      </div>
-                    )}
-                    <label style={{ color: "#475569", fontSize: 10, cursor: "pointer", letterSpacing: 1 }}>
-                      ↑ REPLACE
-                      <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => { setScaleUpload(null); setScaleResult(null); handleScaleUpload(e.target.files[0]); }} />
-                    </label>
+                    <div className="field-label" style={{ marginBottom: 5 }}>Weight (lbs)</div>
+                    <input type="number" placeholder="e.g. 205.0" step="0.1" value={form.weight} onChange={e => setForm(f => ({ ...f, weight: e.target.value }))} />
                   </div>
-                )}
+                  <div>
+                    <div className="field-label" style={{ marginBottom: 5 }}>Body Fat %</div>
+                    <input type="number" placeholder="e.g. 44.5" step="0.1" value={form.bodyFat} onChange={e => setForm(f => ({ ...f, bodyFat: e.target.value }))} />
+                  </div>
+                  <div>
+                    <div className="field-label" style={{ marginBottom: 5 }}>Lean Muscle Mass (lbs)</div>
+                    <input type="number" placeholder="e.g. 107.2" step="0.1" value={form.muscleMass} onChange={e => setForm(f => ({ ...f, muscleMass: e.target.value }))} />
+                  </div>
+                </div>
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -2531,26 +2549,22 @@ export default function App() {
                   })()}
 
                   {/* Vertical timeline */}
-                  <div style={{ position: "relative", paddingLeft: 40 }}>
-                    {/* Vertical line */}
-                    <div style={{ position: "absolute", left: 14, top: 8, bottom: 8, width: 2, background: "linear-gradient(to bottom, #10b981, #131929)", borderRadius: 1 }} />
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {[...weighIns].reverse().map((w, i) => {
                       const prev = i < weighIns.length - 1 ? [...weighIns].reverse()[i + 1] : null;
                       const delta = prev ? (parseFloat(w.weight) - parseFloat(prev.weight)).toFixed(1) : null;
                       const isFirst = i === 0;
-                      const nodeColor = delta === null ? "#10b981" : parseFloat(delta) < 0 ? "#34d399" : parseFloat(delta) > 0 ? "#f87171" : "#475569";
+                      const deltaColor = delta === null ? "#10b981" : parseFloat(delta) < 0 ? "#34d399" : parseFloat(delta) > 0 ? "#f87171" : "#475569";
                       return (
-                        <div key={w.date} className="timeline-node" style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: i < weighIns.length - 1 ? 18 : 0, animation: `fadeUp 0.3s ${i * 0.04}s ease both` }}>
-                          {/* Node dot */}
-                          <div style={{ position: "absolute", left: 8, width: 14, height: 14, borderRadius: "50%", background: isFirst ? "linear-gradient(135deg,#059669,#10b981)" : nodeColor + "33", border: `2px solid ${nodeColor}`, boxShadow: isFirst ? `0 0 10px ${nodeColor}88` : "none", marginTop: 2, flexShrink: 0 }} />
-                          {/* Content */}
-                          <div style={{ flex: 1, background: isFirst ? "#0f1623" : "transparent", borderRadius: 8, padding: isFirst ? "10px 12px" : "2px 0", border: isFirst ? "1px solid #1e2d40" : "none" }}>
-                            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
-                              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                        <div key={w.date} className="timeline-node" style={{ display: "flex", alignItems: "center", gap: 12, background: isFirst ? "#0f1623" : "transparent", borderRadius: 10, padding: "10px 14px", border: isFirst ? "1px solid #1e2d40" : "1px solid transparent", animation: `fadeUp 0.3s ${i * 0.04}s ease both` }}>
+                          <div style={{ width: 4, height: 40, borderRadius: 2, background: isFirst ? "linear-gradient(to bottom,#059669,#34d399)" : "#1e2d40", flexShrink: 0 }} />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+                              <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                                 <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: isFirst ? 28 : 20, color: isFirst ? "#10b981" : "#94a3b8", lineHeight: 1 }}>{w.weight}</span>
                                 <span style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>lb</span>
                                 {delta !== null && (
-                                  <span style={{ fontSize: 11, fontFamily: "'Bebas Neue',sans-serif", color: parseFloat(delta) < 0 ? "#34d399" : "#f87171" }}>
+                                  <span style={{ fontSize: 11, fontFamily: "'Bebas Neue',sans-serif", color: deltaColor }}>
                                     {parseFloat(delta) > 0 ? "+" : ""}{delta}
                                   </span>
                                 )}
@@ -2558,7 +2572,7 @@ export default function App() {
                               <span style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{w.date}</span>
                             </div>
                             {(w.bodyFat || w.muscleMass) && (
-                              <div style={{ display: "flex", gap: 10, marginTop: 4, flexWrap: "wrap" }}>
+                              <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
                                 {w.bodyFat && <span style={{ fontSize: 9, color: "#a78bfa", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>}
                                 {w.muscleMass && <span style={{ fontSize: 9, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>Muscle {w.muscleMass}lb</span>}
                               </div>
@@ -2672,6 +2686,46 @@ export default function App() {
                   }}>
                   {saved ? "✓ Saved" : nutritionDate === getLocalDateStr() ? "↻ Auto-saving · Tap to force save" : "Save to Log"}
                 </button>
+              </div>
+
+              {/* Manual Macro Input */}
+              <div className="stat-card" style={{ padding: 0, overflow: "hidden" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer" }} onClick={() => setShowManualMacros(v => !v)}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 14 }}>✏️</span>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Manual Macro Entry</div>
+                    {Object.keys(getManualToday()).length > 0 && <span style={{ fontSize: 10, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>✓ Entered</span>}
+                  </div>
+                  <span style={{ color: "#475569", fontSize: 14, transition: "transform 0.2s", display: "inline-block", transform: showManualMacros ? "rotate(90deg)" : "rotate(0deg)" }}>›</span>
+                </div>
+                {showManualMacros && (
+                  <div style={{ padding: "0 16px 16px", borderTop: "1px solid #131929" }}>
+                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", margin: "12px 0 10px", letterSpacing: 1 }}>ENTER YOUR TOTALS FOR TODAY</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                      {[
+                        { key: "calories", label: "Calories", unit: "kcal", color: "#fbbf24" },
+                        { key: "protein",  label: "Protein",  unit: "g",    color: "#34d399" },
+                        { key: "carbs",    label: "Carbs",    unit: "g",    color: "#60a5fa" },
+                        { key: "fat",      label: "Fat",      unit: "g",    color: "#f87171" },
+                        { key: "fiber",    label: "Fiber",    unit: "g",    color: "#a78bfa" },
+                        { key: "sugar",    label: "Sugar",    unit: "g",    color: "#fb923c" },
+                      ].map(({ key, label, unit, color }) => {
+                        const manual = getManualToday();
+                        return (
+                          <div key={key}>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>{label} <span style={{ color }}>{unit}</span></div>
+                            <input type="number" placeholder="0" value={manual[key] || ""}
+                              onChange={e => saveManualMacro(key, e.target.value)}
+                              style={{ width: "100%", boxSizing: "border-box" }} />
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{ marginTop: 12, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace" }}>
+                      These totals will be added to your tracked foods for the day.
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Meal slots */}
