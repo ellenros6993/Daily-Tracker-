@@ -567,15 +567,28 @@ export default function App() {
     localStorage.setItem("dat-settings", JSON.stringify(merged));
   }
 
+  // Water unit helpers
+  const WATER_UNITS = [
+    { id: "halfL", label: "½L", ml: 500 },
+    { id: "L",     label: "L",  ml: 1000 },
+    { id: "gal",   label: "gal",ml: 3785 },
+  ];
+  function waterUnitMl() { return WATER_UNITS.find(u => u.id === waterUnit)?.ml || 1000; }
+  function waterTotalMl() { return waterCups * waterUnitMl(); }
+  function waterGoalMl() { return S_WATER_GOAL * waterUnitMl(); }
   function waterDisplayVal() {
-    const litres = waterCups * 0.25;
-    if (waterUnit === "gal") return parseFloat((litres / 3.78541).toFixed(2));
-    return parseFloat(litres.toFixed(2));
+    const ml = waterTotalMl();
+    if (waterUnit === "halfL") return parseFloat((ml / 500).toFixed(1));
+    if (waterUnit === "L")     return parseFloat((ml / 1000).toFixed(2));
+    if (waterUnit === "gal")   return parseFloat((ml / 3785).toFixed(2));
+    return ml;
   }
-  function waterUnitGoal() {
-    const litres = S_WATER_GOAL * 0.25;
-    if (waterUnit === "gal") return parseFloat((litres / 3.78541).toFixed(2));
-    return parseFloat(litres.toFixed(2));
+  function waterGoalDisplay() {
+    const ml = waterGoalMl();
+    if (waterUnit === "halfL") return parseFloat((ml / 500).toFixed(1));
+    if (waterUnit === "L")     return parseFloat((ml / 1000).toFixed(2));
+    if (waterUnit === "gal")   return parseFloat((ml / 3785).toFixed(2));
+    return ml;
   }
   function addWater() {
     const next = Math.min(waterCups + 1, 40);
@@ -2201,39 +2214,37 @@ export default function App() {
                   <Droplets size={16} style={{ color: "#60a5fa" }} />
                   <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Water</div>
                 </div>
-                <div style={{ display: "flex", gap: 4 }}>
-                  {["L", "gal"].map(u => (
-                    <button key={u} onClick={() => { setWaterUnit(u); localStorage.setItem("dat-water-unit", u); }}
-                      style={{ background: waterUnit === u ? "#1d4ed8" : "#0f1623", border: `1px solid ${waterUnit === u ? "#3b82f6" : "#1e2d40"}`, color: waterUnit === u ? "#fff" : "#475569", padding: "3px 10px", borderRadius: 6, fontSize: 10, cursor: "pointer", fontFamily: "'DM Mono',monospace", fontWeight: waterUnit === u ? 700 : 400 }}>
-                      {u}
-                    </button>
-                  ))}
+                <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 28, color: waterDisplayVal() >= waterGoalDisplay() ? "#34d399" : "#60a5fa", lineHeight: 1 }}>
+                  {waterDisplayVal()}<span style={{ fontSize: 13, color: "#475569", fontFamily: "'DM Mono',monospace" }}> / {waterGoalDisplay()} {WATER_UNITS.find(u => u.id === waterUnit)?.label}</span>
                 </div>
               </div>
-              <div style={{ textAlign: "center", marginBottom: 8 }}>
-                <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 40, color: waterDisplayVal() >= waterUnitGoal() ? "#34d399" : "#60a5fa", lineHeight: 1 }}>
-                  {waterDisplayVal()}
-                </div>
-                <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>
-                  {waterUnit} · goal {waterUnitGoal()} {waterUnit}
-                </div>
+              {/* Unit selector */}
+              <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+                {WATER_UNITS.map(u => (
+                  <button key={u.id} onClick={() => { setWaterUnit(u.id); localStorage.setItem("dat-water-unit", u.id); }}
+                    style={{ flex: 1, background: waterUnit === u.id ? "#1d4ed8" : "#0f1623", border: `1px solid ${waterUnit === u.id ? "#3b82f6" : "#1e2d40"}`, color: waterUnit === u.id ? "#fff" : "#475569", padding: "5px 4px", borderRadius: 7, fontSize: 11, fontWeight: waterUnit === u.id ? 700 : 400, cursor: "pointer", fontFamily: "'DM Mono',monospace" }}>
+                    {u.label}
+                  </button>
+                ))}
               </div>
+              {/* Progress bar */}
               <div className="bar-bg" style={{ marginBottom: 10 }}>
-                <div className="bar-fill" style={{ width: `${Math.min(100, Math.round((waterDisplayVal() / waterUnitGoal()) * 100))}%`, background: waterDisplayVal() >= waterUnitGoal() ? "#34d399" : "#3b82f6" }} />
+                <div className="bar-fill" style={{ width: `${Math.min(100, Math.round((waterDisplayVal() / waterGoalDisplay()) * 100))}%`, background: waterDisplayVal() >= waterGoalDisplay() ? "#34d399" : "#3b82f6" }} />
               </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 10, justifyContent: "center" }}>
+              {/* Dot visualizer (up to 12) */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 10 }}>
                 {Array.from({ length: Math.min(S_WATER_GOAL, 12) }, (_, i) => (
                   <div key={i} onClick={() => { if (i < waterCups) removeWater(); else addWater(); }}
                     style={{ width: 26, height: 26, borderRadius: 6, background: i < waterCups ? "#1d4ed8" : "#131929", border: `1px solid ${i < waterCups ? "#3b82f6" : "#1e2d40"}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, transition: "all 0.15s" }}>
                     {i < waterCups ? "💧" : ""}
                   </div>
                 ))}
-                {waterCups > 12 && <span style={{ fontSize: 10, color: "#60a5fa", fontFamily: "'DM Mono',monospace", alignSelf: "center" }}>+{waterCups - 12}</span>}
+                {waterCups > 12 && <span style={{ fontSize: 10, color: "#60a5fa", fontFamily: "'DM Mono',monospace", alignSelf: "center" }}>+{waterCups - 12} more</span>}
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={removeWater} style={{ flex: 1, background: "#0f1623", border: "1px solid #1e2d40", color: "#60a5fa", padding: "8px", borderRadius: 8, cursor: "pointer", fontSize: 18 }}>−</button>
                 <button onClick={addWater} style={{ flex: 1, background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", border: "none", color: "#fff", padding: "8px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>
-                  + {waterUnit === "gal" ? "¼ gal" : "250 ml"}
+                  + {WATER_UNITS.find(u => u.id === waterUnit)?.label}
                 </button>
               </div>
             </div>
@@ -2797,13 +2808,37 @@ export default function App() {
                                       </div>
                                     </div>
                                     {/* Quantity adjuster */}
-                                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, background: "#131929", borderRadius: 8, padding: "6px 10px" }}>
-                                      <button onClick={() => setPendingGrams(g => Math.max(5, g - 25))} style={{ background: "none", border: "none", color: "#e2e8f0", fontSize: 18, cursor: "pointer", width: 28, lineHeight: 1 }}>−</button>
-                                      <input type="number" value={pendingGrams} onChange={e => setPendingGrams(Math.max(1, parseInt(e.target.value) || 1))}
-                                        style={{ flex: 1, textAlign: "center", fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, background: "none", border: "none", color: "#10b981" }} />
-                                      <span style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>g</span>
-                                      <button onClick={() => setPendingGrams(g => g + 25)} style={{ background: "none", border: "none", color: "#e2e8f0", fontSize: 18, cursor: "pointer", width: 28, lineHeight: 1 }}>+</button>
-                                    </div>
+                                    {(() => {
+                                      const UNITS = [
+                                        { id: "g",    label: "g",    toG: v => v,           step: 25 },
+                                        { id: "ml",   label: "ml",   toG: v => v,           step: 25 },
+                                        { id: "cup",  label: "cup",  toG: v => v * 240,     step: 0.25 },
+                                        { id: "tbsp", label: "tbsp", toG: v => v * 15,      step: 1 },
+                                        { id: "tsp",  label: "tsp",  toG: v => v * 5,       step: 0.5 },
+                                      ];
+                                      const [qtyUnit, setQtyUnit] = window.__qtyUnitState || [UNITS[0], u => window.__qtyUnitState = [u, window.__qtyUnitState?.[1]]];
+                                      const unit = UNITS.find(u => u.id === (qtyUnit?.id || "g")) || UNITS[0];
+                                      const displayVal = parseFloat((pendingGrams / unit.toG(1)).toFixed(2));
+                                      return (
+                                        <>
+                                          <div style={{ display: "flex", gap: 4, marginBottom: 6 }}>
+                                            {UNITS.map(u => (
+                                              <button key={u.id} onClick={() => { window.__qtyUnitState = [u, null]; setPendingGrams(g => Math.round(g)); }}
+                                                style={{ flex: 1, background: (qtyUnit?.id || "g") === u.id ? "#10b981" : "#131929", border: "none", color: (qtyUnit?.id || "g") === u.id ? "#000" : "#475569", padding: "3px 2px", borderRadius: 5, fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Mono',monospace" }}>
+                                                {u.label}
+                                              </button>
+                                            ))}
+                                          </div>
+                                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, background: "#131929", borderRadius: 8, padding: "6px 10px" }}>
+                                            <button onClick={() => setPendingGrams(g => Math.max(1, Math.round((g / unit.toG(1) - unit.step) * unit.toG(1))))} style={{ background: "none", border: "none", color: "#e2e8f0", fontSize: 18, cursor: "pointer", width: 28, lineHeight: 1 }}>−</button>
+                                            <input type="number" value={displayVal} onChange={e => setPendingGrams(Math.max(1, Math.round(parseFloat(e.target.value || 0) * unit.toG(1))))}
+                                              style={{ flex: 1, textAlign: "center", fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, background: "none", border: "none", color: "#10b981" }} />
+                                            <span style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{unit.label}</span>
+                                            <button onClick={() => setPendingGrams(g => Math.round((g / unit.toG(1) + unit.step) * unit.toG(1)))} style={{ background: "none", border: "none", color: "#e2e8f0", fontSize: 18, cursor: "pointer", width: 28, lineHeight: 1 }}>+</button>
+                                          </div>
+                                        </>
+                                      );
+                                    })()}
                                     <div style={{ display: "flex", gap: 8 }}>
                                       <button onClick={() => {
                                         const scaled = { ...foodResults, basePer100g: { calories: foodResults.calories, protein: foodResults.protein, carbs: foodResults.carbs, fat: foodResults.fat }, grams: pendingGrams, calories: Math.round(foodResults.calories * pendingGrams / 100), protein: Math.round(foodResults.protein * pendingGrams / 100 * 10)/10, servingSize: `${pendingGrams}g` };
