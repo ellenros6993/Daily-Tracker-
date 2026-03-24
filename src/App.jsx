@@ -456,7 +456,7 @@ function getLoggingStreak(logs) {
 const TABS = ["Dashboard", "Nutrition", "Training", "Weight Tracker", "Weekly Report", "Progress Photos", "Settings"];
 const TRAINING_KEY = "fat-loss-training-v1";
 const TEMPLATES_KEY = "dat-templates-v1";
-const MILESTONES = [5, 10, 15, 20, 25, 30, 40, 50];
+const MILESTONES = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
 const PROGRESS_KEY = "fat-loss-progress-v1";
 const PROGRESS_INTERVAL_DAYS = 30;
 const ANGLES = ["front", "side", "side_flexed", "back", "video"];
@@ -1874,15 +1874,20 @@ export default function App() {
             ) : (
             <div className="kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
               <div className="stat-card stat-card-glow fade-up" style={{ padding: "12px 14px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Weight</div>
+                <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Current Weight</div>
                 <div className="big-num" style={{ fontSize: 26 }}>{latestWeight ? cWeight : "—"}</div>
                 <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lb</div>
               </div>
               <div className="stat-card fade-up-1" style={{ padding: "12px 14px" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Lost</div>
                 <div className="big-num" style={{ fontSize: 26, color: "#34d399" }}>{lostSoFar > 0 ? cLost : "—"}</div>
-                <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lb down</div>
-              </div>
+                <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lbs down</div>
+                {weighIns.length >= 2 && (() => {
+                  const first = weighIns[0], last = weighIns[weighIns.length-1];
+                  const days = getDaysBetween(first.date, last.date);
+                  const avg = days > 0 ? ((parseFloat(first.weight) - parseFloat(last.weight)) / days * 7).toFixed(2) : null;
+                  return avg ? <div style={{ fontSize: 9, color: "#10b981", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{avg} lbs/wk avg</div> : null;
+                })()}              </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px", display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>To Goal</div>
                 {latestWeight ? (
@@ -1896,7 +1901,7 @@ export default function App() {
                         transform="rotate(-90 42 42)"
                         style={{ transition: "stroke-dasharray 1s cubic-bezier(0.34,1.56,0.64,1)" }} />
                       <text x="42" y="38" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="14" fontFamily="'Bebas Neue',sans-serif">{cRem}</text>
-                      <text x="42" y="54" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lb left</text>
+                      <text x="42" y="54" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lbs left</text>
                     </svg>
                     <div style={{ color: "#334155", fontSize: 9, fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{_pct}% complete</div>
                   </>
@@ -2282,7 +2287,7 @@ export default function App() {
                 <div className="stat-card fade-up-4" style={{ padding: "14px 16px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                     <span style={{ fontSize: 16 }}>😴</span>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Sleep</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Last Night's Sleep</div>
                     {sleep.hours && <span style={{ marginLeft: "auto", fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#60a5fa" }}>{sleep.hours}h</span>}
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
