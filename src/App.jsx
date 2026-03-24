@@ -1988,7 +1988,6 @@ export default function App() {
                   );
                 })()}
               </div>
-            <div className="grid2" style={{ gap: 8 }}>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Streak</div>
                 {(() => {
@@ -2047,15 +2046,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* TODAY card — compact, reactive glow */}
-            {(() => {
-              const score = today ? calcScore(today) : 0;
-              const glowClass = score === 4 ? "card-glow-4" : score === 3 ? "card-glow-3" : score === 2 ? "card-glow-2" : score === 1 ? "card-glow-1" : "";
-              return (
-            <div className={`stat-card fade-up-3 ${glowClass}`} style={{ padding: "12px 14px", position: "relative" }}>
-
-              {/* Next milestone */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
 
             {/* 7-Day Averages */}
             {(() => {
@@ -2079,7 +2069,6 @@ export default function App() {
               );
             })()}
 
-            {/* Projection + Streak + Pace + Weekly Ring */}
             {/* TODAY card — compact, reactive glow */}
             {(() => {
               const score = today ? calcScore(today) : 0;
