@@ -2205,7 +2205,7 @@ export default function App() {
                   const lw = weighIns.length ? weighIns[weighIns.length-1].weight : '—';
                   const streak = getLoggingStreak(logs);
                   const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m);
-                  try { await navigator.clipboard.writeText(text); alert('✓ Copied to clipboard!'); } catch(e) { prompt('Copy this:', text); }
+                  const text = `📊 DAT\n⚖️ ${lw} lbs · 📉 ${lostSoFar||0} lbs lost · 🔥 ${streak} days${earned.length ? "\n🏅 "+earned.map(m=>m+"lbs").join(" ") : ""}\n${new Date().toLocaleDateString()}`; navigator.share ? navigator.share({title:"My Progress",text}).catch(()=>prompt("Copy:",text)) : prompt("Copy:",text);
                 }} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #3b82f644", color: "#93c5fd", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>📸 Save Card</button>
               </div>
 
