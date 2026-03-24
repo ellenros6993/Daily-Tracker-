@@ -1890,7 +1890,7 @@ export default function App() {
                         stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
                         strokeWidth="5" strokeLinecap="round"
                         strokeDasharray={`${arcDash} ${ARC_CIRC}`}
-                        transform="rotate(-90 42 42)"
+                        transform="rotate(-90 50 50)"
                         style={{ transition: "stroke-dasharray 1s cubic-bezier(0.34,1.56,0.64,1)" }} />
                       <text x="50" y="46" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="14" fontFamily="'Bebas Neue',sans-serif">{cRem}</text>
                       <text x="50" y="60" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lbs left</text>
@@ -1945,7 +1945,7 @@ export default function App() {
                   );
                 })()}
               </div>
-              <div className="stat-card fade-up-2" style={{ padding: "12px 14px" }}>
+              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #10b981" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Streak</div>
                 {(() => {
                   const streak = getLoggingStreak(logs);
