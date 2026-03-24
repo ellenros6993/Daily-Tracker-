@@ -1882,6 +1882,13 @@ export default function App() {
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Lost</div>
                 <div className="big-num" style={{ fontSize: 26, color: "#34d399" }}>{lostSoFar > 0 ? cLost : "—"}</div>
                 <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lbs down</div>
+                {lostSoFar > 0 && (() => {
+                  const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m);
+                  if(!earned.length) return null;
+                  const mColors = ["#cd7f32","#c0c0c0","#ffd700","#a855f7","#3b82f6","#10b981","#f87171","#fbbf24","#34d399","#60a5fa"];
+                  return (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:6}}>{earned.map((m,i) => (<div key={m} style={{width:22,height:22,borderRadius:"50%",background:mColors[i%mColors.length]+"33",border:"2px solid "+mColors[i%mColors.length],display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:700,color:mColors[i%mColors.length],fontFamily:"'Bebas Neue',sans-serif"}}>{m}</div>))}</div>);
+                })()}
+                {weighIns.length >= 2 && (() => { const first = weighIns[0], last = weighIns[weighIns.length-1]; const days = getDaysBetween(first.date, last.date); const avg = days > 0 ? ((parseFloat(first.weight) - parseFloat(last.weight)) / days * 7).toFixed(2) : null; return avg ? <div style={{ fontSize: 9, color: "#10b981", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{avg} lbs/wk avg</div> : null; })()}
                 {weighIns.length >= 2 && (() => {
                   const first = weighIns[0], last = weighIns[weighIns.length-1];
                   const days = getDaysBetween(first.date, last.date);
@@ -1910,6 +1917,28 @@ export default function App() {
 
             </div>
             )}
+
+            {/* 7-Day Averages */}
+            {(() => {
+              const last7 = logs.filter(l => { const d = getDaysBetween(l.date, getLocalDateStr()); return d >= 0 && d < 7; });
+              const withCal = last7.filter(l => l.calories && parseInt(l.calories) > 0);
+              const withPro = last7.filter(l => l.protein && parseInt(l.protein) > 0);
+              const withSteps = last7.filter(l => l.steps && parseInt(l.steps) > 0);
+              const avgCal = withCal.length ? Math.round(withCal.reduce((s,l) => s + parseInt(l.calories), 0) / withCal.length) : null;
+              const avgPro = withPro.length ? Math.round(withPro.reduce((s,l) => s + parseInt(l.protein), 0) / withPro.length) : null;
+              const avgSteps = withSteps.length ? Math.round(withSteps.reduce((s,l) => s + parseInt(l.steps), 0) / withSteps.length) : null;
+              if(!avgCal && !avgPro && !avgSteps) return null;
+              return (
+                <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
+                  <div className="label" style={{ fontSize: 9, marginBottom: 10 }}>7-DAY AVERAGES</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgCal && avgCal >= CALORIES_MIN && avgCal <= CALORIES_MAX ? "#34d399" : avgCal ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgCal || "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>kcal/day</div></div>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgPro && avgPro >= PROTEIN_MIN ? "#34d399" : avgPro ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgPro ? avgPro + "g" : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>protein/day</div></div>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgSteps && avgSteps >= STEPS_MIN ? "#34d399" : avgSteps ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgSteps ? avgSteps.toLocaleString() : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>steps/day</div></div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Projection + Streak + Pace + Weekly Ring */}
             <div className="grid2" style={{ gap: 8 }}>
