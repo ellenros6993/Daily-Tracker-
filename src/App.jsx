@@ -1550,7 +1550,7 @@ export default function App() {
   const _goalRem = latestWeight ? (parseFloat(latestWeight.weight) - GOAL_WEIGHT).toFixed(1) : 0;
   const cRem = useCountUp(_goalRem, 700);
   const _pct = latestWeight ? Math.round(((START_WEIGHT - parseFloat(latestWeight.weight)) / (START_WEIGHT - GOAL_WEIGHT)) * 100) : 0;
-  const ARC_R = 42, ARC_CIRC = 2 * Math.PI * ARC_R;
+  const ARC_R = 48, ARC_CIRC = 2 * Math.PI * ARC_R;
   const arcDash = (_pct / 100) * ARC_CIRC;
 
   return (
@@ -1919,7 +1919,7 @@ export default function App() {
                     return { hitGoals: acc.hitGoals + calcScore(l), totalGoals: acc.totalGoals + possible };
                   }, { hitGoals: 0, totalGoals: 0 });
                   const pct = totalGoals > 0 ? Math.round((hitGoals / totalGoals) * 100) : 0;
-                  const R = 22, CIRC = 2 * Math.PI * R;
+                  const R = 28, CIRC = 2 * Math.PI * R;
                   const dash = (pct / 100) * CIRC;
                   const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
                   return (
@@ -1955,7 +1955,7 @@ export default function App() {
                   const weekHits = thisWeekLogs.filter(l => calcScore(l) >= 1).length;
                   const WEEK_GOAL = 7;
                   const ringPct = weekHits / WEEK_GOAL;
-                  const R = 22, CIRC = 2 * Math.PI * R;
+                  const R = 28, CIRC = 2 * Math.PI * R;
                   const dash = ringPct * CIRC;
                   return <>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
