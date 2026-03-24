@@ -1886,7 +1886,7 @@ export default function App() {
                   const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m);
                   if(!earned.length) return null;
                   const mColors = ["#cd7f32","#c0c0c0","#ffd700","#a855f7","#3b82f6","#10b981","#f87171","#fbbf24","#34d399","#60a5fa"];
-                  return (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:6}}>{earned.map((m,i) => (<div key={m} style={{width:22,height:22,borderRadius:"50%",background:mColors[i%mColors.length]+"33",border:"2px solid "+mColors[i%mColors.length],display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:700,color:mColors[i%mColors.length],fontFamily:"'Bebas Neue',sans-serif"}}>{m}</div>))}</div>);
+                  return (<div style={{display:"flex",flexWrap:"wrap",gap:4,marginTop:6}}>{earned.map(m => (<span key={m} style={{fontSize:12,lineHeight:1}}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>);
                 })()}
                 {weighIns.length >= 2 && (() => { const first = weighIns[0], last = weighIns[weighIns.length-1]; const days = getDaysBetween(first.date, last.date); const avg = days > 0 ? ((parseFloat(first.weight) - parseFloat(last.weight)) / days * 7).toFixed(2) : null; return avg ? <div style={{ fontSize: 9, color: "#10b981", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{avg} lbs/wk avg</div> : null; })()}
                 {weighIns.length >= 2 && (() => {
@@ -1914,9 +1914,100 @@ export default function App() {
                   </>
                 ) : <div style={{ color: "#1e2d40", fontSize: 10, marginTop: 8 }}>—</div>}
               </div>
-
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
+                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Medals</div>
+                {lostSoFar > 0 ? (() => {
+                  const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m);
+                  return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:4}}>{earned.map(m => (<span key={m} style={{fontSize:14,lineHeight:1}}>🏅<span style={{fontSize:9,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : <div style={{color:"#334155",fontSize:10}}>Keep going!</div>;
+                })() : <div style={{color:"#334155",fontSize:10}}>First 5 lbs!</div>}
+              </div>
             </div>
             )}
+
+            {/* Weekly Compliance + Next Milestone + Share */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }} className="kpi-grid">
+              {/* Weekly compliance ring */}
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
+                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>This Week</div>
+                {(() => {
+                  const weekLogs = getWeekLogs(logs, getCurrentWeekStart());
+                  // Smart max with max 2 rest days: first 2 non-training days score /3, extras score /4
+                  let restDaysUsed = 0;
+                  const { hitGoals, totalGoals } = weekLogs.reduce((acc, l) => {
+                    const trained = l.training && l.training.trim() !== "";
+                    const isRest = !trained && restDaysUsed < 2;
+                    if (!trained) restDaysUsed++;
+                    const possible = isRest ? 3 : 4;
+                    return { hitGoals: acc.hitGoals + calcScore(l), totalGoals: acc.totalGoals + possible };
+                  }, { hitGoals: 0, totalGoals: 0 });
+                  const pct = totalGoals > 0 ? Math.round((hitGoals / totalGoals) * 100) : 0;
+                  const R = 22, CIRC = 2 * Math.PI * R;
+                  const dash = (pct / 100) * CIRC;
+                  const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
+                  return (
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                      <svg width={54} height={54}>
+                        <circle cx="27" cy="27" r={R} fill="none" stroke="#131929" strokeWidth="4" />
+                        <circle cx="27" cy="27" r={R} fill="none" stroke={col}
+                          strokeWidth="4" strokeLinecap="round"
+                          strokeDasharray={`${dash} ${CIRC}`}
+                          transform="rotate(-90 27 27)"
+                          style={{ transition: "stroke-dasharray 0.7s cubic-bezier(0.34,1.56,0.64,1)" }} />
+                        <text x="27" y="24" textAnchor="middle" dominantBaseline="central"
+                          fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="10" fontFamily="'Bebas Neue',sans-serif">{pct}%</text>
+                        <text x="27" y="36" textAnchor="middle" fill="#475569" fontSize="6" fontFamily="'DM Mono',monospace">goals hit</text>
+                      </svg>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 10, color: col, fontWeight: 600 }}>
+                          {pct >= 80 ? "🔥 Crushing it" : pct >= 50 ? "💪 On track" : weekLogs.length === 0 ? "Start logging!" : "⚠ Push harder"}
+                        </div>
+                        <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{hitGoals}/{totalGoals} pts</div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Next milestone */}
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
+                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Next Milestone</div>
+                {(() => {
+                  const lost = lostSoFar > 0 ? parseFloat(lostSoFar) : 0;
+                  const next = MILESTONES.find(m => m > lost);
+                  const prev = [...MILESTONES].reverse().find(m => m <= lost) || 0;
+                  const pct = next ? Math.round(((lost - prev) / (next - prev)) * 100) : 100;
+                  const toNext = next ? (next - lost).toFixed(1) : null;
+                  const R = 22, CIRC = 2 * Math.PI * R;
+                  const dash = (pct / 100) * CIRC;
+                  return (
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                      <svg width={54} height={54} style={{ flexShrink: 0 }}>
+                        <circle cx="27" cy="27" r={R} fill="none" stroke="#131929" strokeWidth="4" />
+                        <circle cx="27" cy="27" r={R} fill="none"
+                          stroke={!next ? "#fbbf24" : pct >= 75 ? "#34d399" : "#10b981"}
+                          strokeWidth="4" strokeLinecap="round"
+                          strokeDasharray={`${dash} ${CIRC}`}
+                          transform="rotate(-90 27 27)"
+                          style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.34,1.56,0.64,1)" }} />
+                        <text x="27" y="24" textAnchor="middle" dominantBaseline="central"
+                          fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="10" fontFamily="'Bebas Neue',sans-serif">{pct}%</text>
+                        <text x="27" y="36" textAnchor="middle" fill="#475569" fontSize="6" fontFamily="'DM Mono',monospace">there</text>
+                      </svg>
+                      <div style={{ textAlign: "center" }}>
+                        {next ? (
+                          <>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#10b981", lineHeight: 1 }}>{toNext}<span style={{ fontSize: 10, color: "#475569" }}> lb</span></div>
+                            <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>🏅 {next}lb badge</div>
+                          </>
+                        ) : (
+                          <div style={{ fontSize: 10, color: "#fbbf24", fontWeight: 600 }}>🏆 All done!</div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
 
             {/* 7-Day Averages */}
             {(() => {
@@ -2114,91 +2205,6 @@ export default function App() {
                 </div>
               );
             })()}
-
-            {/* Weekly Compliance + Next Milestone + Share */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }} className="kpi-grid">
-              {/* Weekly compliance ring */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>This Week</div>
-                {(() => {
-                  const weekLogs = getWeekLogs(logs, getCurrentWeekStart());
-                  // Smart max with max 2 rest days: first 2 non-training days score /3, extras score /4
-                  let restDaysUsed = 0;
-                  const { hitGoals, totalGoals } = weekLogs.reduce((acc, l) => {
-                    const trained = l.training && l.training.trim() !== "";
-                    const isRest = !trained && restDaysUsed < 2;
-                    if (!trained) restDaysUsed++;
-                    const possible = isRest ? 3 : 4;
-                    return { hitGoals: acc.hitGoals + calcScore(l), totalGoals: acc.totalGoals + possible };
-                  }, { hitGoals: 0, totalGoals: 0 });
-                  const pct = totalGoals > 0 ? Math.round((hitGoals / totalGoals) * 100) : 0;
-                  const R = 22, CIRC = 2 * Math.PI * R;
-                  const dash = (pct / 100) * CIRC;
-                  const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
-                  return (
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <svg width={54} height={54}>
-                        <circle cx="27" cy="27" r={R} fill="none" stroke="#131929" strokeWidth="4" />
-                        <circle cx="27" cy="27" r={R} fill="none" stroke={col}
-                          strokeWidth="4" strokeLinecap="round"
-                          strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 27 27)"
-                          style={{ transition: "stroke-dasharray 0.7s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                        <text x="27" y="24" textAnchor="middle" dominantBaseline="central"
-                          fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="10" fontFamily="'Bebas Neue',sans-serif">{pct}%</text>
-                        <text x="27" y="36" textAnchor="middle" fill="#475569" fontSize="6" fontFamily="'DM Mono',monospace">goals hit</text>
-                      </svg>
-                      <div style={{ textAlign: "center" }}>
-                        <div style={{ fontSize: 10, color: col, fontWeight: 600 }}>
-                          {pct >= 80 ? "🔥 Crushing it" : pct >= 50 ? "💪 On track" : weekLogs.length === 0 ? "Start logging!" : "⚠ Push harder"}
-                        </div>
-                        <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{hitGoals}/{totalGoals} pts</div>
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-
-              {/* Next milestone */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Next Milestone</div>
-                {(() => {
-                  const lost = lostSoFar > 0 ? parseFloat(lostSoFar) : 0;
-                  const next = MILESTONES.find(m => m > lost);
-                  const prev = [...MILESTONES].reverse().find(m => m <= lost) || 0;
-                  const pct = next ? Math.round(((lost - prev) / (next - prev)) * 100) : 100;
-                  const toNext = next ? (next - lost).toFixed(1) : null;
-                  const R = 22, CIRC = 2 * Math.PI * R;
-                  const dash = (pct / 100) * CIRC;
-                  return (
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <svg width={54} height={54} style={{ flexShrink: 0 }}>
-                        <circle cx="27" cy="27" r={R} fill="none" stroke="#131929" strokeWidth="4" />
-                        <circle cx="27" cy="27" r={R} fill="none"
-                          stroke={!next ? "#fbbf24" : pct >= 75 ? "#34d399" : "#10b981"}
-                          strokeWidth="4" strokeLinecap="round"
-                          strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 27 27)"
-                          style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                        <text x="27" y="24" textAnchor="middle" dominantBaseline="central"
-                          fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="10" fontFamily="'Bebas Neue',sans-serif">{pct}%</text>
-                        <text x="27" y="36" textAnchor="middle" fill="#475569" fontSize="6" fontFamily="'DM Mono',monospace">there</text>
-                      </svg>
-                      <div style={{ textAlign: "center" }}>
-                        {next ? (
-                          <>
-                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#10b981", lineHeight: 1 }}>{toNext}<span style={{ fontSize: 10, color: "#475569" }}> lb</span></div>
-                            <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>🏅 {next}lb badge</div>
-                          </>
-                        ) : (
-                          <div style={{ fontSize: 10, color: "#fbbf24", fontWeight: 600 }}>🏆 All done!</div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
 
 
 
