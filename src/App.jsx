@@ -1890,7 +1890,7 @@ export default function App() {
                         stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
                         strokeWidth="5" strokeLinecap="round"
                         strokeDasharray={`${arcDash} ${ARC_CIRC}`}
-                        transform="rotate(-90 42 42)"
+                        transform="rotate(-90 50 50)"
                         style={{ transition: "stroke-dasharray 1s cubic-bezier(0.34,1.56,0.64,1)" }} />
                       <text x="50" y="46" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="14" fontFamily="'Bebas Neue',sans-serif">{cRem}</text>
                       <text x="50" y="60" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lbs left</text>
@@ -1919,21 +1919,21 @@ export default function App() {
                     return { hitGoals: acc.hitGoals + calcScore(l), totalGoals: acc.totalGoals + possible };
                   }, { hitGoals: 0, totalGoals: 0 });
                   const pct = totalGoals > 0 ? Math.round((hitGoals / totalGoals) * 100) : 0;
-                  const R = 48, CIRC = 2 * Math.PI * R;
+                  const R = 38, CIRC = 2 * Math.PI * R;
                   const dash = (pct / 100) * CIRC;
                   const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
                   return (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <svg width={110} height={110} style={{ overflow: "visible" }}>
-                        <circle cx="55" cy="55" r={R} fill="none" stroke="#131929" strokeWidth="4" />
-                        <circle cx="55" cy="55" r={R} fill="none" stroke={col}
+                      <svg width={80} height={80} style={{ overflow: "visible" }}>
+                        <circle cx="40" cy="40" r={R} fill="none" stroke="#131929" strokeWidth="4" />
+                        <circle cx="40" cy="40" r={R} fill="none" stroke={col}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 55 55)"
+                          transform="rotate(-90 40 40)"
                           style={{ transition: "stroke-dasharray 0.7s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                        <text x="55" y="50" textAnchor="middle" dominantBaseline="central"
+                        <text x="40" y="37" textAnchor="middle" dominantBaseline="central"
                           fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="10" fontFamily="'Bebas Neue',sans-serif">{pct}%</text>
-                        <text x="55" y="64" textAnchor="middle" fill="#94a3b8" fontSize="8" fontFamily="'DM Mono',monospace">goals hit</text>
+                        <text x="40" y="50" textAnchor="middle" fill="#94a3b8" fontSize="7" fontFamily="'DM Mono',monospace">goals hit</text>
                       </svg>
                       <div style={{ textAlign: "center" }}>
                         <div style={{ fontSize: 10, color: col, fontWeight: 600 }}>
@@ -1964,12 +1964,12 @@ export default function App() {
                       </div>
                       {/* Weekly ring */}
                       <svg width={80} height={80} style={{ flexShrink: 0 }}>
-                        <circle cx="55" cy="55" r={R} fill="none" stroke="#131929" strokeWidth="4" />
+                        <circle cx="40" cy="40" r={R} fill="none" stroke="#131929" strokeWidth="4" />
                         <circle cx="40" cy="40" r={R} fill="none"
                           stroke={weekHits >= 5 ? "#34d399" : weekHits >= 3 ? "#fbbf24" : "#10b981"}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 55 55)"
+                          transform="rotate(-90 40 40)"
                           style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.34,1.56,0.64,1)" }} />
                         <text x="27" y="27" textAnchor="middle" dominantBaseline="central" fill="#e2e8f0" fontSize="11" fontFamily="'DM Mono',monospace" fontWeight="600">{weekHits}/7</text>
                       </svg>
