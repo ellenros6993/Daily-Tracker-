@@ -1919,21 +1919,21 @@ export default function App() {
                     return { hitGoals: acc.hitGoals + calcScore(l), totalGoals: acc.totalGoals + possible };
                   }, { hitGoals: 0, totalGoals: 0 });
                   const pct = totalGoals > 0 ? Math.round((hitGoals / totalGoals) * 100) : 0;
-                  const R = 26, CIRC = 2 * Math.PI * R;
+                  const R = 28, CIRC = 2 * Math.PI * R;
                   const dash = (pct / 100) * CIRC;
                   const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
                   return (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <svg width={80} height={80}>
+                      <svg width={80} height={80} style={{ overflow: "visible" }}>
                         <circle cx="40" cy="40" r={R} fill="none" stroke="#131929" strokeWidth="4" />
                         <circle cx="40" cy="40" r={R} fill="none" stroke={col}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 28 28)"
+                          transform="rotate(-90 27 27)"
                           style={{ transition: "stroke-dasharray 0.7s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                        <text x="28" y="25" textAnchor="middle" dominantBaseline="central"
+                        <text x="27" y="24" textAnchor="middle" dominantBaseline="central"
                           fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="10" fontFamily="'Bebas Neue',sans-serif">{pct}%</text>
-                        <text x="28" y="37" textAnchor="middle" fill="#475569" fontSize="6" fontFamily="'DM Mono',monospace">goals hit</text>
+                        <text x="27" y="36" textAnchor="middle" fill="#475569" fontSize="6" fontFamily="'DM Mono',monospace">goals hit</text>
                       </svg>
                       <div style={{ textAlign: "center" }}>
                         <div style={{ fontSize: 10, color: col, fontWeight: 600 }}>
@@ -1955,7 +1955,7 @@ export default function App() {
                   const weekHits = thisWeekLogs.filter(l => calcScore(l) >= 1).length;
                   const WEEK_GOAL = 7;
                   const ringPct = weekHits / WEEK_GOAL;
-                  const R = 26, CIRC = 2 * Math.PI * R;
+                  const R = 28, CIRC = 2 * Math.PI * R;
                   const dash = ringPct * CIRC;
                   return <>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1969,7 +1969,7 @@ export default function App() {
                           stroke={weekHits >= 5 ? "#34d399" : weekHits >= 3 ? "#fbbf24" : "#10b981"}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 28 28)"
+                          transform="rotate(-90 27 27)"
                           style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.34,1.56,0.64,1)" }} />
                         <text x="27" y="27" textAnchor="middle" dominantBaseline="central" fill="#e2e8f0" fontSize="11" fontFamily="'DM Mono',monospace" fontWeight="600">{weekHits}/7</text>
                       </svg>
