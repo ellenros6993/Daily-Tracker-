@@ -1550,7 +1550,7 @@ export default function App() {
   const _goalRem = latestWeight ? (parseFloat(latestWeight.weight) - GOAL_WEIGHT).toFixed(1) : 0;
   const cRem = useCountUp(_goalRem, 700);
   const _pct = latestWeight ? Math.round(((START_WEIGHT - parseFloat(latestWeight.weight)) / (START_WEIGHT - GOAL_WEIGHT)) * 100) : 0;
-  const ARC_R = 44, ARC_CIRC = 2 * Math.PI * ARC_R;
+  const ARC_R = 48, ARC_CIRC = 2 * Math.PI * ARC_R;
   const arcDash = (_pct / 100) * ARC_CIRC;
 
   return (
@@ -1884,7 +1884,7 @@ export default function App() {
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>Progress</div>
                 {latestWeight ? (
                   <>
-                    <svg width={100} height={100} style={{ margin: "2px auto" }}>
+                    <svg width={100} height={100} style={{ margin: "2px auto", overflow: "visible" }}>
                       <circle cx="50" cy="50" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
                       <circle cx="50" cy="50" r={ARC_R} fill="none"
                         stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
