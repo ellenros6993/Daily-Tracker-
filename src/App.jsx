@@ -1884,7 +1884,7 @@ export default function App() {
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>Progress</div>
                 {latestWeight ? (
                   <>
-                    <svg width={100} height={100} style={{ margin: "2px auto", overflow: "visible" }}>
+                    <svg width={88} height={88} style={{ margin: "2px auto", overflow: "visible" }}>
                       <circle cx="50" cy="50" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
                       <circle cx="50" cy="50" r={ARC_R} fill="none"
                         stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
@@ -1919,7 +1919,7 @@ export default function App() {
                     return { hitGoals: acc.hitGoals + calcScore(l), totalGoals: acc.totalGoals + possible };
                   }, { hitGoals: 0, totalGoals: 0 });
                   const pct = totalGoals > 0 ? Math.round((hitGoals / totalGoals) * 100) : 0;
-                  const R = 28, CIRC = 2 * Math.PI * R;
+                  const R = 24, CIRC = 2 * Math.PI * R;
                   const dash = (pct / 100) * CIRC;
                   const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
                   return (
@@ -1955,7 +1955,7 @@ export default function App() {
                   const weekHits = thisWeekLogs.filter(l => calcScore(l) >= 1).length;
                   const WEEK_GOAL = 7;
                   const ringPct = weekHits / WEEK_GOAL;
-                  const R = 28, CIRC = 2 * Math.PI * R;
+                  const R = 24, CIRC = 2 * Math.PI * R;
                   const dash = ringPct * CIRC;
                   return <>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
