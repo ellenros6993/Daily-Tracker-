@@ -1877,9 +1877,16 @@ export default function App() {
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Current Weight</div>
                 <div className="big-num" style={{ fontSize: 26 }}>{latestWeight ? cWeight : "—"}</div>
                 <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lb</div>
-                {weighIns.length >= 2 && (() => { const prev = weighIns[weighIns.length-2]; const curr = weighIns[weighIns.length-1]; const diff = (parseFloat(curr.weight) - parseFloat(prev.weight)).toFixed(1); const isDown = parseFloat(diff) < 0; return <div style={{fontSize:10,color:isDown?"#34d399":"#f87171",marginTop:3,fontFamily:"'DM Mono',monospace"}}>{isDown?"↓ ":"↑ "}{Math.abs(diff)} lbs lost</div>; })()}
+                {weighIns.length >= 2 && (() => { const prev = weighIns[weighIns.length-2]; const curr = weighIns[weighIns.length-1]; const diff = (parseFloat(curr.weight) - parseFloat(prev.weight)).toFixed(1); const isDown = parseFloat(diff) < 0; return <div style={{fontSize:10,color:isDown?"#34d399":"#f87171",marginTop:3,fontFamily:"'DM Mono',monospace"}}>{isDown?"↓":"↑"} {Math.abs(diff)} lbs</div>; })()}
+                {weighIns.length >= 2 && (() => { const prev = weighIns[weighIns.length-2]; const curr = weighIns[weighIns.length-1]; const diff = (parseFloat(curr.weight) - parseFloat(prev.weight)).toFixed(1); const isDown = parseFloat(diff) < 0; return <div style={{fontSize:10,color:isDown?"#34d399":"#f87171",marginTop:3,fontFamily:"'DM Mono',monospace"}}>{isDown?"↓":"↑"}{Math.abs(diff)} lbs</div>; })()}
                 {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:6}}>COLLECTION</div>}
                 {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
+              </div>
+              <div className="stat-card fade-up-1" style={{ padding: "12px 14px", borderLeft: "3px solid #34d399" }}>
+                <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Lost</div>
+                <div className="big-num" style={{ fontSize: 26, color: "#34d399" }}>{lostSoFar > 0 ? cLost : "—"}</div>
+                <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lbs down</div>
+                {weighIns.length >= 2 && (() => { const first = weighIns[0], last = weighIns[weighIns.length-1]; const days = getDaysBetween(first.date, last.date); const avg = days > 0 ? ((parseFloat(first.weight) - parseFloat(last.weight)) / days * 7).toFixed(2) : null; return avg ? <div style={{ fontSize: 9, color: "#10b981", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{avg} lbs/wk avg</div> : null; })()}
               </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #60a5fa", display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>To Goal</div>
@@ -1899,44 +1906,6 @@ export default function App() {
                     <div style={{ color: "#334155", fontSize: 9, fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{_pct}% complete</div>
                   </>
                 ) : <div style={{ color: "#1e2d40", fontSize: 10, marginTop: 8 }}>—</div>}
-              </div>
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px", borderLeft: "3px solid #a855f7" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Next Milestone</div>
-                {(() => {
-                  const lost = lostSoFar > 0 ? parseFloat(lostSoFar) : 0;
-                  const next = MILESTONES.find(m => m > lost);
-                  const prev = [...MILESTONES].reverse().find(m => m <= lost) || 0;
-                  const pct = next ? Math.round(((lost - prev) / (next - prev)) * 100) : 100;
-                  const toNext = next ? (next - lost).toFixed(1) : null;
-                  const R = 22, CIRC = 2 * Math.PI * R;
-                  const dash = (pct / 100) * CIRC;
-                  return (
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <svg width={54} height={54} style={{ flexShrink: 0 }}>
-                        <circle cx="27" cy="27" r={R} fill="none" stroke="#131929" strokeWidth="4" />
-                        <circle cx="27" cy="27" r={R} fill="none"
-                          stroke={!next ? "#fbbf24" : pct >= 75 ? "#34d399" : "#10b981"}
-                          strokeWidth="4" strokeLinecap="round"
-                          strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 27 27)"
-                          style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                        <text x="27" y="24" textAnchor="middle" dominantBaseline="central"
-                          fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="10" fontFamily="'Bebas Neue',sans-serif">{pct}%</text>
-                        <text x="27" y="36" textAnchor="middle" fill="#475569" fontSize="6" fontFamily="'DM Mono',monospace">there</text>
-                      </svg>
-                      <div style={{ textAlign: "center" }}>
-                        {next ? (
-                          <>
-                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#10b981", lineHeight: 1 }}>{toNext}<span style={{ fontSize: 10, color: "#475569" }}> lb</span></div>
-                            <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>🏅 {next}lb badge</div>
-                          </>
-                        ) : (
-                          <div style={{ fontSize: 10, color: "#fbbf24", fontWeight: 600 }}>🏆 All done!</div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })()}
               </div>
             </div>
             )}
