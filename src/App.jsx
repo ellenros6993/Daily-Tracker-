@@ -2205,13 +2205,8 @@ export default function App() {
                   const lw = weighIns.length ? weighIns[weighIns.length-1].weight : '—';
                   const streak = getLoggingStreak(logs);
                   const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m);
-                  el.innerHTML = `<div style='color:#10b981;font-size:11px;letter-spacing:2px;margin-bottom:12px'>DAILY ACCOUNTABILITY TRACKER</div><div style='display:flex;gap:16px;margin-bottom:16px'><div><div style='color:#475569;font-size:9px;letter-spacing:1px'>WEIGHT</div><div style='color:#e2e8f0;font-size:32px;font-family:serif;line-height:1'>${lw}</div><div style='color:#475569;font-size:9px'>lbs</div></div><div><div style='color:#475569;font-size:9px;letter-spacing:1px'>LOST</div><div style='color:#34d399;font-size:32px;font-family:serif;line-height:1'>${lostSoFar||'0'}</div><div style='color:#475569;font-size:9px'>lbs</div></div><div><div style='color:#475569;font-size:9px;letter-spacing:1px'>STREAK</div><div style='color:#fbbf24;font-size:32px;font-family:serif;line-height:1'>${streak}</div><div style='color:#475569;font-size:9px'>days</div></div></div>${earned.length ? "<div style='margin-top:8px'>" + earned.map(m => '🏅'+m).join(' ') + '</div>' : ''}<div style='color:#334155;font-size:9px;margin-top:12px;letter-spacing:1px'>${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase()}</div>`;
-                  const text = `📊 DAILY ACCOUNTABILITY TRACKER\n\n⚖️ Weight: ${lw} lbs\n📉 Lost: ${lostSoFar || 0} lbs\n🔥 Streak: ${streak} days\n🏅 Medals: ${earned.length ? earned.map(m => m+'lbs').join(', ') : 'none yet'}\n\n${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\n\n#DailyAccountability #WeightLoss`;
                   if(navigator.share) { navigator.share({title:'My Progress',text}).catch(()=>{}); }
                   else { navigator.clipboard.writeText(text).then(()=>alert('Copied to clipboard!')).catch(()=>alert(text)); }
-                    const a = document.createElement('a'); a.href = canvas.toDataURL(); a.download = 'progress-card.png'; a.click();
-                    document.body.removeChild(el);
-                  }).catch(() => { document.body.removeChild(el); alert('Export failed - try screenshot instead'); });
                 }} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #3b82f644", color: "#93c5fd", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>📸 Save Card</button>
               </div>
 
