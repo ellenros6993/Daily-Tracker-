@@ -2192,23 +2192,11 @@ export default function App() {
               );
             })()}
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
               <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share</div>
                 <button onClick={shareStats} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>📤 Share</button>
               </div>
-              <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Export Card</div>
-                <button onClick={() => {
-                  const el = document.createElement('div');
-                  el.style.cssText = 'background:#07080d;padding:24px;width:320px;font-family:Inter,sans-serif;border-radius:16px;border:1px solid #1e2d40';
-                  const lw = weighIns.length ? weighIns[weighIns.length-1].weight : '—';
-                  const streak = getLoggingStreak(logs);
-                  const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m);
-                  const text = `📊 DAT\n⚖️ ${lw} lbs · 📉 ${lostSoFar||0} lbs lost · 🔥 ${streak} days${earned.length ? "\n🏅 "+earned.map(m=>m+"lbs").join(" ") : ""}\n${new Date().toLocaleDateString()}`; navigator.share ? navigator.share({title:"My Progress",text}).catch(()=>prompt("Copy:",text)) : prompt("Copy:",text);
-                }} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #3b82f644", color: "#93c5fd", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>📸 Save Card</button>
-              </div>
-
               <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Reminders</div>
                 <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", transition: "all 0.2s" }}>{notifEnabled ? "On ✓" : "Enable"}</button>
