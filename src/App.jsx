@@ -2069,7 +2069,6 @@ export default function App() {
               );
             })()}
 
-            {/* TODAY card — compact, reactive glow */}
             {(() => {
               const score = today ? calcScore(today) : 0;
               const glowClass = score === 4 ? "card-glow-4" : score === 3 ? "card-glow-3" : score === 2 ? "card-glow-2" : score === 1 ? "card-glow-1" : "";
