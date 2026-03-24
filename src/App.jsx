@@ -1873,19 +1873,22 @@ export default function App() {
               </div>
             ) : (
             <div className="kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
-              <div className="stat-card stat-card-glow fade-up" style={{ padding: "12px 14px" }}>
+              <div className="stat-card stat-card-glow fade-up" style={{ padding: "12px 14px", borderLeft: "3px solid #10b981" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Current Weight</div>
                 <div className="big-num" style={{ fontSize: 26 }}>{latestWeight ? cWeight : "—"}</div>
                 <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lb</div>
+                {weighIns.length >= 2 && (() => { const prev = weighIns[weighIns.length-2]; const curr = weighIns[weighIns.length-1]; const diff = (parseFloat(curr.weight) - parseFloat(prev.weight)).toFixed(1); const isDown = parseFloat(diff) < 0; return <div style={{fontSize:10,color:isDown?"#34d399":"#f87171",marginTop:3,fontFamily:"'DM Mono',monospace"}}>{isDown?"↓":"↑"} {Math.abs(diff)} lbs</div>; })()}
+                {weighIns.length >= 2 && (() => { const prev = weighIns[weighIns.length-2]; const curr = weighIns[weighIns.length-1]; const diff = (parseFloat(curr.weight) - parseFloat(prev.weight)).toFixed(1); const isDown = parseFloat(diff) < 0; return <div style={{fontSize:10,color:isDown?"#34d399":"#f87171",marginTop:3,fontFamily:"'DM Mono',monospace"}}>{isDown?"↓":"↑"}{Math.abs(diff)} lbs</div>; })()}
+                {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:6}}>COLLECTION</div>}
                 {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
               </div>
-              <div className="stat-card fade-up-1" style={{ padding: "12px 14px" }}>
+              <div className="stat-card fade-up-1" style={{ padding: "12px 14px", borderLeft: "3px solid #34d399" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Lost</div>
                 <div className="big-num" style={{ fontSize: 26, color: "#34d399" }}>{lostSoFar > 0 ? cLost : "—"}</div>
                 <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lbs down</div>
                 {weighIns.length >= 2 && (() => { const first = weighIns[0], last = weighIns[weighIns.length-1]; const days = getDaysBetween(first.date, last.date); const avg = days > 0 ? ((parseFloat(first.weight) - parseFloat(last.weight)) / days * 7).toFixed(2) : null; return avg ? <div style={{ fontSize: 9, color: "#10b981", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{avg} lbs/wk avg</div> : null; })()}
               </div>
-              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #60a5fa", display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>To Goal</div>
                 {latestWeight ? (
                   <>
@@ -1904,7 +1907,7 @@ export default function App() {
                   </>
                 ) : <div style={{ color: "#1e2d40", fontSize: 10, marginTop: 8 }}>—</div>}
               </div>
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px", borderLeft: "3px solid #a855f7" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Next Milestone</div>
                 {(() => {
                   const lost = lostSoFar > 0 ? parseFloat(lostSoFar) : 0;
@@ -2240,6 +2243,22 @@ export default function App() {
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share</div>
                 <button onClick={shareStats} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>📤 Share</button>
               </div>
+              <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
+                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Export Card</div>
+                <button onClick={() => {
+                  const el = document.createElement('div');
+                  el.style.cssText = 'background:#07080d;padding:24px;width:320px;font-family:Inter,sans-serif;border-radius:16px;border:1px solid #1e2d40';
+                  const lw = weighIns.length ? weighIns[weighIns.length-1].weight : '—';
+                  const streak = getLoggingStreak(logs);
+                  const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m);
+                  el.innerHTML = `<div style='color:#10b981;font-size:11px;letter-spacing:2px;margin-bottom:12px'>DAILY ACCOUNTABILITY TRACKER</div><div style='display:flex;gap:16px;margin-bottom:16px'><div><div style='color:#475569;font-size:9px;letter-spacing:1px'>WEIGHT</div><div style='color:#e2e8f0;font-size:32px;font-family:serif;line-height:1'>${lw}</div><div style='color:#475569;font-size:9px'>lbs</div></div><div><div style='color:#475569;font-size:9px;letter-spacing:1px'>LOST</div><div style='color:#34d399;font-size:32px;font-family:serif;line-height:1'>${lostSoFar||'0'}</div><div style='color:#475569;font-size:9px'>lbs</div></div><div><div style='color:#475569;font-size:9px;letter-spacing:1px'>STREAK</div><div style='color:#fbbf24;font-size:32px;font-family:serif;line-height:1'>${streak}</div><div style='color:#475569;font-size:9px'>days</div></div></div>${earned.length ? "<div style='margin-top:8px'>" + earned.map(m => '🏅'+m).join(' ') + '</div>' : ''}<div style='color:#334155;font-size:9px;margin-top:12px;letter-spacing:1px'>${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase()}</div>`;
+                  document.body.appendChild(el);
+                  import('https://html2canvas.hertzen.com/dist/html2canvas.min.js').then(m => m.default(el)).then(canvas => {
+                    const a = document.createElement('a'); a.href = canvas.toDataURL(); a.download = 'progress-card.png'; a.click();
+                    document.body.removeChild(el);
+                  }).catch(() => { document.body.removeChild(el); alert('Export failed - try screenshot instead'); });
+                }} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #3b82f644", color: "#93c5fd", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>📸 Save Card</button>
+              </div>
 
               <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Reminders</div>
@@ -2424,7 +2443,7 @@ export default function App() {
                             </div>
                             {(w.bodyFat || w.muscleMass) && (
                               <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-                                {w.bodyFat && <span style={{ fontSize: 9, color: "#a78bfa", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>}
+                                {w.bodyFat && <span style={{ fontSize: 9, color: "#a78bfa", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>{(() => { const idx = [...weighIns].reverse().findIndex(x=>x.date===w.date); const prevW = [...weighIns].reverse()[idx+1]; return prevW BF {w.bodyFat}%</span>BF {w.bodyFat}%</span> prevW.bodyFat ? <span style={{fontSize:8,color:parseFloat(w.bodyFat)<parseFloat(prevW.bodyFat)?"#34d399":"#f87171",marginLeft:2}}>{parseFloat(w.bodyFat)<parseFloat(prevW.bodyFat)?"↓":"↑"}{Math.abs(parseFloat(w.bodyFat)-parseFloat(prevW.bodyFat)).toFixed(1)}%</span> : null; })()}}
                                 {w.muscleMass && <span style={{ fontSize: 9, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>Muscle {w.muscleMass}lb</span>}
                               </div>
                             )}
