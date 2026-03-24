@@ -2404,25 +2404,25 @@ export default function App() {
               );
             })()}
 
-            {/* Share Progress */}
-            <div className="stat-card fade-up-4" style={{ padding: "12px 14px" }}>
-              <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share Progress</div>
-              <div style={{ fontSize: 10, color: "#475569", marginBottom: 10, lineHeight: 1.4 }}>Copy your stats as a text snippet</div>
-              <button onClick={shareStats} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                📤 Share Stats
-              </button>
-            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
+                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share</div>
+                <button onClick={shareStats} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>📤 Share</button>
+              </div>
 
-            {/* Daily Reminders */}
-            <div className="stat-card fade-up-4" style={{ padding: "10px 14px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <Bell size={13} style={{ color: notifEnabled ? "#10b981" : "#334155" }} />
-                  <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Daily Reminders</div>
-                </div>
-                <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "5px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-                  {notifEnabled ? "On ✓" : "Enable"}
-                </button>
+              <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
+                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Reminders</div>
+                <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", transition: "all 0.2s" }}>{notifEnabled ? "On ✓" : "Enable"}</button>
+              </div>
+            </div>
+              <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
+                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Reminders</div>
+                <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", transition: "all 0.2s" }}>{notifEnabled ? "On ✓" : "Enable"}</button>
+              </div>
+            </div>
+              <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
+                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Reminders</div>
+                <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", transition: "all 0.2s" }}>{notifEnabled ? "On ✓" : "Enable"}</button>
               </div>
             </div>
 
