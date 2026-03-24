@@ -1603,7 +1603,7 @@ export default function App() {
         .stat-card { background: #0c0e18; border: 1px solid #131929; border-radius: 12px; padding: 20px; transition: all 0.22s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden; }
         .stat-card::before { content: ''; position: absolute; inset: 0; border-radius: 12px; background: linear-gradient(135deg, #10b98106 0%, transparent 60%); pointer-events: none; }
         .stat-card:hover { border-color: #1e2d40; box-shadow: 0 8px 32px #00000055, 0 0 0 1px #10b98112; transform: translateY(-2px); }
-        .stat-card-glow { border-color: #065f3a55 !important; border-left: 3px solid #10b981 !important; box-shadow: 0 0 0 1px #10b98122, 0 4px 32px #10b98112 !important; }
+        .stat-card-glow { border-color: #065f3a55 !important; box-shadow: 0 0 0 1px #10b98122, 0 4px 32px #10b98112 !important; }
 
         /* Typography */
         .big-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: #10b981; line-height: 1; letter-spacing: 1px; }
@@ -1945,7 +1945,7 @@ export default function App() {
                   );
                 })()}
               </div>
-              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #10b981" }}>
+              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #a855f7" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Streak</div>
                 {(() => {
                   const streak = getLoggingStreak(logs);
@@ -1966,7 +1966,7 @@ export default function App() {
                       <svg width={80} height={80} style={{ flexShrink: 0, overflow: "visible" }}>
                         <circle cx="40" cy="40" r={R} fill="none" stroke="#131929" strokeWidth="4" />
                         <circle cx="40" cy="40" r={R} fill="none"
-                          stroke={weekHits >= 5 ? "#34d399" : weekHits >= 3 ? "#fbbf24" : "#10b981"}
+                          stroke="#a855f7"
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
                           transform="rotate(-90 40 40)"
