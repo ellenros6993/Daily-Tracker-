@@ -1924,9 +1924,9 @@ export default function App() {
                   const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
                   return (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <svg width={66} height={66}>
-                        <circle cx="33" cy="33" r={R} fill="none" stroke="#131929" strokeWidth="4" />
-                        <circle cx="33" cy="33" r={R} fill="none" stroke={col}
+                      <svg width={80} height={80}>
+                        <circle cx="40" cy="40" r={R} fill="none" stroke="#131929" strokeWidth="4" />
+                        <circle cx="40" cy="40" r={R} fill="none" stroke={col}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
                           transform="rotate(-90 27 27)"
@@ -1963,9 +1963,9 @@ export default function App() {
                         {streak}<span style={{ fontSize: 14, color: "#1e2d40", fontFamily: "'Inter',sans-serif", fontWeight: 400 }}> days</span>
                       </div>
                       {/* Weekly ring */}
-                      <svg width={66} height={66} style={{ flexShrink: 0 }}>
-                        <circle cx="33" cy="33" r={R} fill="none" stroke="#131929" strokeWidth="4" />
-                        <circle cx="33" cy="33" r={R} fill="none"
+                      <svg width={80} height={80} style={{ flexShrink: 0 }}>
+                        <circle cx="40" cy="40" r={R} fill="none" stroke="#131929" strokeWidth="4" />
+                        <circle cx="40" cy="40" r={R} fill="none"
                           stroke={weekHits >= 5 ? "#34d399" : weekHits >= 3 ? "#fbbf24" : "#10b981"}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
