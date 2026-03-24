@@ -1882,7 +1882,7 @@ export default function App() {
                 {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
               </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #60a5fa", display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>To Goal</div>
+                <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>Progress</div>
                 {latestWeight ? (
                   <>
                     <svg width={84} height={84} style={{ margin: "2px auto" }}>
