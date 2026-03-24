@@ -1880,14 +1880,14 @@ export default function App() {
                 {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:6}}>COLLECTION</div>}
                 {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
               </div>
-              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #60a5fa", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: `3px solid ${_pct >= 50 ? "#34d399" : _pct >= 25 ? "#fbbf24" : "#f87171"}`, display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>Progress</div>
                 {latestWeight ? (
                   <>
                     <svg width={100} height={100} style={{ margin: "8px auto 2px", overflow: "visible" }}>
                       <circle cx="50" cy="50" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
                       <circle cx="50" cy="50" r={ARC_R} fill="none"
-                        stroke={_pct >= 50 ? "#34d399" : _pct >= 25 ? "#fbbf24" : "#f87171"}
+                        stroke="#60a5fa"
                         strokeWidth="5" strokeLinecap="round"
                         strokeDasharray={`${arcDash} ${ARC_CIRC}`}
                         transform="rotate(-90 50 50)"
@@ -3236,8 +3236,8 @@ export default function App() {
                   <input type="number" placeholder="8500" value={form.steps} onChange={e => setForm(f => ({ ...f, steps: e.target.value }))} />
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  {form.steps && <div style={{ fontSize: 11, color: parseInt(form.steps) >= STEPS_MIN ? "#60a5fa" : "#94a3b8" }}>{parseInt(form.steps) >= STEPS_MIN ? "✓ Goal hit!" : `${(STEPS_MIN - parseInt(form.steps)).toLocaleString()} steps to go`}</div>}
-                  <button className="save-btn" style={{ marginLeft: "auto", fontSize: 14, padding: "8px 20px" }} onClick={saveLog}>{saved ? "✓ Saved" : "Save Steps"}</button>
+                  {form.steps && <div style={{ fontSize: 11, color: parseInt(form.steps) >= STEPS_MIN ? "#34d399" : "#fbbf24" }}>{parseInt(form.steps) >= STEPS_MIN ? "✓ Goal hit!" : `${(STEPS_MIN - parseInt(form.steps)).toLocaleString()} steps to go`}</div>}
+                  <button style={{ marginLeft: "auto", fontSize: 14, padding: "8px 20px", background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", borderRadius: 8, fontWeight: 600, cursor: "pointer" }} onClick={saveLog}>{saved ? "✓ Saved" : "Save Steps"}</button>
                 </div>
               </div>
 
@@ -3260,8 +3260,8 @@ export default function App() {
                           return (
                             <tr key={row.date} className={i % 2 === 0 ? "row-even" : "row-odd"}>
                               <td style={{ padding: "8px 12px", color: "#94a3b8" }}>{row.date}</td>
-                              <td style={{ padding: "8px 12px", fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: "#60a5fa" }}>{parseInt(row.steps).toLocaleString()}</td>
-                              <td style={{ padding: "8px 12px", fontSize: 11, color: "#60a5fa" }}>{hit ? "✓ Hit" : `${(STEPS_MIN - parseInt(row.steps)).toLocaleString()} short`}</td>
+                              <td style={{ padding: "8px 12px", fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: hit ? "#34d399" : "#f87171" }}>{parseInt(row.steps).toLocaleString()}</td>
+                              <td style={{ padding: "8px 12px", fontSize: 11, color: hit ? "#34d399" : "#f87171" }}>{hit ? "✓ Hit" : `${(STEPS_MIN - parseInt(row.steps)).toLocaleString()} short`}</td>
                             </tr>
                           );
                         })}
@@ -4067,7 +4067,7 @@ export default function App() {
                                 <td style={{ padding: "6px 10px", color: "#10b981" }}>{row.weight || "—"}</td>
                                 <td style={{ padding: "6px 10px", color: calHit ? "#34d399" : row.calories ? "#f87171" : "#334155" }}>{row.calories || "—"}</td>
                                 <td style={{ padding: "6px 10px", color: proHit ? "#34d399" : row.protein ? "#f87171" : "#334155" }}>{row.protein ? row.protein + "g" : "—"}</td>
-                                <td style={{ padding: "6px 10px", color: "#60a5fa" }}>{row.steps ? parseInt(row.steps).toLocaleString() : "—"}</td>
+                                <td style={{ padding: "6px 10px", color: stepHit ? "#34d399" : row.steps ? "#f87171" : "#334155" }}>{row.steps ? parseInt(row.steps).toLocaleString() : "—"}</td>
                                 <td style={{ padding: "6px 10px", color: row.training ? "#34d399" : "#334155", maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.training || "—"}</td>
                                 <td style={{ padding: "6px 10px", fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: row.score === 4 ? "#34d399" : row.score >= 3 ? "#fbbf24" : "#f87171" }}>{row.score ?? "—"}<span style={{ fontSize: 11, color: "#334155" }}>/4</span></td>
                               </tr>
