@@ -1887,7 +1887,7 @@ export default function App() {
                     <svg width={100} height={100} style={{ margin: "8px auto 2px", overflow: "visible" }}>
                       <circle cx="50" cy="50" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
                       <circle cx="50" cy="50" r={ARC_R} fill="none"
-                        stroke={_pct >= 50 ? "#34d399" : _pct >= 25 ? "#fbbf24" : "#f87171"}
+                        stroke="#60a5fa"
                         strokeWidth="5" strokeLinecap="round"
                         strokeDasharray={`${arcDash} ${ARC_CIRC}`}
                         transform="rotate(-90 50 50)"
@@ -3210,7 +3210,7 @@ export default function App() {
 
               {/* Step Count */}
               <div className="stat-card">
-                <div className="section-title" style={{ fontSize: 16 }}>STEP COUNT</div>
+                <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>STEP COUNT</div>
                 <div style={{ marginBottom: 10 }}>
                   <div className="field-label" style={{ marginBottom: 4 }}>Date</div>
                   <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ maxWidth: 200, marginBottom: 10 }} />
@@ -3244,7 +3244,7 @@ export default function App() {
               {/* Step Count History */}
               {logs.filter(l => l.steps && parseInt(l.steps) > 0).length > 0 && (
                 <div className="stat-card">
-                  <div className="section-title" style={{ fontSize: 16 }}>STEP HISTORY</div>
+                  <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>STEP HISTORY</div>
                   <div style={{ overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                       <thead>
