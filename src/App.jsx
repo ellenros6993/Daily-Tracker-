@@ -1550,7 +1550,7 @@ export default function App() {
   const _goalRem = latestWeight ? (parseFloat(latestWeight.weight) - GOAL_WEIGHT).toFixed(1) : 0;
   const cRem = useCountUp(_goalRem, 700);
   const _pct = latestWeight ? Math.round(((START_WEIGHT - parseFloat(latestWeight.weight)) / (START_WEIGHT - GOAL_WEIGHT)) * 100) : 0;
-  const ARC_R = 48, ARC_CIRC = 2 * Math.PI * ARC_R;
+  const ARC_R = 44, ARC_CIRC = 2 * Math.PI * ARC_R;
   const arcDash = (_pct / 100) * ARC_CIRC;
 
   return (
@@ -1884,18 +1884,18 @@ export default function App() {
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>Progress</div>
                 {latestWeight ? (
                   <>
-                    <svg width={110} height={110} style={{ margin: "2px auto" }}>
-                      <circle cx="55" cy="55" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
-                      <circle cx="55" cy="55" r={ARC_R} fill="none"
+                    <svg width={100} height={100} style={{ margin: "2px auto" }}>
+                      <circle cx="50" cy="50" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
+                      <circle cx="50" cy="50" r={ARC_R} fill="none"
                         stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
                         strokeWidth="5" strokeLinecap="round"
                         strokeDasharray={`${arcDash} ${ARC_CIRC}`}
                         transform="rotate(-90 42 42)"
                         style={{ transition: "stroke-dasharray 1s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                      <text x="55" y="52" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="18" fontFamily="'Bebas Neue',sans-serif">{cRem}</text>
-                      <text x="55" y="68" textAnchor="middle" fill="#94a3b8" fontSize="9" fontFamily="'DM Mono',monospace">lbs left</text>
+                      <text x="50" y="46" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="14" fontFamily="'Bebas Neue',sans-serif">{cRem}</text>
+                      <text x="50" y="60" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lbs left</text>
                     </svg>
-                    <div style={{ color: "#94a3b8", fontSize: 11, fontFamily: "'DM Mono',monospace", marginTop: 4 }}>{_pct}% complete</div>
+                    <div style={{ color: "#334155", fontSize: 9, fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{_pct}% complete</div>
                   </>
                 ) : <div style={{ color: "#1e2d40", fontSize: 10, marginTop: 8 }}>—</div>}
               </div>
