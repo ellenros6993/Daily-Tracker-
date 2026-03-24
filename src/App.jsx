@@ -1887,10 +1887,10 @@ export default function App() {
                     <svg width={100} height={100} style={{ margin: "8px auto 2px", overflow: "visible" }}>
                       <circle cx="50" cy="50" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
                       <circle cx="50" cy="50" r={ARC_R} fill="none"
-                        stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
+                        stroke="#60a5fa"
                         strokeWidth="5" strokeLinecap="round"
                         strokeDasharray={`${arcDash} ${ARC_CIRC}`}
-                        transform="rotate(-90 50 50)"
+                        transform="rotate(-90 42 42)"
                         style={{ transition: "stroke-dasharray 1s cubic-bezier(0.34,1.56,0.64,1)" }} />
                       <text x="50" y="46" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="14" fontFamily="'Bebas Neue',sans-serif">{cRem}</text>
                       <text x="50" y="60" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lbs left</text>
@@ -1905,7 +1905,7 @@ export default function App() {
             {/* Weekly Compliance + Next Milestone + Share */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }} className="kpi-grid">
               {/* Weekly compliance ring */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px", borderLeft: "3px solid #fbbf24" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>This Week</div>
                 {(() => {
                   const weekLogs = getWeekLogs(logs, getCurrentWeekStart());
