@@ -1890,7 +1890,7 @@ export default function App() {
                         stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
                         strokeWidth="5" strokeLinecap="round"
                         strokeDasharray={`${arcDash} ${ARC_CIRC}`}
-                        transform="rotate(-90 50 50)"
+                        transform="rotate(-90 42 42)"
                         style={{ transition: "stroke-dasharray 1s cubic-bezier(0.34,1.56,0.64,1)" }} />
                       <text x="50" y="46" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="14" fontFamily="'Bebas Neue',sans-serif">{cRem}</text>
                       <text x="50" y="60" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lbs left</text>
@@ -1963,7 +1963,7 @@ export default function App() {
                         {streak}<span style={{ fontSize: 14, color: "#1e2d40", fontFamily: "'Inter',sans-serif", fontWeight: 400 }}> days</span>
                       </div>
                       {/* Weekly ring */}
-                      <svg width={80} height={80} style={{ flexShrink: 0 }}>
+                      <svg width={80} height={80} style={{ flexShrink: 0, overflow: "visible" }}>
                         <circle cx="40" cy="40" r={R} fill="none" stroke="#131929" strokeWidth="4" />
                         <circle cx="40" cy="40" r={R} fill="none"
                           stroke={weekHits >= 5 ? "#34d399" : weekHits >= 3 ? "#fbbf24" : "#10b981"}
@@ -1971,7 +1971,7 @@ export default function App() {
                           strokeDasharray={`${dash} ${CIRC}`}
                           transform="rotate(-90 40 40)"
                           style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                        <text x="27" y="27" textAnchor="middle" dominantBaseline="central" fill="#e2e8f0" fontSize="11" fontFamily="'DM Mono',monospace" fontWeight="600">{weekHits}/7</text>
+                        <text x="40" y="40" textAnchor="middle" dominantBaseline="central" fill="#e2e8f0" fontSize="11" fontFamily="'DM Mono',monospace" fontWeight="600">{weekHits}/7</text>
                       </svg>
                     </div>
                     <div style={{ color: "#475569", fontSize: 10, marginTop: 4 }}>
