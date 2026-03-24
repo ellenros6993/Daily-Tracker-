@@ -656,15 +656,6 @@ export default function App() {
   });
   const [manualFoodForm, setManualFoodForm] = useState({ name: "", calories: "", protein: "", carbs: "", fat: "", fiber: "", sugar: "", servingSize: "1 serving" });
   const [showManualEntry, setShowManualEntry] = useState(false);
-
-    try {
-      const stored = JSON.parse(localStorage.getItem("dat-personal-foods") || "[]");
-      // Merge preloaded foods — add any that aren't already in the DB
-      const storedIds = new Set(stored.map(f => f.id));
-      const toAdd = PRELOADED_FOODS.filter(f => !storedIds.has(f.id));
-      return [...stored, ...toAdd];
-    } catch { return PRELOADED_FOODS; }
-  });
   const [nutritionDate, setNutritionDate] = useState(getLocalDateStr());
 
   function navigateNutritionDate(newDate) {
