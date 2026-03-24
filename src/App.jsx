@@ -1919,7 +1919,7 @@ export default function App() {
                     return { hitGoals: acc.hitGoals + calcScore(l), totalGoals: acc.totalGoals + possible };
                   }, { hitGoals: 0, totalGoals: 0 });
                   const pct = totalGoals > 0 ? Math.round((hitGoals / totalGoals) * 100) : 0;
-                  const R = 34, CIRC = 2 * Math.PI * R;
+                  const R = 38, CIRC = 2 * Math.PI * R;
                   const dash = (pct / 100) * CIRC;
                   const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
                   return (
