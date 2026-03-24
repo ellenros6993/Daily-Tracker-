@@ -1877,24 +1877,14 @@ export default function App() {
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Current Weight</div>
                 <div className="big-num" style={{ fontSize: 26 }}>{latestWeight ? cWeight : "—"}</div>
                 <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lb</div>
+                {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
               </div>
               <div className="stat-card fade-up-1" style={{ padding: "12px 14px" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Lost</div>
                 <div className="big-num" style={{ fontSize: 26, color: "#34d399" }}>{lostSoFar > 0 ? cLost : "—"}</div>
                 <div style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>lbs down</div>
-                {lostSoFar > 0 && (() => {
-                  const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m);
-                  if(!earned.length) return null;
-                  const mColors = ["#cd7f32","#c0c0c0","#ffd700","#a855f7","#3b82f6","#10b981","#f87171","#fbbf24","#34d399","#60a5fa"];
-                  return (<div style={{display:"flex",flexWrap:"wrap",gap:4,marginTop:6}}>{earned.map(m => (<span key={m} style={{fontSize:12,lineHeight:1}}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>);
-                })()}
                 {weighIns.length >= 2 && (() => { const first = weighIns[0], last = weighIns[weighIns.length-1]; const days = getDaysBetween(first.date, last.date); const avg = days > 0 ? ((parseFloat(first.weight) - parseFloat(last.weight)) / days * 7).toFixed(2) : null; return avg ? <div style={{ fontSize: 9, color: "#10b981", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{avg} lbs/wk avg</div> : null; })()}
-                {weighIns.length >= 2 && (() => {
-                  const first = weighIns[0], last = weighIns[weighIns.length-1];
-                  const days = getDaysBetween(first.date, last.date);
-                  const avg = days > 0 ? ((parseFloat(first.weight) - parseFloat(last.weight)) / days * 7).toFixed(2) : null;
-                  return avg ? <div style={{ fontSize: 9, color: "#10b981", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{avg} lbs/wk avg</div> : null;
-                })()}              </div>
+              </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px", display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>To Goal</div>
                 {latestWeight ? (
@@ -1913,13 +1903,6 @@ export default function App() {
                     <div style={{ color: "#334155", fontSize: 9, fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{_pct}% complete</div>
                   </>
                 ) : <div style={{ color: "#1e2d40", fontSize: 10, marginTop: 8 }}>—</div>}
-              </div>
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Medals</div>
-                {lostSoFar > 0 ? (() => {
-                  const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m);
-                  return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:4}}>{earned.map(m => (<span key={m} style={{fontSize:14,lineHeight:1}}>🏅<span style={{fontSize:9,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : <div style={{color:"#334155",fontSize:10}}>Keep going!</div>;
-                })() : <div style={{color:"#334155",fontSize:10}}>First 5 lbs!</div>}
               </div>
             </div>
             )}
