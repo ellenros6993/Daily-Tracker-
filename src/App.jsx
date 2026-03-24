@@ -373,7 +373,7 @@ function generateReportHTML(weekStart, weekLogs, allLogs) {
         <td style="color:#10b981">${row.weight || '—'}</td>
         <td style="color:${calHit ? '#34d399' : row.calories ? '#f87171' : '#334155'}">${row.calories || '—'}</td>
         <td style="color:${proHit ? '#34d399' : row.protein ? '#f87171' : '#334155'}">${row.protein ? row.protein + 'g' : '—'}</td>
-        <td style="color:${stepHit ? '#34d399' : row.steps ? '#f87171' : '#334155'}">${row.steps ? parseInt(row.steps).toLocaleString() : '—'}</td>
+        <td style="color:#60a5fa">${row.steps ? parseInt(row.steps).toLocaleString() : '—'}</td>
         <td style="color:${row.training ? '#34d399' : '#334155'}">${row.training || '—'}</td>
         <td style="color:${row.score === 4 ? '#34d399' : row.score >= 3 ? '#fbbf24' : '#f87171'};font-family:'Bebas Neue',sans-serif;font-size:18px">${row.score ?? '—'}/4</td>
       </tr>`;
@@ -1880,14 +1880,14 @@ export default function App() {
                 {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:6}}>COLLECTION</div>}
                 {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
               </div>
-              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: `3px solid ${_pct >= 50 ? "#34d399" : _pct >= 25 ? "#fbbf24" : "#f87171"}`, display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #60a5fa", display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>Progress</div>
                 {latestWeight ? (
                   <>
                     <svg width={100} height={100} style={{ margin: "8px auto 2px", overflow: "visible" }}>
                       <circle cx="50" cy="50" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
                       <circle cx="50" cy="50" r={ARC_R} fill="none"
-                        stroke={_pct >= 50 ? "#34d399" : _pct >= 25 ? "#fbbf24" : "#f87171"}
+                        stroke="#60a5fa"
                         strokeWidth="5" strokeLinecap="round"
                         strokeDasharray={`${arcDash} ${ARC_CIRC}`}
                         transform="rotate(-90 50 50)"
@@ -2020,7 +2020,7 @@ export default function App() {
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                     <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgCal && avgCal >= CALORIES_MIN && avgCal <= CALORIES_MAX ? "#34d399" : avgCal ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgCal || "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>kcal/day</div></div>
                     <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgPro && avgPro >= PROTEIN_MIN ? "#34d399" : avgPro ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgPro ? avgPro + "g" : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>protein/day</div></div>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgSteps && avgSteps >= STEPS_MIN ? "#34d399" : avgSteps ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgSteps ? avgSteps.toLocaleString() : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>steps/day</div></div>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: "#60a5fa", lineHeight: 1 }}>{avgSteps ? avgSteps.toLocaleString() : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>steps/day</div></div>
                   </div>
                 </div>
               );
@@ -3985,7 +3985,7 @@ export default function App() {
                     {[
                       { label: "Avg Calories", val: stats.avgCals, display: stats.avgCals, target: `${CALORIES_MIN}–${CALORIES_MAX}`, pct: stats.avgCals ? Math.min(100, Math.round(stats.avgCals / CALORIES_MAX * 100)) : 0, color: stats.avgCals && stats.avgCals >= CALORIES_MIN && stats.avgCals <= CALORIES_MAX ? "#34d399" : "#f87171", hitRate: stats.calHitRate },
                       { label: "Avg Protein", val: stats.avgPro, display: stats.avgPro ? `${stats.avgPro}g` : null, target: "≥120g", pct: stats.avgPro ? Math.min(100, Math.round(stats.avgPro / PROTEIN_MIN * 100)) : 0, color: stats.avgPro && stats.avgPro >= PROTEIN_MIN ? "#34d399" : "#fbbf24", hitRate: stats.proHitRate },
-                      { label: "Avg Steps", val: stats.avgSteps, display: stats.avgSteps ? stats.avgSteps.toLocaleString() : null, target: "≥8,000", pct: stats.avgSteps ? Math.min(100, Math.round(stats.avgSteps / STEPS_MIN * 100)) : 0, color: stats.avgSteps && stats.avgSteps >= STEPS_MIN ? "#34d399" : "#f87171", hitRate: stats.stepHitRate },
+                      { label: "Avg Steps", val: stats.avgSteps, display: stats.avgSteps ? stats.avgSteps.toLocaleString() : null, target: "≥8,000", pct: stats.avgSteps ? Math.min(100, Math.round(stats.avgSteps / STEPS_MIN * 100)) : 0, color: "#60a5fa", hitRate: stats.stepHitRate },
                     ].map(({ label, display, target, pct, color, hitRate }) => (
                       <div key={label} style={{ marginBottom: 16 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
