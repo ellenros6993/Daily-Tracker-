@@ -2415,16 +2415,6 @@ export default function App() {
                 <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", transition: "all 0.2s" }}>{notifEnabled ? "On ✓" : "Enable"}</button>
               </div>
             </div>
-              <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Reminders</div>
-                <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", transition: "all 0.2s" }}>{notifEnabled ? "On ✓" : "Enable"}</button>
-              </div>
-            </div>
-              <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Reminders</div>
-                <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", transition: "all 0.2s" }}>{notifEnabled ? "On ✓" : "Enable"}</button>
-              </div>
-            </div>
 
             {/* Settings & Targets */}
             <div className="stat-card fade-up-4" style={{ padding: "10px 14px" }}>
