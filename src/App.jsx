@@ -1801,7 +1801,7 @@ export default function App() {
       {/* Main */}
       <div className="main-content">
         <div className="topbar">
-          <div className="topbar-title">Daily Accountability Tracker<span>{tab}</span></div>
+          <div className="topbar-title">Daily Accountability Tracker<span>{tab === "Dashboard" ? "Home" : tab}</span></div>
           <div className="topbar-status" style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {/* Score ring — always visible */}
             {(() => {
