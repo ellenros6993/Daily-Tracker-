@@ -1929,11 +1929,11 @@ export default function App() {
                         <circle cx="40" cy="40" r={R} fill="none" stroke={col}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 27 27)"
+                          transform="rotate(-90 40 40)"
                           style={{ transition: "stroke-dasharray 0.7s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                        <text x="27" y="24" textAnchor="middle" dominantBaseline="central"
+                        <text x="40" y="37" textAnchor="middle" dominantBaseline="central"
                           fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="10" fontFamily="'Bebas Neue',sans-serif">{pct}%</text>
-                        <text x="27" y="36" textAnchor="middle" fill="#475569" fontSize="6" fontFamily="'DM Mono',monospace">goals hit</text>
+                        <text x="40" y="50" textAnchor="middle" fill="#94a3b8" fontSize="7" fontFamily="'DM Mono',monospace">goals hit</text>
                       </svg>
                       <div style={{ textAlign: "center" }}>
                         <div style={{ fontSize: 10, color: col, fontWeight: 600 }}>
@@ -1969,7 +1969,7 @@ export default function App() {
                           stroke={weekHits >= 5 ? "#34d399" : weekHits >= 3 ? "#fbbf24" : "#10b981"}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 27 27)"
+                          transform="rotate(-90 40 40)"
                           style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.34,1.56,0.64,1)" }} />
                         <text x="27" y="27" textAnchor="middle" dominantBaseline="central" fill="#e2e8f0" fontSize="11" fontFamily="'DM Mono',monospace" fontWeight="600">{weekHits}/7</text>
                       </svg>
