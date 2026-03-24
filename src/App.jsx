@@ -1603,7 +1603,7 @@ export default function App() {
         .stat-card { background: #0c0e18; border: 1px solid #131929; border-radius: 12px; padding: 20px; transition: all 0.22s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden; }
         .stat-card::before { content: ''; position: absolute; inset: 0; border-radius: 12px; background: linear-gradient(135deg, #10b98106 0%, transparent 60%); pointer-events: none; }
         .stat-card:hover { border-color: #1e2d40; box-shadow: 0 8px 32px #00000055, 0 0 0 1px #10b98112; transform: translateY(-2px); }
-        .stat-card-glow { border-color: #065f3a55 !important; border-left: 3px solid #10b981 !important; box-shadow: 0 0 0 1px #10b98122, 0 4px 32px #10b98112 !important; }
+        .stat-card-glow { border-color: #065f3a55 !important; box-shadow: 0 0 0 1px #10b98122, 0 4px 32px #10b98112 !important; }
 
         /* Typography */
         .big-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: #10b981; line-height: 1; letter-spacing: 1px; }
@@ -1959,7 +1959,7 @@ export default function App() {
                   const dash = ringPct * CIRC;
                   return <>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div className="big-num" style={{ fontSize: 26, color: "#a855f7" }}>
+                      <div className="big-num" style={{ fontSize: 26, color: streak >= 7 ? "#34d399" : streak >= 3 ? "#fbbf24" : "#10b981" }}>
                         {streak}<span style={{ fontSize: 14, color: "#1e2d40", fontFamily: "'Inter',sans-serif", fontWeight: 400 }}> days</span>
                       </div>
                       {/* Weekly ring */}
@@ -1986,7 +1986,7 @@ export default function App() {
                         const score = l ? calcScore(l) : -1;
                         return { ds, score };
                       });
-                      const color = (s) => s < 0 ? "#0f1623" : s === 0 ? "#131929" : s === 1 ? "#3b1f6b" : s === 2 ? "#5b2d8e" : s === 3 ? "#8b3fc8" : "#a855f7";
+                      const color = (s) => s < 0 ? "#0f1623" : s === 0 ? "#131929" : s === 1 ? "#064e35" : s === 2 ? "#065f3a" : s === 3 ? "#059669" : "#10b981";
                       return (
                         <div style={{ marginTop: 10 }}>
                           <div style={{ display: "grid", gridTemplateColumns: "repeat(14, 1fr)", gap: 2 }}>
