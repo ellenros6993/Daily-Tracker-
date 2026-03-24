@@ -2226,14 +2226,14 @@ export default function App() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <Settings2 size={14} style={{ color: "#475569" }} />
                   <div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Settings & Targets</div>
+                    <div className="label" style={{ fontSize: 9, marginBottom: 4 }}>Settings & Targets</div>
                     <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>
                       {S_CALORIES_MIN}–{S_CALORIES_MAX} kcal · ≥{S_PROTEIN_MIN}g protein · ≥{S_STEPS_MIN.toLocaleString()} steps
                     </div>
                   </div>
                 </div>
                 <button onClick={() => navigateTo("Settings")}
-                  style={{ background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                  style={{ background: "linear-gradient(135deg,#0f1623,#1e2d40)", border: "1px solid #1e2d4066", color: "#94a3b8", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
                   Edit <ChevronRight size={11} />
                 </button>
               </div>
