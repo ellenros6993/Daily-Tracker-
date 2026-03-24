@@ -1919,12 +1919,12 @@ export default function App() {
                     return { hitGoals: acc.hitGoals + calcScore(l), totalGoals: acc.totalGoals + possible };
                   }, { hitGoals: 0, totalGoals: 0 });
                   const pct = totalGoals > 0 ? Math.round((hitGoals / totalGoals) * 100) : 0;
-                  const R = 28, CIRC = 2 * Math.PI * R;
+                  const R = 34, CIRC = 2 * Math.PI * R;
                   const dash = (pct / 100) * CIRC;
                   const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
                   return (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <svg width={80} height={80} style={{ overflow: "visible", marginTop: 6 }}>
+                      <svg width={80} height={80} style={{ overflow: "visible" }}>
                         <circle cx="40" cy="40" r={R} fill="none" stroke="#131929" strokeWidth="4" />
                         <circle cx="40" cy="40" r={R} fill="none" stroke={col}
                           strokeWidth="4" strokeLinecap="round"
