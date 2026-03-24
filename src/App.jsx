@@ -2443,7 +2443,7 @@ export default function App() {
                             </div>
                             {(w.bodyFat || w.muscleMass) && (
                               <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-                                {w.bodyFat && <span style={{ fontSize: 9, color: "#a78bfa", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>{(() => { const idx = [...weighIns].reverse().findIndex(x=>x.date===w.date); const prevW = [...weighIns].reverse()[idx+1]; return prevW BF {w.bodyFat}%</span>BF {w.bodyFat}%</span> prevW.bodyFat ? <span style={{fontSize:8,color:parseFloat(w.bodyFat)<parseFloat(prevW.bodyFat)?"#34d399":"#f87171",marginLeft:2}}>{parseFloat(w.bodyFat)<parseFloat(prevW.bodyFat)?"↓":"↑"}{Math.abs(parseFloat(w.bodyFat)-parseFloat(prevW.bodyFat)).toFixed(1)}%</span> : null; })()}}
+                                {w.bodyFat && <span style={{ fontSize: 9, color: "#a78bfa", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>}
                                 {w.muscleMass && <span style={{ fontSize: 9, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>Muscle {w.muscleMass}lb</span>}
                               </div>
                             )}
