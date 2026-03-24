@@ -1904,6 +1904,44 @@ export default function App() {
                   </>
                 ) : <div style={{ color: "#1e2d40", fontSize: 10, marginTop: 8 }}>—</div>}
               </div>
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
+                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Next Milestone</div>
+                {(() => {
+                  const lost = lostSoFar > 0 ? parseFloat(lostSoFar) : 0;
+                  const next = MILESTONES.find(m => m > lost);
+                  const prev = [...MILESTONES].reverse().find(m => m <= lost) || 0;
+                  const pct = next ? Math.round(((lost - prev) / (next - prev)) * 100) : 100;
+                  const toNext = next ? (next - lost).toFixed(1) : null;
+                  const R = 22, CIRC = 2 * Math.PI * R;
+                  const dash = (pct / 100) * CIRC;
+                  return (
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                      <svg width={54} height={54} style={{ flexShrink: 0 }}>
+                        <circle cx="27" cy="27" r={R} fill="none" stroke="#131929" strokeWidth="4" />
+                        <circle cx="27" cy="27" r={R} fill="none"
+                          stroke={!next ? "#fbbf24" : pct >= 75 ? "#34d399" : "#10b981"}
+                          strokeWidth="4" strokeLinecap="round"
+                          strokeDasharray={`${dash} ${CIRC}`}
+                          transform="rotate(-90 27 27)"
+                          style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.34,1.56,0.64,1)" }} />
+                        <text x="27" y="24" textAnchor="middle" dominantBaseline="central"
+                          fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="10" fontFamily="'Bebas Neue',sans-serif">{pct}%</text>
+                        <text x="27" y="36" textAnchor="middle" fill="#475569" fontSize="6" fontFamily="'DM Mono',monospace">there</text>
+                      </svg>
+                      <div style={{ textAlign: "center" }}>
+                        {next ? (
+                          <>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#10b981", lineHeight: 1 }}>{toNext}<span style={{ fontSize: 10, color: "#475569" }}> lb</span></div>
+                            <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>🏅 {next}lb badge</div>
+                          </>
+                        ) : (
+                          <div style={{ fontSize: 10, color: "#fbbf24", fontWeight: 600 }}>🏆 All done!</div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
             </div>
             )}
 
@@ -1950,71 +1988,6 @@ export default function App() {
                   );
                 })()}
               </div>
-
-              {/* Next milestone */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Next Milestone</div>
-                {(() => {
-                  const lost = lostSoFar > 0 ? parseFloat(lostSoFar) : 0;
-                  const next = MILESTONES.find(m => m > lost);
-                  const prev = [...MILESTONES].reverse().find(m => m <= lost) || 0;
-                  const pct = next ? Math.round(((lost - prev) / (next - prev)) * 100) : 100;
-                  const toNext = next ? (next - lost).toFixed(1) : null;
-                  const R = 22, CIRC = 2 * Math.PI * R;
-                  const dash = (pct / 100) * CIRC;
-                  return (
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <svg width={54} height={54} style={{ flexShrink: 0 }}>
-                        <circle cx="27" cy="27" r={R} fill="none" stroke="#131929" strokeWidth="4" />
-                        <circle cx="27" cy="27" r={R} fill="none"
-                          stroke={!next ? "#fbbf24" : pct >= 75 ? "#34d399" : "#10b981"}
-                          strokeWidth="4" strokeLinecap="round"
-                          strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 27 27)"
-                          style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                        <text x="27" y="24" textAnchor="middle" dominantBaseline="central"
-                          fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="10" fontFamily="'Bebas Neue',sans-serif">{pct}%</text>
-                        <text x="27" y="36" textAnchor="middle" fill="#475569" fontSize="6" fontFamily="'DM Mono',monospace">there</text>
-                      </svg>
-                      <div style={{ textAlign: "center" }}>
-                        {next ? (
-                          <>
-                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#10b981", lineHeight: 1 }}>{toNext}<span style={{ fontSize: 10, color: "#475569" }}> lb</span></div>
-                            <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>🏅 {next}lb badge</div>
-                          </>
-                        ) : (
-                          <div style={{ fontSize: 10, color: "#fbbf24", fontWeight: 600 }}>🏆 All done!</div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-
-            {/* 7-Day Averages */}
-            {(() => {
-              const last7 = logs.filter(l => { const d = getDaysBetween(l.date, getLocalDateStr()); return d >= 0 && d < 7; });
-              const withCal = last7.filter(l => l.calories && parseInt(l.calories) > 0);
-              const withPro = last7.filter(l => l.protein && parseInt(l.protein) > 0);
-              const withSteps = last7.filter(l => l.steps && parseInt(l.steps) > 0);
-              const avgCal = withCal.length ? Math.round(withCal.reduce((s,l) => s + parseInt(l.calories), 0) / withCal.length) : null;
-              const avgPro = withPro.length ? Math.round(withPro.reduce((s,l) => s + parseInt(l.protein), 0) / withPro.length) : null;
-              const avgSteps = withSteps.length ? Math.round(withSteps.reduce((s,l) => s + parseInt(l.steps), 0) / withSteps.length) : null;
-              if(!avgCal && !avgPro && !avgSteps) return null;
-              return (
-                <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
-                  <div className="label" style={{ fontSize: 9, marginBottom: 10 }}>7-DAY AVERAGES</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgCal && avgCal >= CALORIES_MIN && avgCal <= CALORIES_MAX ? "#34d399" : avgCal ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgCal || "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>kcal/day</div></div>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgPro && avgPro >= PROTEIN_MIN ? "#34d399" : avgPro ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgPro ? avgPro + "g" : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>protein/day</div></div>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgSteps && avgSteps >= STEPS_MIN ? "#34d399" : avgSteps ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgSteps ? avgSteps.toLocaleString() : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>steps/day</div></div>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Projection + Streak + Pace + Weekly Ring */}
             <div className="grid2" style={{ gap: 8 }}>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Streak</div>
@@ -2074,6 +2047,39 @@ export default function App() {
               </div>
             </div>
 
+            {/* TODAY card — compact, reactive glow */}
+            {(() => {
+              const score = today ? calcScore(today) : 0;
+              const glowClass = score === 4 ? "card-glow-4" : score === 3 ? "card-glow-3" : score === 2 ? "card-glow-2" : score === 1 ? "card-glow-1" : "";
+              return (
+            <div className={`stat-card fade-up-3 ${glowClass}`} style={{ padding: "12px 14px", position: "relative" }}>
+
+              {/* Next milestone */}
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
+
+            {/* 7-Day Averages */}
+            {(() => {
+              const last7 = logs.filter(l => { const d = getDaysBetween(l.date, getLocalDateStr()); return d >= 0 && d < 7; });
+              const withCal = last7.filter(l => l.calories && parseInt(l.calories) > 0);
+              const withPro = last7.filter(l => l.protein && parseInt(l.protein) > 0);
+              const withSteps = last7.filter(l => l.steps && parseInt(l.steps) > 0);
+              const avgCal = withCal.length ? Math.round(withCal.reduce((s,l) => s + parseInt(l.calories), 0) / withCal.length) : null;
+              const avgPro = withPro.length ? Math.round(withPro.reduce((s,l) => s + parseInt(l.protein), 0) / withPro.length) : null;
+              const avgSteps = withSteps.length ? Math.round(withSteps.reduce((s,l) => s + parseInt(l.steps), 0) / withSteps.length) : null;
+              if(!avgCal && !avgPro && !avgSteps) return null;
+              return (
+                <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
+                  <div className="label" style={{ fontSize: 9, marginBottom: 10 }}>7-DAY AVERAGES</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgCal && avgCal >= CALORIES_MIN && avgCal <= CALORIES_MAX ? "#34d399" : avgCal ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgCal || "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>kcal/day</div></div>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgPro && avgPro >= PROTEIN_MIN ? "#34d399" : avgPro ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgPro ? avgPro + "g" : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>protein/day</div></div>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgSteps && avgSteps >= STEPS_MIN ? "#34d399" : avgSteps ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgSteps ? avgSteps.toLocaleString() : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>steps/day</div></div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Projection + Streak + Pace + Weekly Ring */}
             {/* TODAY card — compact, reactive glow */}
             {(() => {
               const score = today ? calcScore(today) : 0;
