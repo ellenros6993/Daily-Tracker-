@@ -1880,7 +1880,7 @@ export default function App() {
                 {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:6}}>COLLECTION</div>}
                 {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
               </div>
-              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: `3px solid ${_pct >= 50 ? "#34d399" : _pct >= 25 ? "#fbbf24" : "#f87171"}`, display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #60a5fa", display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>Progress</div>
                 {latestWeight ? (
                   <>
@@ -2004,27 +2004,6 @@ export default function App() {
             </div>
 
 
-            {/* 7-Day Averages */}
-            {(() => {
-              const last7 = logs.filter(l => { const d = getDaysBetween(l.date, getLocalDateStr()); return d >= 0 && d < 7; });
-              const withCal = last7.filter(l => l.calories && parseInt(l.calories) > 0);
-              const withPro = last7.filter(l => l.protein && parseInt(l.protein) > 0);
-              const withSteps = last7.filter(l => l.steps && parseInt(l.steps) > 0);
-              const avgCal = withCal.length ? Math.round(withCal.reduce((s,l) => s + parseInt(l.calories), 0) / withCal.length) : null;
-              const avgPro = withPro.length ? Math.round(withPro.reduce((s,l) => s + parseInt(l.protein), 0) / withPro.length) : null;
-              const avgSteps = withSteps.length ? Math.round(withSteps.reduce((s,l) => s + parseInt(l.steps), 0) / withSteps.length) : null;
-              if(!avgCal && !avgPro && !avgSteps) return null;
-              return (
-                <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
-                  <div className="label" style={{ fontSize: 9, marginBottom: 10 }}>7-DAY AVERAGES</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgCal && avgCal >= CALORIES_MIN && avgCal <= CALORIES_MAX ? "#34d399" : avgCal ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgCal || "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>kcal/day</div></div>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgPro && avgPro >= PROTEIN_MIN ? "#34d399" : avgPro ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgPro ? avgPro + "g" : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>protein/day</div></div>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: "#60a5fa", lineHeight: 1 }}>{avgSteps ? avgSteps.toLocaleString() : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>steps/day</div></div>
-                  </div>
-                </div>
-              );
-            })()}
 
             {(() => {
               const score = today ? calcScore(today) : 0;
@@ -2135,6 +2114,27 @@ export default function App() {
                   </svg>
                   <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 4 }}>
                     {latestRate >= 1 ? "🔥 Excellent pace" : latestRate >= 0.5 ? "✓ On track" : latestRate > 0 ? "⚠ Below target — check nutrition" : "⚠ No recent loss detected"}
+                  </div>
+                </div>
+              );
+            })()}
+            {/* 7-Day Averages */}
+            {(() => {
+              const last7 = logs.filter(l => { const d = getDaysBetween(l.date, getLocalDateStr()); return d >= 0 && d < 7; });
+              const withCal = last7.filter(l => l.calories && parseInt(l.calories) > 0);
+              const withPro = last7.filter(l => l.protein && parseInt(l.protein) > 0);
+              const withSteps = last7.filter(l => l.steps && parseInt(l.steps) > 0);
+              const avgCal = withCal.length ? Math.round(withCal.reduce((s,l) => s + parseInt(l.calories), 0) / withCal.length) : null;
+              const avgPro = withPro.length ? Math.round(withPro.reduce((s,l) => s + parseInt(l.protein), 0) / withPro.length) : null;
+              const avgSteps = withSteps.length ? Math.round(withSteps.reduce((s,l) => s + parseInt(l.steps), 0) / withSteps.length) : null;
+              if(!avgCal && !avgPro && !avgSteps) return null;
+              return (
+                <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
+                  <div className="label" style={{ fontSize: 9, marginBottom: 10 }}>7-DAY AVERAGES</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgCal && avgCal >= CALORIES_MIN && avgCal <= CALORIES_MAX ? "#34d399" : avgCal ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgCal || "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>kcal/day</div></div>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgPro && avgPro >= PROTEIN_MIN ? "#34d399" : avgPro ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgPro ? avgPro + "g" : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>protein/day</div></div>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: "#60a5fa", lineHeight: 1 }}>{avgSteps ? avgSteps.toLocaleString() : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>steps/day</div></div>
                   </div>
                 </div>
               );
@@ -3237,7 +3237,7 @@ export default function App() {
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   {form.steps && <div style={{ fontSize: 11, color: parseInt(form.steps) >= STEPS_MIN ? "#60a5fa" : "#94a3b8" }}>{parseInt(form.steps) >= STEPS_MIN ? "✓ Goal hit!" : `${(STEPS_MIN - parseInt(form.steps)).toLocaleString()} steps to go`}</div>}
-                  <button style={{ marginLeft: "auto", fontSize: 14, padding: "8px 20px", background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", borderRadius: 8, fontWeight: 600, cursor: "pointer" }} onClick={saveLog}>{saved ? "✓ Saved" : "Save Steps"}</button>
+                  <button className="save-btn" style={{ marginLeft: "auto", fontSize: 14, padding: "8px 20px" }} onClick={saveLog}>{saved ? "✓ Saved" : "Save Steps"}</button>
                 </div>
               </div>
 
