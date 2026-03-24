@@ -4246,7 +4246,7 @@ export default function App() {
 
         </div>
       </div>
-
+      </div>
       {/* ── ONBOARDING OVERLAY ── */}
       {showOnboarding && (() => {
         const steps = [
