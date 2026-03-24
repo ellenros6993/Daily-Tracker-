@@ -1959,7 +1959,7 @@ export default function App() {
                   const dash = ringPct * CIRC;
                   return <>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div className="big-num" style={{ fontSize: 26, color: streak >= 7 ? "#34d399" : streak >= 3 ? "#fbbf24" : "#10b981" }}>
+                      <div className="big-num" style={{ fontSize: 26, color: "#a855f7" }}>
                         {streak}<span style={{ fontSize: 14, color: "#1e2d40", fontFamily: "'Inter',sans-serif", fontWeight: 400 }}> days</span>
                       </div>
                       {/* Weekly ring */}
@@ -1986,7 +1986,7 @@ export default function App() {
                         const score = l ? calcScore(l) : -1;
                         return { ds, score };
                       });
-                      const color = (s) => s < 0 ? "#0f1623" : s === 0 ? "#131929" : s === 1 ? "#064e35" : s === 2 ? "#065f3a" : s === 3 ? "#059669" : "#10b981";
+                      const color = (s) => s < 0 ? "#0f1623" : s === 0 ? "#131929" : s === 1 ? "#3b1f6b" : s === 2 ? "#5b2d8e" : s === 3 ? "#8b3fc8" : "#a855f7";
                       return (
                         <div style={{ marginTop: 10 }}>
                           <div style={{ display: "grid", gridTemplateColumns: "repeat(14, 1fr)", gap: 2 }}>
