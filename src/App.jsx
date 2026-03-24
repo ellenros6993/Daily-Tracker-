@@ -1550,7 +1550,7 @@ export default function App() {
   const _goalRem = latestWeight ? (parseFloat(latestWeight.weight) - GOAL_WEIGHT).toFixed(1) : 0;
   const cRem = useCountUp(_goalRem, 700);
   const _pct = latestWeight ? Math.round(((START_WEIGHT - parseFloat(latestWeight.weight)) / (START_WEIGHT - GOAL_WEIGHT)) * 100) : 0;
-  const ARC_R = 36, ARC_CIRC = 2 * Math.PI * ARC_R;
+  const ARC_R = 42, ARC_CIRC = 2 * Math.PI * ARC_R;
   const arcDash = (_pct / 100) * ARC_CIRC;
 
   return (
@@ -1607,7 +1607,7 @@ export default function App() {
 
         /* Typography */
         .big-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: #10b981; line-height: 1; letter-spacing: 1px; }
-        .label { color: #e2e8f0; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; font-weight: 600; font-family: 'DM Mono', monospace; }
+        .label { color: #334155; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; font-weight: 600; font-family: 'DM Mono', monospace; }
         .section-title { font-size: 10px; font-weight: 700; letter-spacing: 3px; color: #10b981; margin-bottom: 18px; text-transform: uppercase; font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 8px; }
         .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, #10b98122, transparent); }
         .field-label { color: #475569; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; font-weight: 600; font-family: 'DM Mono', monospace; }
@@ -1884,18 +1884,18 @@ export default function App() {
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>Progress</div>
                 {latestWeight ? (
                   <>
-                    <svg width={84} height={84} style={{ margin: "2px auto" }}>
-                      <circle cx="42" cy="42" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
-                      <circle cx="42" cy="42" r={ARC_R} fill="none"
+                    <svg width={100} height={100} style={{ margin: "2px auto" }}>
+                      <circle cx="50" cy="50" r={ARC_R} fill="none" stroke="#131929" strokeWidth="5" />
+                      <circle cx="50" cy="50" r={ARC_R} fill="none"
                         stroke={_pct >= 80 ? "#34d399" : _pct >= 40 ? "#fbbf24" : "#f87171"}
                         strokeWidth="5" strokeLinecap="round"
                         strokeDasharray={`${arcDash} ${ARC_CIRC}`}
                         transform="rotate(-90 42 42)"
                         style={{ transition: "stroke-dasharray 1s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                      <text x="42" y="38" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="14" fontFamily="'Bebas Neue',sans-serif">{cRem}</text>
-                      <text x="42" y="54" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lbs left</text>
+                      <text x="50" y="46" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="14" fontFamily="'Bebas Neue',sans-serif">{cRem}</text>
+                      <text x="50" y="60" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">lbs left</text>
                     </svg>
-                    <div style={{ color: "#94a3b8", fontSize: 10, fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{_pct}% complete</div>
+                    <div style={{ color: "#334155", fontSize: 9, fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{_pct}% complete</div>
                   </>
                 ) : <div style={{ color: "#1e2d40", fontSize: 10, marginTop: 8 }}>—</div>}
               </div>
@@ -1924,9 +1924,9 @@ export default function App() {
                   const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
                   return (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <svg width={54} height={54}>
-                        <circle cx="27" cy="27" r={R} fill="none" stroke="#131929" strokeWidth="4" />
-                        <circle cx="27" cy="27" r={R} fill="none" stroke={col}
+                      <svg width={66} height={66}>
+                        <circle cx="33" cy="33" r={R} fill="none" stroke="#131929" strokeWidth="4" />
+                        <circle cx="33" cy="33" r={R} fill="none" stroke={col}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
                           transform="rotate(-90 27 27)"
@@ -1963,9 +1963,9 @@ export default function App() {
                         {streak}<span style={{ fontSize: 14, color: "#1e2d40", fontFamily: "'Inter',sans-serif", fontWeight: 400 }}> days</span>
                       </div>
                       {/* Weekly ring */}
-                      <svg width={54} height={54} style={{ flexShrink: 0 }}>
-                        <circle cx="27" cy="27" r={R} fill="none" stroke="#131929" strokeWidth="4" />
-                        <circle cx="27" cy="27" r={R} fill="none"
+                      <svg width={66} height={66} style={{ flexShrink: 0 }}>
+                        <circle cx="33" cy="33" r={R} fill="none" stroke="#131929" strokeWidth="4" />
+                        <circle cx="33" cy="33" r={R} fill="none"
                           stroke={weekHits >= 5 ? "#34d399" : weekHits >= 3 ? "#fbbf24" : "#10b981"}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
@@ -1974,10 +1974,10 @@ export default function App() {
                         <text x="27" y="27" textAnchor="middle" dominantBaseline="central" fill="#e2e8f0" fontSize="11" fontFamily="'DM Mono',monospace" fontWeight="600">{weekHits}/7</text>
                       </svg>
                     </div>
-                    <div style={{ color: "#94a3b8", fontSize: 11, marginTop: 4 }}>
+                    <div style={{ color: "#475569", fontSize: 10, marginTop: 4 }}>
                       {streak === 0 ? "Log today!" : streak >= 7 ? "🔥 On fire!" : streak >= 3 ? "Keep it up!" : "Building momentum"}
                     </div>
-                    <div style={{ color: "#94a3b8", fontSize: 10, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>This week: {weekHits}/7 days logged</div>
+                    <div style={{ color: "#334155", fontSize: 9, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>This week: {weekHits}/7 days logged</div>
                     {logs.length > 0 && (() => {
                       const cells = Array.from({ length: 28 }, (_, i) => {
                         const d = new Date(); d.setDate(d.getDate() - (27 - i));
@@ -2066,20 +2066,20 @@ export default function App() {
                             <span className="label" style={{ marginBottom: 0, fontSize: 8 }}>{label}</span>
                           </div>
                           <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: hit === true ? "#34d399" : hit === false ? "#f87171" : "#1e2d40", lineHeight: 1 }}>{val || "—"}</div>
-                          {unit && val && <div style={{ color: "#94a3b8", fontSize: 10, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>{unit}</div>}
+                          {unit && val && <div style={{ color: "#334155", fontSize: 9, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>{unit}</div>}
                         </div>
                       );
                     })}
                   </div>
                   <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ color: "#94a3b8", fontSize: 11, fontFamily: "'DM Mono',monospace" }}>Score</span>
+                      <span style={{ color: "#334155", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>Score</span>
                       {Array.from({ length: 4 }, (_, i) => (
                         <div key={i} style={{ width: 16, height: 16, borderRadius: 3, background: i < calcScore(today) ? "linear-gradient(135deg,#059669,#10b981)" : "#131929", border: `1px solid ${i < calcScore(today) ? "#10b98155" : "#1e2d40"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                           {i < calcScore(today) && <span style={{ color: "#fff", fontSize: 8 }}>✓</span>}
                         </div>
                       ))}
-                      <span style={{ color: "#94a3b8", fontSize: 11, fontFamily: "'DM Mono',monospace" }}>{calcScore(today)}/4</span>
+                      <span style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>{calcScore(today)}/4</span>
                     </div>
                     <button onClick={() => navigateTo("Nutrition")} style={{ background: "none", border: "none", color: "#10b981", fontSize: 10, fontWeight: 500, display: "flex", alignItems: "center", gap: 2 }}>Update <ChevronRight size={11} /></button>
                   </div>
@@ -2859,7 +2859,7 @@ export default function App() {
                                         </div>
                                       </div>
                                     ))}
-                                    <button onClick={() => setFoodResults(null)} style={{ background: "none", border: "none", color: "#94a3b8", fontSize: 11, cursor: "pointer", textAlign: "left" }}>✕ Clear</button>
+                                    <button onClick={() => setFoodResults(null)} style={{ background: "none", border: "none", color: "#475569", fontSize: 10, cursor: "pointer", textAlign: "left" }}>✕ Clear</button>
                                   </div>
                                 ) : (
                                   <div style={{ background: "#0f1623", borderRadius: 10, padding: 12 }}>
@@ -3471,14 +3471,14 @@ export default function App() {
                           </div>
                         )}
                         {ex.name && !pr && lastSession && (
-                          <div style={{ color: "#94a3b8", fontSize: 11, marginBottom: 8 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</div>
+                          <div style={{ color: "#475569", fontSize: 10, marginBottom: 8 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</div>
                         )}
 
                         <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr auto", gap: 6, alignItems: "center", marginBottom: 6 }}>
-                          <div style={{ color: "#94a3b8", fontSize: 11, letterSpacing: 1 }}>SET</div>
-                          <div style={{ color: "#94a3b8", fontSize: 11, letterSpacing: 1 }}>REPS</div>
-                          <div style={{ color: "#94a3b8", fontSize: 11, letterSpacing: 1 }}>WEIGHT (lb)</div>
-                          <div style={{ color: "#94a3b8", fontSize: 11, letterSpacing: 1 }}>NOTES</div>
+                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>SET</div>
+                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>REPS</div>
+                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>WEIGHT (lb)</div>
+                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>NOTES</div>
                           <div />
                         </div>
 
@@ -3499,7 +3499,7 @@ export default function App() {
                         })}
 
                         <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-                          <button onClick={() => addSet(ex.id)} style={{ background: "none", border: "1px solid #131929", color: "#94a3b8", fontSize: 11, padding: "4px 12px", borderRadius: 3, letterSpacing: 1 }}>
+                          <button onClick={() => addSet(ex.id)} style={{ background: "none", border: "1px solid #131929", color: "#475569", fontSize: 10, padding: "4px 12px", borderRadius: 3, letterSpacing: 1 }}>
                             + ADD SET
                           </button>
                           <div style={{ marginLeft: "auto", display: "flex", gap: 4, alignItems: "center" }}>
@@ -3557,7 +3557,7 @@ export default function App() {
                           <div style={{ marginTop: 8 }}>
                             {w.watchPhoto && (
                               <div style={{ marginBottom: 12 }}>
-                                <div style={{ color: "#94a3b8", fontSize: 11, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>⌚ Apple Watch</div>
+                                <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>⌚ Apple Watch</div>
                                 <img src={w.watchPhoto} alt="Apple Watch" style={{ width: "100%", maxHeight: 180, objectFit: "cover", borderRadius: 6, border: "1px solid #046c4e33" }} />
                               </div>
                             )}
@@ -3650,7 +3650,7 @@ export default function App() {
                           <div key={name} style={{ background: "#0f1623", border: "1px solid #131929", borderRadius: 6, padding: 12 }}>
                             <div style={{ color: "#64748b", fontSize: 10, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{name}</div>
                             <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 26, color: "#fbbf24", lineHeight: 1 }}>{pr}<span style={{ fontSize: 13, color: "#475569" }}> lb</span></div>
-                            <div style={{ color: "#94a3b8", fontSize: 11, marginTop: 3 }}>{allSessions.length} session{allSessions.length !== 1 ? "s" : ""}</div>
+                            <div style={{ color: "#334155", fontSize: 10, marginTop: 3 }}>{allSessions.length} session{allSessions.length !== 1 ? "s" : ""}</div>
                           </div>
                         ) : null;
                       })}
@@ -3683,7 +3683,7 @@ export default function App() {
                     <div style={{ color: "#34d399", fontSize: 12, fontFamily: "'Bebas Neue', sans-serif", letterSpacing: 2 }}>
                       {daysSinceLast === null ? "📸 TIME FOR YOUR FIRST PROGRESS CHECK-IN" : `📸 PROGRESS CHECK-IN DUE · ${daysSinceLast} DAYS SINCE LAST`}
                     </div>
-                    <div style={{ color: "#94a3b8", fontSize: 11, marginTop: 2 }}>Log front, side, back, and video below</div>
+                    <div style={{ color: "#475569", fontSize: 10, marginTop: 2 }}>Log front, side, back, and video below</div>
                   </div>
                 </div>
               )}
@@ -3756,7 +3756,7 @@ export default function App() {
                     <div className="section-title" style={{ fontSize: 16, marginBottom: 0 }}>SIDE-BY-SIDE COMPARISON</div>
                     {progressEntries.length >= 2 && (
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ color: "#94a3b8", fontSize: 11 }}>Compare with:</span>
+                        <span style={{ color: "#475569", fontSize: 10 }}>Compare with:</span>
                         <select value={compareIdx ?? ""} onChange={e => setCompareIdx(e.target.value === "" ? null : parseInt(e.target.value))} style={{ width: "auto", fontSize: 11 }}>
                           {progressEntries.slice(0, -1).map((e, i) => (
                             <option key={i} value={i}>{e.date}</option>
@@ -3776,7 +3776,7 @@ export default function App() {
                         <div style={{ display: "grid", gridTemplateColumns: compareImg ? "1fr 1fr" : "1fr", gap: 8 }}>
                           {compareImg && (
                             <div>
-                              <div style={{ color: "#94a3b8", fontSize: 10, letterSpacing: 1, marginBottom: 4 }}>BEFORE · {compareEntry.date}</div>
+                              <div style={{ color: "#475569", fontSize: 9, letterSpacing: 1, marginBottom: 4 }}>BEFORE · {compareEntry.date}</div>
                               <img src={compareImg} alt={`before ${angle}`} style={{ width: "100%", borderRadius: 6, objectFit: "cover", maxHeight: 280 }} />
                             </div>
                           )}
@@ -3798,7 +3798,7 @@ export default function App() {
                       <div style={{ display: "grid", gridTemplateColumns: compareEntry?.video && lastEntry?.video ? "1fr 1fr" : "1fr", gap: 8 }}>
                         {compareEntry?.video && (
                           <div>
-                            <div style={{ color: "#94a3b8", fontSize: 10, letterSpacing: 1, marginBottom: 4 }}>BEFORE · {compareEntry.date}</div>
+                            <div style={{ color: "#475569", fontSize: 9, letterSpacing: 1, marginBottom: 4 }}>BEFORE · {compareEntry.date}</div>
                             <video src={compareEntry.video} style={{ width: "100%", borderRadius: 6 }} controls />
                           </div>
                         )}
@@ -3831,14 +3831,14 @@ export default function App() {
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginBottom: entry.video ? 8 : 0 }}>
                           {["front", "side", "side_flexed", "back"].map(angle => entry[angle] ? (
                             <div key={angle}>
-                              <div style={{ color: "#94a3b8", fontSize: 10, letterSpacing: 1, marginBottom: 3 }}>{angle.replace("_"," ").toUpperCase()}</div>
+                              <div style={{ color: "#475569", fontSize: 9, letterSpacing: 1, marginBottom: 3 }}>{angle.replace("_"," ").toUpperCase()}</div>
                               <img src={entry[angle]} alt={angle} style={{ width: "100%", height: 100, objectFit: "cover", borderRadius: 4 }} />
                             </div>
                           ) : null)}
                         </div>
                         {entry.video && (
                           <div style={{ marginTop: 6 }}>
-                            <div style={{ color: "#94a3b8", fontSize: 10, letterSpacing: 1, marginBottom: 3 }}>VIDEO</div>
+                            <div style={{ color: "#475569", fontSize: 9, letterSpacing: 1, marginBottom: 3 }}>VIDEO</div>
                             <video src={entry.video} style={{ width: "100%", maxHeight: 200, borderRadius: 4 }} controls />
                           </div>
                         )}
@@ -4008,12 +4008,12 @@ export default function App() {
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
                           <span className="label">{label}</span>
                           <div style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
-                            <span style={{ color: "#94a3b8", fontSize: 11 }}>hit {hitRate}% of days</span>
+                            <span style={{ color: "#475569", fontSize: 10 }}>hit {hitRate}% of days</span>
                             <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, color, lineHeight: 1 }}>{display || "—"}</span>
                           </div>
                         </div>
                         <div className="bar-bg"><div className="bar-fill" style={{ width: `${pct}%`, background: color }} /></div>
-                        <div style={{ color: "#94a3b8", fontSize: 11, marginTop: 3 }}>target {target}</div>
+                        <div style={{ color: "#475569", fontSize: 10, marginTop: 3 }}>target {target}</div>
                       </div>
                     ))}
                   </div>
