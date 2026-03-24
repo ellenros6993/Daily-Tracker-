@@ -2228,7 +2228,7 @@ export default function App() {
                   <div>
                     <div className="label" style={{ fontSize: 9, marginBottom: 4 }}>Settings & Targets</div>
                     <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>
-                      {S_CALORIES_MIN}–{S_CALORIES_MAX} kcal · ≥{S_PROTEIN_MIN}g protein · ≥{S_STEPS_MIN.toLocaleString()} steps
+                      <div style={{display:"flex",gap:10,marginTop:4}}><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#34d399",lineHeight:1}}>{S_CALORIES_MIN}–{S_CALORIES_MAX}</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>kcal</div></div><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#60a5fa",lineHeight:1}}>≥{S_PROTEIN_MIN}g</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>protein</div></div><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#a855f7",lineHeight:1}}>≥{S_STEPS_MIN.toLocaleString()}</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>steps</div></div></div>
                     </div>
                   </div>
                 </div>
