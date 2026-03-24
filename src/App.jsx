@@ -1942,56 +1942,6 @@ export default function App() {
 
             {/* Projection + Streak + Pace + Weekly Ring */}
             <div className="grid2" style={{ gap: 8 }}>
-              <div className="stat-card fade-up-1" style={{ padding: "12px 14px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Avg Weekly Loss</div>
-                {(() => {
-                  if (weighIns.length < 2) return <div style={{ color: "#1e2d40", marginTop: 6, fontSize: 11 }}>Need 2+ weigh-ins</div>;
-                  const first = weighIns[0];
-                  const last = weighIns[weighIns.length - 1];
-                  const totalLost = parseFloat(first.weight) - parseFloat(last.weight);
-                  const totalDays = getDaysBetween(first.date, last.date);
-                  const avgPerWeek = totalDays > 0 ? (totalLost / totalDays * 7) : 0;
-                  const isGood = avgPerWeek > 0;
-                  const weeksTracked = Math.max(1, Math.round(totalDays / 7));
-                  return (
-                    <>
-                      <div className="big-num" style={{ fontSize: 26, color: isGood ? "#34d399" : "#f87171" }}>
-                        {isGood ? "-" : "+"}{Math.abs(avgPerWeek).toFixed(2)}
-                      </div>
-                      <div style={{ color: "#475569", fontSize: 10, marginTop: 2 }}>lb / week avg</div>
-                      <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #131929" }}>
-                        <div style={{ fontSize: 9, color: "#334155", letterSpacing: 1, fontFamily: "'DM Mono',monospace", marginBottom: 6 }}>ALL-TIME</div>
-                        <div style={{ display: "flex", gap: 12 }}>
-                          <div>
-                            <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Total lost</div>
-                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#34d399" }}>{totalLost.toFixed(1)}<span style={{ fontSize: 11, color: "#334155" }}>lb</span></div>
-                          </div>
-                          <div>
-                            <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Over</div>
-                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#60a5fa" }}>{weeksTracked}<span style={{ fontSize: 11, color: "#334155" }}>wk</span></div>
-                          </div>
-                        </div>
-                      </div>
-                      {weighIns.length >= 2 && (() => {
-                        const pts = weighIns.slice(-8);
-                        const vals = pts.map(w => parseFloat(w.weight));
-                        const minV = Math.min(...vals), maxV = Math.max(...vals);
-                        const W = 120, H = 28;
-                        const x = (i) => (i / (pts.length - 1)) * W;
-                        const y = (v) => H - ((v - minV) / (maxV - minV || 1)) * H;
-                        const d = pts.map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(parseFloat(p.weight)).toFixed(1)}`).join(" ");
-                        return (
-                          <svg width={W} height={H + 4} style={{ marginTop: 8, display: "block", overflow: "visible" }}>
-                            <defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#059669" /><stop offset="100%" stopColor="#34d399" /></linearGradient></defs>
-                            <path d={d} fill="none" stroke="url(#sg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            {pts.map((p, i) => <circle key={i} cx={x(i)} cy={y(parseFloat(p.weight))} r="2" fill="#10b981" />)}
-                          </svg>
-                        );
-                      })()}
-                    </>
-                  );
-                })()}
-              </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Streak</div>
                 {(() => {
