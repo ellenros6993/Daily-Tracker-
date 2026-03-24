@@ -2192,7 +2192,7 @@ export default function App() {
               );
             })()}
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
               <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share</div>
                 <button onClick={shareStats} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>📤 Share</button>
