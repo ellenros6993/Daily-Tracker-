@@ -1877,7 +1877,7 @@ export default function App() {
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Current Weight</div>
                 <div className="big-num" style={{ fontSize: 26, color: "#34d399" }}>{latestWeight ? cWeight : "—"}<span style={{ fontSize: 14, color: "#34d399", fontFamily: "'DM Mono',monospace", marginLeft: 4 }}>lbs</span></div>
                 {weighIns.length >= 2 && (() => { const curr = weighIns[weighIns.length-1]; const totalLost = (START_WEIGHT - parseFloat(curr.weight)).toFixed(1); const isDown = parseFloat(totalLost) > 0; return <div style={{fontSize:10,color:isDown?"#34d399":"#f87171",marginTop:3,fontFamily:"'DM Mono',monospace"}}>{isDown?"↓":"+"} {Math.abs(totalLost)} lbs lost</div>; })()}
-                {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:14}}>COLLECTION</div>}
+                {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:22}}>COLLECTION</div>}
                 {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
               </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: `3px solid ${_pct >= 50 ? "#34d399" : _pct >= 25 ? "#fbbf24" : "#f87171"}`, display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -1905,7 +1905,7 @@ export default function App() {
             {/* Weekly Compliance + Next Milestone + Share */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }} className="kpi-grid">
               {/* Weekly compliance ring */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px", borderLeft: "3px solid #fbbf24", minHeight: 240 }}>
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px", borderLeft: "3px solid #fbbf24" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>This Week</div>
                 {(() => {
                   const weekLogs = getWeekLogs(logs, getCurrentWeekStart());
@@ -1923,7 +1923,7 @@ export default function App() {
                   const dash = (pct / 100) * CIRC;
                   const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
                   return (
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", gap: 0, height: "100%", minHeight: 220 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", gap: 0, height: "100%", minHeight: 160 }}>
                       <svg width={100} height={100} style={{ overflow: "visible" }}>
                         <circle cx="50" cy="50" r={R} fill="none" stroke="#131929" strokeWidth="4" />
                         <circle cx="50" cy="50" r={R} fill="none" stroke={col}
