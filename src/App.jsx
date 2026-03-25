@@ -1189,7 +1189,7 @@ export default function App() {
 
   // Dismiss loading skeletons after mount
   useEffect(() => { const t = setTimeout(() => setIsLoading(false), 600); return () => clearTimeout(t); }, []);
-  useEffect(() => { const p = new URLSearchParams(window.location.search); const s = p.get("steps"); if(s && parseInt(s) > 0) { setForm(f => ({ ...f, steps: s })); setTab("Training"); setTimeout(() => window.history.replaceState({}, "", window.location.pathname), 1000); } }, []);
+  useEffect(() => { try { const p = new URLSearchParams(window.location.search); const s = p.get("steps"); const w = p.get("workout"); const c = p.get("calories"); if(s || w || c) { setForm(f => ({ ...f, ...(s && {steps:s}), ...(w && {training:w}), ...(c && {calories:c}) })); setTab("Training"); setTimeout(() => window.history.replaceState({}, "", window.location.pathname), 500); } } catch(e) {} }, []);
   // Persist dark mode
   useEffect(() => { localStorage.setItem("dat-dark", darkMode ? "dark" : "light"); }, [darkMode]);
 
@@ -1880,7 +1880,7 @@ export default function App() {
                 {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:6}}>COLLECTION</div>}
                 {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
               </div>
-              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #60a5fa", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: `3px solid ${_pct >= 50 ? "#34d399" : _pct >= 25 ? "#fbbf24" : "#f87171"}`, display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3, alignSelf: "flex-start" }}>Progress</div>
                 {latestWeight ? (
                   <>
@@ -3237,7 +3237,7 @@ export default function App() {
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   {form.steps && <div style={{ fontSize: 11, color: parseInt(form.steps) >= STEPS_MIN ? "#60a5fa" : "#94a3b8" }}>{parseInt(form.steps) >= STEPS_MIN ? "✓ Goal hit!" : `${(STEPS_MIN - parseInt(form.steps)).toLocaleString()} steps to go`}</div>}
-                  <button className="save-btn" style={{ marginLeft: "auto", fontSize: 14, padding: "8px 20px" }} onClick={saveLog}>{saved ? "✓ Saved" : "Save Steps"}</button>
+                  <button style={{ marginLeft: "auto", fontSize: 14, padding: "8px 20px", background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", borderRadius: 8, fontWeight: 600, cursor: "pointer" }} onClick={saveLog}>{saved ? "✓ Saved" : "Save Steps"}</button>
                 </div>
               </div>
 
