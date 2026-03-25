@@ -1877,7 +1877,7 @@ export default function App() {
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Current Weight</div>
                 <div className="big-num" style={{ fontSize: 26, color: "#34d399" }}>{latestWeight ? cWeight : "—"}<span style={{ fontSize: 14, color: "#34d399", fontFamily: "'DM Mono',monospace", marginLeft: 4 }}>lbs</span></div>
                 {weighIns.length >= 2 && (() => { const curr = weighIns[weighIns.length-1]; const totalLost = (START_WEIGHT - parseFloat(curr.weight)).toFixed(1); const isDown = parseFloat(totalLost) > 0; return <div style={{fontSize:10,color:isDown?"#34d399":"#f87171",marginTop:3,fontFamily:"'DM Mono',monospace"}}>{isDown?"↓":"+"} {Math.abs(totalLost)} lbs lost</div>; })()}
-                {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:22}}>COLLECTION</div>}
+                {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:14}}>COLLECTION</div>}
                 {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
               </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: `3px solid ${_pct >= 50 ? "#34d399" : _pct >= 25 ? "#fbbf24" : "#f87171"}`, display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -1945,7 +1945,7 @@ export default function App() {
                   );
                 })()}
               </div>
-              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #a855f7", paddingBottom: "18px" }}>
+              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #a855f7", paddingBottom: "18px", minHeight: 200 }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Streak</div>
                 {(() => {
                   const streak = getLoggingStreak(logs);
