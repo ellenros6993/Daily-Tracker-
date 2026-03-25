@@ -1924,7 +1924,7 @@ export default function App() {
                   const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
                   return (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", gap: 0, height: "100%", minHeight: 160 }}>
-                      <svg width={120} height={120} viewBox="0 0 100 100" style={{ overflow: "visible" }}>
+                      <svg width={100} height={100} style={{ overflow: "visible" }}>
                         <circle cx="50" cy="50" r={R} fill="none" stroke="#131929" strokeWidth="4" />
                         <circle cx="50" cy="50" r={R} fill="none" stroke={col}
                           strokeWidth="4" strokeLinecap="round"
