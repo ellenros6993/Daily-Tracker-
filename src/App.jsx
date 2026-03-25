@@ -1905,7 +1905,7 @@ export default function App() {
             {/* Weekly Compliance + Next Milestone + Share */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }} className="kpi-grid">
               {/* Weekly compliance ring */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px", borderLeft: "3px solid #fbbf24" }}>
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px 28px 14px", borderLeft: "3px solid #fbbf24" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>This Week</div>
                 {(() => {
                   const weekLogs = getWeekLogs(logs, getCurrentWeekStart());
