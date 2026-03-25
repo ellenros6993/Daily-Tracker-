@@ -1189,7 +1189,7 @@ export default function App() {
 
   // Dismiss loading skeletons after mount
   useEffect(() => { const t = setTimeout(() => setIsLoading(false), 600); return () => clearTimeout(t); }, []);
-
+  useEffect(() => { const p = new URLSearchParams(window.location.search); const s = p.get("steps"); if(s && parseInt(s) > 0) { setForm(f => ({ ...f, steps: s })); setTab("Training"); setTimeout(() => window.history.replaceState({}, "", window.location.pathname), 1000); } }, []);
   // Persist dark mode
   useEffect(() => { localStorage.setItem("dat-dark", darkMode ? "dark" : "light"); }, [darkMode]);
 
