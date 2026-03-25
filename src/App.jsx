@@ -1876,8 +1876,8 @@ export default function App() {
               <div className="stat-card stat-card-glow fade-up" style={{ padding: "12px 14px", borderLeft: "3px solid #10b981" }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Current Weight</div>
                 <div className="big-num" style={{ fontSize: 26, color: "#34d399" }}>{latestWeight ? cWeight : "—"}<span style={{ fontSize: 14, color: "#34d399", fontFamily: "'DM Mono',monospace", marginLeft: 4 }}>lbs</span></div>
-                {weighIns.length >= 2 && (() => { const curr = weighIns[weighIns.length-1]; const totalLost = (START_WEIGHT - parseFloat(curr.weight)).toFixed(1); const isDown = parseFloat(totalLost) > 0; return <div style={{fontSize:10,color:isDown?"#34d399":"#f87171",marginTop:10,fontFamily:"'DM Mono',monospace"}}>{isDown?"↓":"+"} {Math.abs(totalLost)} lbs lost</div>; })()}
-                {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:16}}>COLLECTION</div>}
+                {weighIns.length >= 2 && (() => { const curr = weighIns[weighIns.length-1]; const totalLost = (START_WEIGHT - parseFloat(curr.weight)).toFixed(1); const isDown = parseFloat(totalLost) > 0; return <div style={{fontSize:10,color:isDown?"#34d399":"#f87171",marginTop:3,fontFamily:"'DM Mono',monospace"}}>{isDown?"↓":"+"} {Math.abs(totalLost)} lbs lost</div>; })()}
+                {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:6}}>COLLECTION</div>}
                 {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
               </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: `3px solid ${_pct >= 50 ? "#34d399" : _pct >= 25 ? "#fbbf24" : "#f87171"}`, display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -1919,17 +1919,17 @@ export default function App() {
                     return { hitGoals: acc.hitGoals + calcScore(l), totalGoals: acc.totalGoals + possible };
                   }, { hitGoals: 0, totalGoals: 0 });
                   const pct = totalGoals > 0 ? Math.round((hitGoals / totalGoals) * 100) : 0;
-                  const R = 38, CIRC = 2 * Math.PI * R;
+                  const R = 44, CIRC = 2 * Math.PI * R;
                   const dash = (pct / 100) * CIRC;
                   const col = pct >= 80 ? "#34d399" : pct >= 50 ? "#fbbf24" : "#f87171";
                   return (
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <svg width={80} height={80} style={{ overflow: "visible" }}>
-                        <circle cx="40" cy="40" r={R} fill="none" stroke="#131929" strokeWidth="4" />
-                        <circle cx="40" cy="40" r={R} fill="none" stroke={col}
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", gap: 0, height: "100%", minHeight: 160 }}>
+                      <svg width={100} height={100} style={{ overflow: "visible" }}>
+                        <circle cx="50" cy="50" r={R} fill="none" stroke="#131929" strokeWidth="4" />
+                        <circle cx="50" cy="50" r={R} fill="none" stroke={col}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 40 40)"
+                          transform="rotate(-90 50 50)"
                           style={{ transition: "stroke-dasharray 0.7s cubic-bezier(0.34,1.56,0.64,1)" }} />
                         <text x="40" y="37" textAnchor="middle" dominantBaseline="central"
                           fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="10" fontFamily="'Bebas Neue',sans-serif">{pct}%</text>
