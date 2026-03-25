@@ -1955,7 +1955,7 @@ export default function App() {
                   const weekHits = thisWeekLogs.filter(l => calcScore(l) >= 1).length;
                   const WEEK_GOAL = 7;
                   const ringPct = weekHits / WEEK_GOAL;
-                  const R = 28, CIRC = 2 * Math.PI * R;
+                  const R = 44, CIRC = 2 * Math.PI * R;
                   const dash = ringPct * CIRC;
                   return <>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1963,18 +1963,18 @@ export default function App() {
                         {streak}<span style={{ fontSize: 14, color: "#1e2d40", fontFamily: "'Inter',sans-serif", fontWeight: 400 }}> days</span>
                       </div>
                       {/* Weekly ring */}
-                      <svg width={80} height={80} style={{ flexShrink: 0, overflow: "visible" }}>
-                        <circle cx="40" cy="40" r={R} fill="none" stroke="#131929" strokeWidth="4" />
-                        <circle cx="40" cy="40" r={R} fill="none"
+                      <svg width={100} height={100} style={{ flexShrink: 0, overflow: "visible" }}>
+                        <circle cx="50" cy="50" r={R} fill="none" stroke="#131929" strokeWidth="4" />
+                        <circle cx="50" cy="50" r={R} fill="none"
                           stroke="#a855f7"
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
-                          transform="rotate(-90 40 40)"
+                          transform="rotate(-90 50 50)"
                           style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                        <text x="40" y="40" textAnchor="middle" dominantBaseline="central" fill="#e2e8f0" fontSize="11" fontFamily="'DM Mono',monospace" fontWeight="600">{weekHits}/7</text>
+                        <text x="50" y="50" textAnchor="middle" dominantBaseline="central" fill="#e2e8f0" fontSize="11" fontFamily="'DM Mono',monospace" fontWeight="600">{weekHits}/7</text>
                       </svg>
                     </div>
-                    <div style={{ color: "#475569", fontSize: 10, marginTop: 4 }}>
+                    <div style={{ color: "#475569", fontSize: 10, marginTop: "auto", paddingTop: 8 }}>
                       {streak === 0 ? "Log today!" : streak >= 7 ? "🔥 On fire!" : streak >= 3 ? "Keep it up!" : "Building momentum"}
                     </div>
                     <div style={{ color: "#334155", fontSize: 9, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>This week: {weekHits}/7 days logged</div>
