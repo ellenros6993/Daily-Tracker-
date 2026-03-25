@@ -1396,6 +1396,16 @@ export default function App() {
       return maxW > 0 && maxW > getPRForExercise(ex.name);
     });
     setWorkouts(updated);
+    const workoutSummary = filled.map(e => e.name).join(", ");
+    const wDate = entry.date || getLocalDateStr();
+    setLogs(prev => {
+      const ex = prev.find(l => l.date === wDate);
+      if (ex) {
+        return prev.map(l => l.date === wDate ? { ...l, training: workoutSummary } : l);
+      } else {
+        return [...prev, { date: wDate, calories: "", protein: "", steps: "", training: workoutSummary, weight: "", bodyFat: "", muscleMass: "", visceralFat: "" }];
+      }
+    });
     setWorkoutSaved(true);
     haptic(hasPR ? "pr" : "success");
     setTimeout(() => setWorkoutSaved(false), 2000);
