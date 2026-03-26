@@ -1054,6 +1054,11 @@ export default function App() {
   });
   const [workoutSaved, setWorkoutSaved] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
+  const [showCircuitTimer, setShowCircuitTimer] = useState(false);
+  const [circuitPhase, setCircuitPhase] = useState("build");
+  const [circuitRunning, setCircuitRunning] = useState(false);
+  const [circuitConfig, setCircuitConfig] = useState({ work: 40, rest: 20, rounds: 4, restBetween: 60 });
+  const [circuitState, setCircuitState] = useState({ round: 1, isWork: true, isBetween: false, secondsLeft: 40, done: false });
   const [expandedExercise, setExpandedExercise] = useState(null);
   const [pageVisible, setPageVisible] = useState(true);
   const prevTabRef = useRef(tab);
@@ -1190,6 +1195,21 @@ export default function App() {
   // Dismiss loading skeletons after mount
   useEffect(() => { const t = setTimeout(() => setIsLoading(false), 600); return () => clearTimeout(t); }, []);
   useEffect(() => { try { const p = new URLSearchParams(window.location.search); const s = p.get("steps"); const w = p.get("workout"); const c = p.get("calories"); if(s || w || c) { setForm(f => ({ ...f, ...(s && {steps:s}), ...(w && {training:w}), ...(c && {calories:c}) })); setTab("Training"); setTimeout(() => window.history.replaceState({}, "", window.location.pathname), 500); } } catch(e) {} }, []);
+  useEffect(() => {
+    if (!circuitRunning || circuitState.done) return;
+    const t = setTimeout(() => {
+      setCircuitState(s => {
+        if (s.secondsLeft > 1) return { ...s, secondsLeft: s.secondsLeft - 1 };
+        haptic("medium");
+        if (s.isBetween) return { ...s, isBetween: false, isWork: true, secondsLeft: circuitConfig.work };
+        if (s.isWork) return { ...s, isWork: false, secondsLeft: circuitConfig.rest };
+        if (s.round >= circuitConfig.rounds) return { ...s, done: true };
+        if (circuitConfig.restBetween > 0) return { ...s, round: s.round + 1, isBetween: true, secondsLeft: circuitConfig.restBetween };
+        return { ...s, round: s.round + 1, isWork: true, secondsLeft: circuitConfig.work };
+      });
+    }, 1000);
+    return () => clearTimeout(t);
+  }, [circuitRunning, circuitState, circuitConfig]);
   // Persist dark mode
   useEffect(() => { localStorage.setItem("dat-dark", darkMode ? "dark" : "light"); }, [darkMode]);
 
@@ -3365,6 +3385,93 @@ export default function App() {
                 </div>
               </div>
 
+              {/* Circuit Timer button */}
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <button onClick={() => setShowCircuitTimer(true)} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", padding: "10px 24px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, display: "flex", alignItems: "center", gap: 8 }}>⏱ CIRCUIT TIMER</button>
+              </div>
+
+              {/* Circuit Timer */}
+              {showCircuitTimer && (
+                <div style={{ position: "fixed", inset: 0, background: "#07080dee", zIndex: 1000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
+                  <div style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 16, width: "100%", maxWidth: 400, padding: 24, position: "relative" }}>
+                    <button onClick={() => { setShowCircuitTimer(false); setCircuitRunning(false); setCircuitPhase("build"); }} style={{ position: "absolute", top: 12, right: 12, background: "none", border: "none", color: "#475569", fontSize: 20, cursor: "pointer" }}>✕</button>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0", marginBottom: 16, letterSpacing: 2, fontFamily: "'DM Mono',monospace" }}>⏱ CIRCUIT TIMER</div>
+
+                    {circuitPhase === "build" && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                        <div style={{ display: "flex", gap: 10 }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4, letterSpacing: 1 }}>WORK (sec)</div>
+                            <input type="number" value={circuitConfig.work} onChange={e => setCircuitConfig(c => ({ ...c, work: parseInt(e.target.value) || 0 }))}
+                              style={{ width: "100%", boxSizing: "border-box", background: "#131929", border: "1px solid #1e2d40", borderRadius: 8, color: "#34d399", fontSize: 22, fontFamily: "'Bebas Neue',sans-serif", padding: "8px 12px", outline: "none", textAlign: "center" }} />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4, letterSpacing: 1 }}>REST (sec)</div>
+                            <input type="number" value={circuitConfig.rest} onChange={e => setCircuitConfig(c => ({ ...c, rest: parseInt(e.target.value) || 0 }))}
+                              style={{ width: "100%", boxSizing: "border-box", background: "#131929", border: "1px solid #1e2d40", borderRadius: 8, color: "#f87171", fontSize: 22, fontFamily: "'Bebas Neue',sans-serif", padding: "8px 12px", outline: "none", textAlign: "center" }} />
+                          </div>
+                        </div>
+                        <div style={{ display: "flex", gap: 10 }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4, letterSpacing: 1 }}>ROUNDS</div>
+                            <input type="number" value={circuitConfig.rounds} onChange={e => setCircuitConfig(c => ({ ...c, rounds: parseInt(e.target.value) || 0 }))}
+                              style={{ width: "100%", boxSizing: "border-box", background: "#131929", border: "1px solid #1e2d40", borderRadius: 8, color: "#e2e8f0", fontSize: 22, fontFamily: "'Bebas Neue',sans-serif", padding: "8px 12px", outline: "none", textAlign: "center" }} />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4, letterSpacing: 1 }}>REST BETWEEN (sec)</div>
+                            <input type="number" value={circuitConfig.restBetween} onChange={e => setCircuitConfig(c => ({ ...c, restBetween: parseInt(e.target.value) || 0 }))}
+                              style={{ width: "100%", boxSizing: "border-box", background: "#131929", border: "1px solid #1e2d40", borderRadius: 8, color: "#fbbf24", fontSize: 22, fontFamily: "'Bebas Neue',sans-serif", padding: "8px 12px", outline: "none", textAlign: "center" }} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>
+                          Total: ~{Math.round(((circuitConfig.work + circuitConfig.rest) * circuitConfig.rounds + circuitConfig.restBetween * Math.max(0, circuitConfig.rounds - 1)) / 60 * 10) / 10} min
+                        </div>
+                        <button onClick={() => {
+                          setCircuitState({ round: 1, isWork: true, secondsLeft: circuitConfig.work });
+                          setCircuitPhase("run");
+                          setCircuitRunning(true);
+                        }} style={{ background: "linear-gradient(135deg,#065f3a,#10b981)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: 1 }}>
+                          START
+                        </button>
+                      </div>
+                    )}
+
+                    {circuitPhase === "run" && (
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+                        {circuitState.done ? (
+                          <div style={{ textAlign: "center" }}>
+                            <div style={{ fontSize: 48, marginBottom: 8 }}>🎉</div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: "#34d399", letterSpacing: 2 }}>DONE!</div>
+                            <div style={{ fontSize: 11, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 4 }}>{circuitConfig.rounds} rounds complete</div>
+                            <button onClick={() => { setCircuitPhase("build"); setCircuitRunning(false); }} style={{ marginTop: 16, background: "#131929", border: "1px solid #1e2d40", color: "#e2e8f0", padding: "10px 24px", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>Edit Timer</button>
+                          </div>
+                        ) : (
+                          <>
+                            <div style={{ fontSize: 11, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 2 }}>
+                              {circuitState.isBetween ? "REST BETWEEN ROUNDS" : circuitState.isWork ? "WORK" : "REST"} · ROUND {circuitState.round}/{circuitConfig.rounds}
+                            </div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 96, lineHeight: 1, color: circuitState.isBetween ? "#fbbf24" : circuitState.isWork ? "#34d399" : "#f87171" }}>
+                              {circuitState.secondsLeft}
+                            </div>
+                            <div style={{ display: "flex", gap: 10, width: "100%" }}>
+                              <button onClick={() => setCircuitRunning(r => !r)}
+                                style={{ flex: 1, background: circuitRunning ? "#131929" : "linear-gradient(135deg,#065f3a,#10b981)", border: "1px solid #1e2d40", color: "#e2e8f0", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                                {circuitRunning ? "PAUSE" : "RESUME"}
+                              </button>
+                              <button onClick={() => { setCircuitPhase("build"); setCircuitRunning(false); setCircuitState({ round: 1, isWork: true, secondsLeft: circuitConfig.work }); }}
+                                style={{ background: "#131929", border: "1px solid #1e2d40", color: "#475569", padding: "12px 16px", borderRadius: 10, fontSize: 13, cursor: "pointer" }}>
+                                RESET
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+
               {/* Workout Templates */}
               <div className="stat-card">
                 <div className="section-title" style={{ fontSize: 16 }}>TEMPLATES</div>
@@ -3429,7 +3536,6 @@ export default function App() {
                 );
               })()}
 
-              {/* Workout Templates */}
 
               {/* Workout history */}
               {workouts.length > 0 && (
