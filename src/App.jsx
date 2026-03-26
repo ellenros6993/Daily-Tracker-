@@ -3167,20 +3167,9 @@ export default function App() {
                 <div style={{ marginBottom: 10 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                     <div className="field-label" style={{ marginBottom: 0 }}>Steps Today</div>
-                    {(() => {
-                      const yesterday = (() => { const d = new Date(); d.setDate(d.getDate() - 1); return getLocalDateStr(d); })();
-                      const yLog = logs.find(l => l.date === yesterday);
-                      const ySteps = yLog?.steps;
-                      const todayHasSteps = !!form.steps;
-                      return ySteps && !todayHasSteps ? (
-                        <button onClick={() => { setForm(f => ({ ...f, steps: ySteps })); haptic("light"); }}
-                          style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "3px 10px", borderRadius: 6, fontSize: 10, fontFamily: "'DM Mono',monospace", cursor: "pointer", transition: "all 0.15s" }}
-                          onMouseEnter={e => { e.target.style.borderColor = "#10b981"; e.target.style.color = "#10b981"; }}
-                          onMouseLeave={e => { e.target.style.borderColor = "#1e2d40"; e.target.style.color = "#475569"; }}>
-                          ↑ Fill yesterday's ({parseInt(ySteps).toLocaleString()})
-                        </button>
-                      ) : null;
-                    })()}
+                  <div style={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
+                    <div className="field-label" style={{ marginBottom: 0 }}>Steps Today</div>
+                  </div>
                   </div>
                   <input type="number" placeholder="8500" value={form.steps} onChange={e => setForm(f => ({ ...f, steps: e.target.value }))} />
                 </div>
@@ -3286,7 +3275,7 @@ export default function App() {
               {/* New workout form */}
               <div className="stat-card">
                 <div className="section-title" style={{ fontSize: 16 }}>LOG WORKOUT</div>
-                <div className="grid2" style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
                   <div>
                     <div className="field-label" style={{ marginBottom: 4 }}>Date</div>
                     <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} />
@@ -3295,31 +3284,6 @@ export default function App() {
                     <div className="field-label" style={{ marginBottom: 4 }}>Session Name (optional)</div>
                     <input type="text" placeholder="e.g. Upper Body, Push Day" value={workoutForm.name} onChange={e => setWorkoutForm(f => ({ ...f, name: e.target.value }))} />
                   </div>
-                </div>
-
-                {/* Apple Watch upload */}
-                <div style={{ marginBottom: 14 }}>
-                  <div className="field-label" style={{ marginBottom: 6 }}>Apple Watch Screenshot (optional)</div>
-                  {!workoutForm.watchPhoto ? (
-                    <label style={{ display: "flex", alignItems: "center", gap: 10, border: "1px dashed #131929", borderRadius: 6, padding: "14px 16px", cursor: "pointer", color: "#334155", fontSize: 11 }}
-                      onDragOver={e => e.preventDefault()}
-                      onDrop={e => { e.preventDefault(); const file = e.dataTransfer.files[0]; if (!file) return; const r = new FileReader(); r.onload = ev => setWorkoutForm(f => ({ ...f, watchPhoto: ev.target.result })); r.readAsDataURL(file); }}>
-                      <span style={{ fontSize: 22 }}>⌚</span>
-                      <span>Drop Apple Watch screenshot or tap to upload</span>
-                      <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = ev => setWorkoutForm(f => ({ ...f, watchPhoto: ev.target.result })); r.readAsDataURL(file); }} />
-                    </label>
-                  ) : (
-                    <div style={{ position: "relative", display: "inline-block", width: "100%" }}>
-                      <img src={workoutForm.watchPhoto} alt="Apple Watch workout" style={{ width: "100%", maxHeight: 200, objectFit: "cover", borderRadius: 6, display: "block", border: "1px solid #046c4e33" }} />
-                      <div style={{ position: "absolute", top: 8, right: 8, display: "flex", gap: 6 }}>
-                        <label style={{ background: "#00000099", color: "#e2e8f0", fontSize: 9, padding: "4px 8px", borderRadius: 3, cursor: "pointer", letterSpacing: 1 }}>
-                          REPLACE
-                          <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = ev => setWorkoutForm(f => ({ ...f, watchPhoto: ev.target.result })); r.readAsDataURL(file); }} />
-                        </label>
-                        <button onClick={() => setWorkoutForm(f => ({ ...f, watchPhoto: null }))} style={{ background: "#00000099", border: "none", color: "#f87171", fontSize: 9, padding: "4px 8px", borderRadius: 3, letterSpacing: 1 }}>REMOVE</button>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 <div style={{ marginLeft: 20 }}>
