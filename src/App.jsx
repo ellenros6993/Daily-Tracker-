@@ -3490,51 +3490,6 @@ export default function App() {
                 </div>
               )}
 
-              {/* Volume Tracker */}
-              {workouts.length > 0 && (() => {
-                const last8 = [...workouts].sort((a,b) => a.date.localeCompare(b.date)).slice(-8);
-                const volumes = last8.map(w => ({
-                  date: w.date,
-                  name: w.name || "Workout",
-                  volume: w.exercises.reduce((total, ex) =>
-                    total + ex.sets.reduce((s, set) =>
-                      s + (parseFloat(set.reps) || 0) * (parseFloat(set.weight) || 0), 0), 0)
-                }));
-                const maxVol = Math.max(...volumes.map(v => v.volume), 1);
-                if (volumes.every(v => v.volume === 0)) return null;
-                return (
-                  <div className="stat-card">
-                    <div className="section-title" style={{ fontSize: 16 }}>VOLUME TRACKER</div>
-                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 12 }}>Total weight lifted per session (sets × reps × weight)</div>
-                    <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 80 }}>
-                      {volumes.map((v, i) => {
-                        const pct = (v.volume / maxVol) * 100;
-                        const isLatest = i === volumes.length - 1;
-                        return (
-                          <div key={v.date} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }} title={`${v.name} · ${v.date} · ${v.volume.toLocaleString()} lb`}>
-                            {v.volume > 0 && <div style={{ fontSize: 8, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{v.volume >= 1000 ? `${(v.volume/1000).toFixed(1)}k` : v.volume}</div>}
-                            <div style={{ width: "100%", height: 56, background: "#131929", borderRadius: 4, overflow: "hidden", display: "flex", alignItems: "flex-end" }}>
-                              <div style={{ width: "100%", height: `${pct}%`, background: isLatest ? "linear-gradient(to top,#059669,#34d399)" : "#10b98166", borderRadius: "3px 3px 0 0", transition: "height 0.6s cubic-bezier(0.34,1.56,0.64,1)", minHeight: v.volume > 0 ? 4 : 0 }} />
-                            </div>
-                            <div style={{ fontSize: 8, color: isLatest ? "#10b981" : "#334155", fontFamily: "'DM Mono',monospace" }}>{v.date.slice(5)}</div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {volumes.length >= 2 && (() => {
-                      const prev = volumes[volumes.length-2].volume;
-                      const curr = volumes[volumes.length-1].volume;
-                      const delta = curr - prev;
-                      return prev > 0 ? (
-                        <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #131929", display: "flex", gap: 20 }}>
-                          <div><div className="label" style={{ fontSize: 9 }}>Last Session</div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#10b981" }}>{curr.toLocaleString()}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div></div>
-                          <div><div className="label" style={{ fontSize: 9 }}>vs Prior</div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: delta >= 0 ? "#34d399" : "#f87171" }}>{delta >= 0 ? "+" : ""}{delta.toLocaleString()}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div></div>
-                        </div>
-                      ) : null;
-                    })()}
-                  </div>
-                );
-              })()}
 
               {/* PR Board */}
               {workouts.length > 0 && (() => {
