@@ -453,7 +453,7 @@ function getLoggingStreak(logs) {
   return streak;
 }
 
-const TABS = ["Home", "Nutrition", "Training", "Weight Tracker", "Weekly Report", "Progress Photos", "Settings"];
+const TABS = ["Dashboard", "Nutrition", "Training", "Weight Tracker", "Weekly Report", "Progress Photos", "Settings"];
 const TRAINING_KEY = "fat-loss-training-v1";
 const TEMPLATES_KEY = "dat-templates-v1";
 const MILESTONES = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
@@ -479,7 +479,7 @@ const PRELOADED_FOODS = [
 ];
 
 export default function App() {
-  const [tab, setTab] = useState("Home");
+  const [tab, setTab] = useState("Dashboard");
   const [logs, setLogs] = useState(() => {
     try {
       const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -1771,7 +1771,7 @@ export default function App() {
         </div>
         <nav className="sidebar-nav">
           <div className="nav-section">Overview</div>
-          {[{ id: "Home", Icon: LayoutDashboard, label: "Home" }].map(({ id, Icon, label }) => (
+          {[{ id: "Dashboard", Icon: LayoutDashboard, label: "Dashboard" }].map(({ id, Icon, label }) => (
             <button key={id} className={`nav-btn${tab === id ? " active" : ""}`} onClick={() => navigateTo(id)}>
               <Icon size={16} className="nav-icon" /><span>{label}</span>
             </button>
@@ -1843,7 +1843,7 @@ export default function App() {
       {/* Bottom nav — mobile only */}
       <div className="bottom-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100, background: "rgba(11,13,21,0.92)", backdropFilter: "blur(20px)", borderTop: "1px solid #131929", display: "none", justifyContent: "space-around", padding: "6px 0 max(6px, env(safe-area-inset-bottom))" }}>
         {[
-          { id: "Home", Icon: LayoutDashboard, label: "Home" },
+          { id: "Dashboard", Icon: LayoutDashboard, label: "Home" },
           { id: "Nutrition", Icon: Utensils, label: "Nutrition" },
           { id: "Training", Icon: Dumbbell, label: "Train" },
           { id: "Weight Tracker", Icon: Scale, label: "Weight" },
@@ -1861,7 +1861,7 @@ export default function App() {
         <div className={pageVisible ? "page-enter" : "page-exit"} key={tab}>
 
         {/* DASHBOARD */}
-        {tab === "Home" && (
+        {tab === "Dashboard" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {(() => { const d = getDaysSinceLastProgress(progressEntries); return (d === null || d >= PROGRESS_INTERVAL_DAYS) ? (
               <div className="fade-up" style={{ background: "#14120a", border: "1px solid #ca8a0433", borderRadius: 10, padding: "8px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
@@ -1887,7 +1887,7 @@ export default function App() {
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Current Weight</div>
                 <div className="big-num" style={{ fontSize: 26, color: "#34d399" }}>{latestWeight ? cWeight : "—"}<span style={{ fontSize: 14, color: "#34d399", fontFamily: "'DM Mono',monospace", marginLeft: 4 }}>lbs</span></div>
                 {weighIns.length >= 2 && (() => { const curr = weighIns[weighIns.length-1]; const totalLost = (START_WEIGHT - parseFloat(curr.weight)).toFixed(1); const isDown = parseFloat(totalLost) > 0; return <div style={{fontSize:10,color:isDown?"#34d399":"#f87171",marginTop:3,fontFamily:"'DM Mono',monospace"}}>{isDown?"↓":"+"} {Math.abs(totalLost)} lbs lost</div>; })()}
-                {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:32}}>COLLECTION</div>}
+                {lostSoFar > 0 && parseFloat(lostSoFar) >= 5 && <div style={{fontSize:8,color:"#475569",fontFamily:"'DM Mono',monospace",letterSpacing:1,marginTop:14}}>COLLECTION</div>}
                 {lostSoFar > 0 && (() => { const earned = [5,10,15,20,25,30,35,40,45,50].filter(m => parseFloat(lostSoFar) >= m); return earned.length ? (<div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:5}}>{earned.map(m => (<span key={m}>🏅<span style={{fontSize:8,fontWeight:700,verticalAlign:"middle"}}>{m}</span></span>))}</div>) : null; })()}
               </div>
               <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: `3px solid ${_pct >= 50 ? "#34d399" : _pct >= 25 ? "#fbbf24" : "#f87171"}`, display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -2082,6 +2082,52 @@ export default function App() {
               )}
             </div>
             );})()}
+
+            {/* Weight loss rate graph */}
+            {weighIns.length >= 4 && (() => {
+              // Calculate rolling 7-day rate for each weigh-in
+              const ratePoints = weighIns.map((w, i) => {
+                if (i === 0) return null;
+                const prev = weighIns[i - 1];
+                const days = getDaysBetween(prev.date, w.date);
+                if (days === 0) return null;
+                const rate = ((parseFloat(prev.weight) - parseFloat(w.weight)) / days) * 7;
+                return { date: w.date, rate: parseFloat(rate.toFixed(2)) };
+              }).filter(Boolean);
+              if (ratePoints.length < 2) return null;
+              const W = 240, H = 60;
+              const rates = ratePoints.map(p => p.rate);
+              const minR = Math.min(...rates, 0), maxR = Math.max(...rates, 0.1);
+              const x = i => (i / (ratePoints.length - 1)) * W;
+              const y = v => H - 8 - ((v - minR) / (maxR - minR || 1)) * (H - 16);
+              const zeroY = y(0);
+              const path = ratePoints.map((p, i) => `${i===0?"M":"L"}${x(i).toFixed(1)},${y(p.rate).toFixed(1)}`).join(" ");
+              const latestRate = ratePoints[ratePoints.length - 1].rate;
+              const trend = ratePoints.length >= 3 ? ratePoints[ratePoints.length-1].rate - ratePoints[ratePoints.length-3].rate : 0;
+              return (
+                <div className="stat-card fade-up-2" style={{ padding: "12px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                    <div className="label" style={{ fontSize: 9, marginBottom: 0 }}>Weekly Loss Rate</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: latestRate >= 0.5 ? "#34d399" : latestRate > 0 ? "#fbbf24" : "#f87171" }}>{latestRate > 0 ? "" : ""}{latestRate} <span style={{ fontSize: 11, color: "#475569" }}>lb/wk</span></span>
+                      <span style={{ fontSize: 10, color: trend > 0 ? "#34d399" : trend < 0 ? "#f87171" : "#475569" }}>{trend > 0 ? "↑" : trend < 0 ? "↓" : "→"}</span>
+                    </div>
+                  </div>
+                  <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block", overflow: "visible" }}>
+                    <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#059669"/><stop offset="100%" stopColor="#34d399"/></linearGradient></defs>
+                    {/* Zero line */}
+                    <line x1="0" y1={zeroY} x2={W} y2={zeroY} stroke="#1e2d40" strokeWidth="1" strokeDasharray="3 3" />
+                    <path d={path} fill="none" stroke="url(#rg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    {ratePoints.map((p, i) => (
+                      <circle key={i} cx={x(i)} cy={y(p.rate)} r="2.5" fill={p.rate > 0 ? "#10b981" : "#f87171"} />
+                    ))}
+                  </svg>
+                  <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 4 }}>
+                    {latestRate >= 1 ? "🔥 Excellent pace" : latestRate >= 0.5 ? "✓ On track" : latestRate > 0 ? "⚠ Below target — check nutrition" : "⚠ No recent loss detected"}
+                  </div>
+                </div>
+              );
+            })()}
             {/* 7-Day Averages */}
             {(() => {
               const last7 = logs.filter(l => { const d = getDaysBetween(l.date, getLocalDateStr()); return d >= 0 && d < 7; });
