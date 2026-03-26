@@ -3210,68 +3210,6 @@ export default function App() {
               )}
 
               {/* Training frequency heatmap */}
-              {workouts.length > 0 && (() => {
-                const cells = Array.from({ length: 56 }, (_, i) => {
-                  const d = new Date(); d.setDate(d.getDate() - (55 - i));
-                  const ds = getLocalDateStr(d);
-                  const w = workouts.find(x => x.date === ds);
-                  const vol = w ? w.exercises.reduce((t, ex) => t + ex.sets.reduce((s, set) => s + (parseFloat(set.reps)||0)*(parseFloat(set.weight)||0), 0), 0) : 0;
-                  return { ds, vol, trained: !!w };
-                });
-                const maxVol = Math.max(...cells.map(c => c.vol), 1);
-                const heatColor = (vol, trained) => {
-                  if (!trained) return "#0f1623";
-                  const intensity = vol / maxVol;
-                  if (intensity > 0.7) return "#10b981";
-                  if (intensity > 0.4) return "#059669";
-                  if (intensity > 0) return "#065f3a";
-                  return "#064e35";
-                };
-                return (
-                  <div className="stat-card">
-                    <div className="section-title" style={{ fontSize: 14 }}>TRAINING FREQUENCY</div>
-                    <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 8 }}>56-day volume heatmap — brighter = more weight lifted</div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(14, 1fr)", gap: 3 }}>
-                      {cells.map(({ ds, vol, trained }) => (
-                        <div key={ds} className="train-heat-cell" title={`${ds}${trained ? ` · ${vol.toLocaleString()}lb` : " · rest"}`}
-                          style={{ height: 12, background: heatColor(vol, trained), borderRadius: 3 }} />
-                      ))}
-                    </div>
-                    <div style={{ display: "flex", gap: 10, marginTop: 8, alignItems: "center" }}>
-                      {[["#0f1623","Rest"],["#064e35","Light"],["#059669","Medium"],["#10b981","Heavy"]].map(([c,l]) => (
-                        <div key={l} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          <div style={{ width: 10, height: 10, borderRadius: 2, background: c }} />
-                          <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{l}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Workout Templates */}
-              <div className="stat-card">
-                <div className="section-title" style={{ fontSize: 16 }}>TEMPLATES</div>
-                {templates.length === 0 ? (
-                  <div style={{ color: "#334155", fontSize: 11, fontFamily: "'DM Mono',monospace" }}>No templates yet — save a workout below to reuse it.</div>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    {templates.map(t => (
-                      <div key={t.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0f1623", borderRadius: 8, padding: "10px 14px", border: "1px solid #1e2d40" }}>
-                        <div>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: "#e2e8f0" }}>{t.name}</div>
-                          <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{t.exercises.length} exercise{t.exercises.length !== 1 ? "s" : ""}</div>
-                        </div>
-                        <div style={{ display: "flex", gap: 8 }}>
-                          <button onClick={() => loadTemplate(t)} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "5px 12px", borderRadius: 7, fontSize: 11, fontWeight: 600 }}>Load</button>
-                          <button onClick={() => deleteTemplate(t.id)} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "5px 8px", borderRadius: 7, fontSize: 11, display: "flex", alignItems: "center" }}><Trash2 size={12} /></button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
               {/* New workout form */}
               <div className="stat-card">
                 <div className="section-title" style={{ fontSize: 16 }}>LOG WORKOUT</div>
@@ -3426,6 +3364,72 @@ export default function App() {
                   </div>
                 </div>
               </div>
+
+              {/* Workout Templates */}
+              <div className="stat-card">
+                <div className="section-title" style={{ fontSize: 16 }}>TEMPLATES</div>
+                {templates.length === 0 ? (
+                  <div style={{ color: "#334155", fontSize: 11, fontFamily: "'DM Mono',monospace" }}>No templates yet — save a workout below to reuse it.</div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {templates.map(t => (
+                      <div key={t.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0f1623", borderRadius: 8, padding: "10px 14px", border: "1px solid #1e2d40" }}>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "#e2e8f0" }}>{t.name}</div>
+                          <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{t.exercises.length} exercise{t.exercises.length !== 1 ? "s" : ""}</div>
+                        </div>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <button onClick={() => loadTemplate(t)} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "5px 12px", borderRadius: 7, fontSize: 11, fontWeight: 600 }}>Load</button>
+                          <button onClick={() => deleteTemplate(t.id)} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "5px 8px", borderRadius: 7, fontSize: 11, display: "flex", alignItems: "center" }}><Trash2 size={12} /></button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* New workout form */}
+              {/* Training frequency heatmap */}
+              {workouts.length > 0 && (() => {
+                const cells = Array.from({ length: 56 }, (_, i) => {
+                  const d = new Date(); d.setDate(d.getDate() - (55 - i));
+                  const ds = getLocalDateStr(d);
+                  const w = workouts.find(x => x.date === ds);
+                  const vol = w ? w.exercises.reduce((t, ex) => t + ex.sets.reduce((s, set) => s + (parseFloat(set.reps)||0)*(parseFloat(set.weight)||0), 0), 0) : 0;
+                  return { ds, vol, trained: !!w };
+                });
+                const maxVol = Math.max(...cells.map(c => c.vol), 1);
+                const heatColor = (vol, trained) => {
+                  if (!trained) return "#0f1623";
+                  const intensity = vol / maxVol;
+                  if (intensity > 0.7) return "#10b981";
+                  if (intensity > 0.4) return "#059669";
+                  if (intensity > 0) return "#065f3a";
+                  return "#064e35";
+                };
+                return (
+                  <div className="stat-card">
+                    <div className="section-title" style={{ fontSize: 14 }}>TRAINING FREQUENCY</div>
+                    <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 8 }}>56-day volume heatmap — brighter = more weight lifted</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(14, 1fr)", gap: 3 }}>
+                      {cells.map(({ ds, vol, trained }) => (
+                        <div key={ds} className="train-heat-cell" title={`${ds}${trained ? ` · ${vol.toLocaleString()}lb` : " · rest"}`}
+                          style={{ height: 12, background: heatColor(vol, trained), borderRadius: 3 }} />
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", gap: 10, marginTop: 8, alignItems: "center" }}>
+                      {[["#0f1623","Rest"],["#064e35","Light"],["#059669","Medium"],["#10b981","Heavy"]].map(([c,l]) => (
+                        <div key={l} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                          <div style={{ width: 10, height: 10, borderRadius: 2, background: c }} />
+                          <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{l}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Workout Templates */}
 
               {/* Workout history */}
               {workouts.length > 0 && (
