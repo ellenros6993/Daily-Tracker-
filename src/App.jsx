@@ -1804,7 +1804,7 @@ export default function App() {
         </nav>
         <div style={{ padding: "16px 20px", borderTop: "1px solid #131929" }}>
           <div style={{ fontSize: 9, color: "#1e2d40", letterSpacing: 1, fontFamily: "'DM Mono', monospace", marginBottom: 4 }}>TARGETS</div>
-          <div style={{ fontSize: 10, color: "#334155", lineHeight: 1.8, fontFamily: "'DM Mono', monospace" }}>{S_CALORIES_MIN}–{S_CALORIES_MAX} kcal<br/><span style={{color:"#10b981"}}>≥{S_PROTEIN_MIN}g protein</span><br/><span style={{color:"#60a5fa"}}>≥{S_STEPS_MIN.toLocaleString()} steps</span></div>
+          <div style={{ fontSize: 10, lineHeight: 1.8, fontFamily: "'DM Mono', monospace" }}><div style={{color:"#334155"}}>{S_CALORIES_MIN}–{S_CALORIES_MAX} kcal</div><div style={{color:"#10b981"}}>≥{S_PROTEIN_MIN}g protein</div><div style={{color:"#60a5fa"}}>≥{S_STEPS_MIN.toLocaleString()} steps</div></div>
         </div>
       </div>
 
