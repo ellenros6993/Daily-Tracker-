@@ -2518,15 +2518,15 @@ export default function App() {
                       </div>
                       <div>
                         <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4, letterSpacing: 1 }}>QUALITY</div>
-                        <div style={{ display: "flex", gap: 3 }}>
-                          {[1,2,3,4,5].map(q => (
-                            <button key={q} onClick={() => { saveSleep("quality", sleep.quality === q ? 0 : q); haptic("light"); }}
-                              style={{ flex: 1, padding: "5px 2px", borderRadius: 6, fontSize: 11, cursor: "pointer", border: `1px solid ${sleep.quality === q ? qualityColors[q] : "#1e2d40"}`, background: sleep.quality === q ? qualityColors[q] + "22" : "#0f1623", color: sleep.quality === q ? qualityColors[q] : "#334155" }}>
-                              {"⭐".repeat(q)}
-                            </button>
-                          ))}
-                        </div>
-                        {sleep.quality > 0 && <div style={{ marginTop: 4, fontSize: 10, color: qualityColors[sleep.quality], fontFamily: "'DM Mono',monospace", textAlign: "center" }}>{qualityLabels[sleep.quality]}</div>}
+                        <select value={sleep.quality || ""} onChange={e => { saveSleep("quality", e.target.value ? parseInt(e.target.value) : 0); haptic("light"); }}
+                          style={{ width: "100%", background: "#0f1623", border: `1px solid ${sleep.quality ? qualityColors[sleep.quality] : "#1e2d40"}`, borderRadius: 7, color: sleep.quality ? qualityColors[sleep.quality] : "#475569", fontSize: 12, fontFamily: "'DM Mono',monospace", padding: "5px 8px", cursor: "pointer", outline: "none" }}>
+                          <option value="">-- quality</option>
+                          <option value="1">😴 Poor</option>
+                          <option value="2">😕 Fair</option>
+                          <option value="3">😊 Okay</option>
+                          <option value="4">😌 Good</option>
+                          <option value="5">🌟 Great</option>
+                        </select>
                       </div>
                       <div>
                         <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4, letterSpacing: 1 }}>NOTES</div>
@@ -2539,7 +2539,6 @@ export default function App() {
                 );
               })()}
             </div>
-              {/* Manual Macro Input */}
               <div className="stat-card" style={{ padding: 0, overflow: "hidden" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer" }} onClick={() => setShowManualMacros(v => !v)}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
