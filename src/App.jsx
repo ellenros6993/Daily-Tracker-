@@ -1908,7 +1908,7 @@ export default function App() {
                       📲 INSTALL SHORTCUT
                     </a>
                     <div style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Works with Apple Watch, Fitness app, and Health app</div>
-                    <button onClick={() => { window.location.href = "shortcuts://run-shortcut?name=Find%20Health%20Samples%20Where"; setShowShortcutModal(false); }} style={{ width: "100%", background: "linear-gradient(135deg,#065f3a,#10b981)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, marginTop: 10 }}>⚡ SYNC NOW</button>
+                    <a href="https://www.icloud.com/shortcuts/1319e6d7f2b0434d9970dadfd2e2d035" style={{ display: "block", width: "100%", boxSizing: "border-box", background: "linear-gradient(135deg,#065f3a,#10b981)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, marginTop: 10, textAlign: "center", textDecoration: "none" }}>⚡ SYNC NOW</a>
                     <div style={{ borderTop: "1px solid #131929", paddingTop: 12, marginTop: 8 }}>
                       <div style={{ display: "flex", gap: 6 }}>
                           style={{ flex: 1, background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "6px 8px", outline: "none" }} />
