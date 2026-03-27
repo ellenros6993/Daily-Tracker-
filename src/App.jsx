@@ -2366,22 +2366,22 @@ export default function App() {
                     );
                   })()}
                   {/* Vertical timeline */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                     {[...weighIns].reverse().map((w, i) => {
                       const prev = i < weighIns.length - 1 ? [...weighIns].reverse()[i + 1] : null;
                       const delta = prev ? (parseFloat(w.weight) - parseFloat(prev.weight)).toFixed(1) : null;
                       const isFirst = i === 0;
                       const deltaColor = delta === null ? "#10b981" : parseFloat(delta) < 0 ? "#34d399" : parseFloat(delta) > 0 ? "#f87171" : "#475569";
                       return (
-                        <div key={w.date} className="timeline-node" style={{ display: "flex", alignItems: "center", gap: 12, background: isFirst ? "#0f1623" : "transparent", borderRadius: 10, padding: "10px 14px", border: isFirst ? "1px solid #1e2d40" : "1px solid transparent", animation: `fadeUp 0.3s ${i * 0.04}s ease both` }}>
-                          <div style={{ width: 4, height: 40, borderRadius: 2, background: isFirst ? "linear-gradient(to bottom,#059669,#34d399)" : "#1e2d40", flexShrink: 0 }} />
+                        <div key={w.date} className="timeline-node" style={{ display: "flex", alignItems: "center", gap: 8, background: isFirst ? "#0f1623" : "transparent", borderRadius: 8, padding: isFirst ? "8px 12px" : "4px 8px", border: isFirst ? "1px solid #1e2d40" : "1px solid transparent", animation: `fadeUp 0.3s ${i * 0.04}s ease both` }}>
+                          <div style={{ width: 4, height: isFirst ? 36 : 24, borderRadius: 2, background: isFirst ? "linear-gradient(to bottom,#059669,#34d399)" : "#1e2d40", flexShrink: 0 }} />
                           <div style={{ flex: 1 }}>
                             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
                               <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                                <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: isFirst ? 28 : 20, color: isFirst ? "#10b981" : "#94a3b8", lineHeight: 1 }}>{w.weight}</span>
+                                <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: isFirst ? 24 : 16, color: isFirst ? "#10b981" : "#94a3b8", lineHeight: 1 }}>{w.weight}</span>
                                 <span style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>lb</span>
                                 {delta !== null && (
-                                  <span style={{ fontSize: 11, fontFamily: "'Bebas Neue',sans-serif", color: deltaColor }}>
+                                  <span style={{ fontSize: 10, fontFamily: "'Bebas Neue',sans-serif", color: deltaColor }}>
                                     {parseFloat(delta) > 0 ? "+" : ""}{delta}
                                   </span>
                                 )}
@@ -2389,9 +2389,9 @@ export default function App() {
                               <span style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{w.date}</span>
                             </div>
                             {(w.bodyFat || w.muscleMass) && (
-                              <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-                                {w.bodyFat && <span style={{ fontSize: 9, color: "#a78bfa", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>}
-                                {w.muscleMass && <span style={{ fontSize: 9, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>Muscle {w.muscleMass}lb</span>}
+                              <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                                {w.bodyFat && <span style={{ fontSize: 8, color: "#a78bfa", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>}
+                                {w.muscleMass && <span style={{ fontSize: 8, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>Muscle {w.muscleMass}lb</span>}
                               </div>
                             )}
                           </div>
@@ -2551,7 +2551,7 @@ export default function App() {
                       <div style={{ fontSize: 12, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Sleep</div>
                       {sleep.hours && <span style={{ marginLeft: "auto", fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "#60a5fa" }}>{sleep.hours}h</span>}
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                       <div>
                         <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4, letterSpacing: 1 }}>HOURS SLEPT</div>
                         <select value={sleep.hours || ""} onChange={e => { saveSleep("hours", e.target.value ? parseFloat(e.target.value) : ""); haptic("light"); }}
@@ -3451,7 +3451,7 @@ export default function App() {
                 {templates.length === 0 ? (
                   <div style={{ color: "#334155", fontSize: 11, fontFamily: "'DM Mono',monospace" }}>No templates yet — save a workout below to reuse it.</div>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                     {templates.map(t => (
                       <div key={t.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0f1623", borderRadius: 8, padding: "10px 14px", border: "1px solid #1e2d40" }}>
                         <div>
