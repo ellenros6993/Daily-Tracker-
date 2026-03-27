@@ -1895,7 +1895,7 @@ export default function App() {
                       {[
                         { num: "1", text: "Tap Install Shortcut and add it to your Shortcuts app — keep the name as-is" },
                         { num: "2", text: "When prompted, tap Allow Access to Health" },
-                        { num: "3", text: "Tap Sync Now below each day to pull your steps automatically" },
+                        { num: "3", text: "Set up an automation in Shortcuts to run it automatically each day — or run it manually from the Shortcuts app" },
                       ].map(({ num, text }) => (
                         <div key={num} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                           <div style={{ background: "#1e2d40", color: "#60a5fa", fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{num}</div>
@@ -1908,7 +1908,6 @@ export default function App() {
                       📲 INSTALL SHORTCUT
                     </a>
                     <div style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Works with Apple Watch, Fitness app, and Health app</div>
-                    <a href="https://www.icloud.com/shortcuts/1319e6d7f2b0434d9970dadfd2e2d035" style={{ display: "block", width: "100%", boxSizing: "border-box", background: "linear-gradient(135deg,#065f3a,#10b981)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, marginTop: 10, textAlign: "center", textDecoration: "none" }}>⚡ SYNC NOW</a>
                     <div style={{ borderTop: "1px solid #131929", paddingTop: 12, marginTop: 8 }}>
                       <div style={{ display: "flex", gap: 6 }}>
                           style={{ flex: 1, background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "6px 8px", outline: "none" }} />
