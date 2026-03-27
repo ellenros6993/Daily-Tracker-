@@ -3835,7 +3835,7 @@ export default function App() {
 
         {/* WEEKLY REPORT */}
         {tab === "Weekly Report" && (() => {
-          const days = parseInt(summaryPeriod);
+          const days = summaryPeriod === "all" ? 3650 : parseInt(summaryPeriod);
           const periodLogs = logs.filter(l => {
             const d = getDaysBetween(l.date, getLocalDateStr());
             return d >= 0 && d < days;
@@ -3917,9 +3917,9 @@ export default function App() {
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {/* Period selector */}
               <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-                {[["7","7 Days"],["14","14 Days"],["30","30 Days"]].map(([val, label]) => (
+                {[["7","7D"],["14","14D"],["30","30D"],["all","All"]].map(([val, label]) => (
                   <button key={val} onClick={() => setSummaryPeriod(val)}
-                    style={{ padding: "6px 18px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Mono',monospace", letterSpacing: 1, border: `1px solid ${summaryPeriod === val ? "#10b981" : "#1e2d40"}`, background: summaryPeriod === val ? "#065f3a" : "#0f1623", color: summaryPeriod === val ? "#34d399" : "#475569" }}>
+                    style={{ padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Mono',monospace", letterSpacing: 1, border: `1px solid ${summaryPeriod === val ? "#60a5fa" : "#1e2d40"}`, background: summaryPeriod === val ? "#1e3a5f" : "#0f1623", color: summaryPeriod === val ? "#60a5fa" : "#475569" }}>
                     {label}
                   </button>
                 ))}
