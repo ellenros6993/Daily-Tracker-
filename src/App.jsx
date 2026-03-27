@@ -1910,6 +1910,7 @@ export default function App() {
                     </a>
                     <div style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Works with Apple Watch, Fitness app, and Health app</div>
                     <button onClick={() => { window.location.href = "shortcuts://run-shortcut?name=Find%20Health%20Samples%20Where"; setShowShortcutModal(false); }} style={{ width: "100%", background: "linear-gradient(135deg,#065f3a,#10b981)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, marginTop: 10 }}>⚡ SYNC NOW</button>
+                    <button onClick={() => { window.location.href = "shortcuts://run-shortcut?name=Find%20Health%20Samples%20Where"; setShowShortcutModal(false); }} style={{ width: "100%", background: "linear-gradient(135deg,#065f3a,#10b981)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, marginTop: 10 }}>⚡ SYNC NOW</button>
                     <div style={{ borderTop: "1px solid #131929", paddingTop: 12, marginTop: 8 }}>
                       <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>HAVE YOUR OWN SHORTCUT? PASTE URL:</div>
                       <div style={{ display: "flex", gap: 6 }}>
