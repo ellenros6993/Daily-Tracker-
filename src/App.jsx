@@ -1059,7 +1059,6 @@ export default function App() {
   const [summaryPeriod, setSummaryPeriod] = useState("7");
   const [showPlateCalc, setShowPlateCalc] = useState(false);
   const [plateWeight, setPlateWeight] = useState("");
-  const [exAutoComplete, setExAutoComplete] = useState({});
   const [circuitPhase, setCircuitPhase] = useState("build");
   const [circuitRunning, setCircuitRunning] = useState(false);
   const [circuitConfig, setCircuitConfig] = useState({ work: 40, rest: 20, rounds: 4, restBetween: 60 });
@@ -1413,48 +1412,33 @@ export default function App() {
   }, [workouts]);
 
   function saveWorkout() {
-    const isCardio = workoutForm.activityType && workoutForm.activityType !== "strength";
-    if (!isCardio) {
-      const filled = workoutForm.exercises.filter(e => e.name.trim());
-      if (!filled.length) return;
-      const entry = { ...workoutForm, exercises: filled, id: workoutForm.id || Date.now() };
-      const idx = workouts.findIndex(w => w.id === entry.id);
-      const updated = idx >= 0 ? workouts.map((w,i) => i === idx ? entry : w) : [...workouts, entry].sort((a,b) => a.date.localeCompare(b.date));
-      const hasPR = filled.some(ex => {
-        const maxW = Math.max(...ex.sets.map(s => parseFloat(s.weight) || 0));
-        return maxW > 0 && maxW > getPRForExercise(ex.name);
-      });
-      setWorkouts(updated);
-      const workoutSummary = filled.map(e => e.name).join(", ");
-      const wDate = entry.date || getLocalDateStr();
-      setLogs(prev => {
-        const ex = prev.find(l => l.date === wDate);
-        if (ex) return prev.map(l => l.date === wDate ? { ...l, training: workoutSummary } : l);
+    const filled = workoutForm.exercises.filter(e => e.name.trim());
+    if (!filled.length) return;
+    const entry = { ...workoutForm, exercises: filled, id: workoutForm.id || Date.now() };
+    const idx = workouts.findIndex(w => w.id === entry.id);
+    const updated = idx >= 0 ? workouts.map((w,i) => i === idx ? entry : w) : [...workouts, entry].sort((a,b) => a.date.localeCompare(b.date));
+    // Check for any PRs in this session
+    const hasPR = filled.some(ex => {
+      const maxW = Math.max(...ex.sets.map(s => parseFloat(s.weight) || 0));
+      return maxW > 0 && maxW > getPRForExercise(ex.name);
+    });
+    setWorkouts(updated);
+    const workoutSummary = filled.map(e => e.name).join(", ");
+    const wDate = entry.date || getLocalDateStr();
+    setLogs(prev => {
+      const ex = prev.find(l => l.date === wDate);
+      if (ex) {
+        return prev.map(l => l.date === wDate ? { ...l, training: workoutSummary } : l);
+      } else {
         return [...prev, { date: wDate, calories: "", protein: "", steps: "", training: workoutSummary, weight: "", bodyFat: "", muscleMass: "", visceralFat: "" }];
-      });
-      setWorkoutSaved(true);
-      haptic(hasPR ? "pr" : "success");
-      setTimeout(() => setWorkoutSaved(false), 2000);
-      setWorkoutForm({ date: getLocalDateStr(), name: "", activityType: "strength", exercises: [{ id: Date.now(), name: "", sets: [{ reps: "", weight: "" }] }] });
-    } else {
-      const entry = { ...workoutForm, exercises: [], id: workoutForm.id || Date.now() };
-      const idx = workouts.findIndex(w => w.id === entry.id);
-      const updated = idx >= 0 ? workouts.map((w,i) => i === idx ? entry : w) : [...workouts, entry].sort((a,b) => a.date.localeCompare(b.date));
-      setWorkouts(updated);
-      const actLabel = workoutForm.activityType.charAt(0).toUpperCase() + workoutForm.activityType.slice(1);
-      const summary = `${actLabel}${workoutForm.duration ? ` ${workoutForm.duration}${workoutForm.durationUnit || "min"}` : ""}`;
-      const wDate = entry.date || getLocalDateStr();
-      setLogs(prev => {
-        const ex = prev.find(l => l.date === wDate);
-        if (ex) return prev.map(l => l.date === wDate ? { ...l, training: summary } : l);
-        return [...prev, { date: wDate, calories: "", protein: "", steps: "", training: summary, weight: "", bodyFat: "", muscleMass: "", visceralFat: "" }];
-      });
-      setWorkoutSaved(true);
-      haptic("success");
-      setTimeout(() => setWorkoutSaved(false), 2000);
-      setWorkoutForm({ date: getLocalDateStr(), name: "", activityType: workoutForm.activityType, exercises: [{ id: Date.now(), name: "", sets: [{ reps: "", weight: "" }] }] });
-    }
+      }
+    });
+    setWorkoutSaved(true);
+    haptic(hasPR ? "pr" : "success");
+    setTimeout(() => setWorkoutSaved(false), 2000);
+    setWorkoutForm({ date: getLocalDateStr(), name: "", exercises: [{ id: Date.now(), name: "", sets: [{ reps: "", weight: "" }] }] });
   }
+
   function addExercise() {
     setWorkoutForm(f => ({ ...f, exercises: [...f.exercises, { id: Date.now(), name: "", sets: [{ reps: "", weight: "" }] }] }));
   }
@@ -3222,49 +3206,6 @@ export default function App() {
 
               {/* Circuit Timer button */}
 
-              {/* Plate Calculator Modal */}
-              {showPlateCalc && (
-                <div style={{ position: "fixed", inset: 0, background: "#07080dee", zIndex: 1001, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-                  <div style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 16, width: "100%", maxWidth: 360, padding: 24, position: "relative" }}>
-                    <button onClick={() => setShowPlateCalc(false)} style={{ position: "absolute", top: 12, right: 12, background: "none", border: "none", color: "#475569", fontSize: 20, cursor: "pointer" }}>✕</button>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0", marginBottom: 16, letterSpacing: 2, fontFamily: "'DM Mono',monospace" }}>🏋️ PLATE CALCULATOR</div>
-                    <div style={{ display: "flex", gap: 8, marginBottom: 16, alignItems: "center" }}>
-                      <input type="number" placeholder="Target weight (lb)" value={plateWeight} onChange={e => setPlateWeight(e.target.value)}
-                        style={{ flex: 1, fontSize: 20, fontFamily: "'Bebas Neue',sans-serif", padding: "8px 12px", textAlign: "center" }} />
-                      <span style={{ color: "#475569", fontSize: 12 }}>lb</span>
-                    </div>
-                    {plateWeight && (() => {
-                      const barWeight = 45;
-                      const target = parseFloat(plateWeight);
-                      if (target < barWeight) return <div style={{ color: "#f87171", fontSize: 11, fontFamily: "'DM Mono',monospace" }}>Weight must be at least {barWeight}lb (bar weight)</div>;
-                      const perSide = (target - barWeight) / 2;
-                      const plates = [45, 35, 25, 10, 5, 2.5];
-                      let remaining = perSide;
-                      const result = [];
-                      plates.forEach(p => {
-                        const count = Math.floor(remaining / p);
-                        if (count > 0) { result.push({ plate: p, count }); remaining = Math.round((remaining - count * p) * 10) / 10; }
-                      });
-                      return (
-                        <div>
-                          <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 8, letterSpacing: 1 }}>PLATES PER SIDE (45lb bar)</div>
-                          {result.length > 0 ? result.map(({ plate, count }) => (
-                            <div key={plate} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #131929" }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <div style={{ width: 32, height: 32, borderRadius: "50%", background: plate >= 45 ? "#1e3a5f" : plate >= 25 ? "#3b1f6b" : plate >= 10 ? "#065f3a" : "#334155", border: "2px solid #475569", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#e2e8f0", fontWeight: 700 }}>{plate}</div>
-                                <span style={{ color: "#e2e8f0", fontSize: 13, fontFamily: "'DM Mono',monospace" }}>{plate} lb plate</span>
-                              </div>
-                              <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#60a5fa" }}>×{count}</span>
-                            </div>
-                          )) : <div style={{ color: "#34d399", fontSize: 11, fontFamily: "'DM Mono',monospace" }}>✓ Bar only (45lb)</div>}
-                          {remaining > 0 && <div style={{ color: "#f87171", fontSize: 10, fontFamily: "'DM Mono',monospace", marginTop: 6 }}>⚠ {remaining}lb unaccounted — not achievable with standard plates</div>}
-                        </div>
-                      );
-                    })()}
-                  </div>
-                </div>
-              )}
-
               <div style={{ display: "flex" }}>
                 <button onClick={() => setShowCircuitTimer(true)} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", padding: "10px 24px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, display: "flex", alignItems: "center", gap: 8 }}>⏱ CIRCUIT TIMER</button>
               </div>
@@ -3437,7 +3378,7 @@ export default function App() {
                             onChange={e => updateExerciseName(ex.id, e.target.value)}
                             style={{ flex: 1, fontWeight: 500 }}
                           />
-                          {(() => { const allExNames = [...new Set(workouts.flatMap(w => w.exercises.map(e => e.name.trim())).filter(Boolean))]; const filteredEx = ex.name.length > 0 ? allExNames.filter(n => n.toLowerCase().includes(ex.name.toLowerCase()) && n.toLowerCase() !== ex.name.toLowerCase()) : []; return filteredEx.length > 0 ? (<div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#131929", border: "1px solid #1e2d40", borderRadius: 7, zIndex: 100, maxHeight: 120, overflowY: "auto" }}>{filteredEx.slice(0,5).map(n => <div key={n} onClick={() => updateExerciseName(ex.id, n)} style={{ padding: "6px 10px", fontSize: 12, color: "#e2e8f0", cursor: "pointer", borderBottom: "1px solid #1e2d4044" }}>{n}</div>)}</div>) : null; })()}
+                            {ex.name.length > 1 && (() => { const opts = [...new Set(workouts.flatMap(w => w.exercises.map(e => e.name.trim())).filter(n => n && n.toLowerCase().includes(ex.name.toLowerCase()) && n.toLowerCase() !== ex.name.toLowerCase()))].slice(0,4); return opts.length > 0 ? <div style={{ background: "#131929", border: "1px solid #1e2d40", borderRadius: 6, marginTop: 2, overflow: "hidden" }}>{opts.map(n => <div key={n} onClick={() => updateExerciseName(ex.id, n)} style={{ padding: "5px 10px", fontSize: 11, color: "#e2e8f0", cursor: "pointer", borderBottom: "1px solid #1e2d4033" }}>{n}</div>)}</div> : null; })()}
                           {canSuperset && (
                             <button
                               onClick={() => toggleSuperset(ex.id)}
@@ -3462,6 +3403,7 @@ export default function App() {
                           </div>
                         )}
                         {ex.name && !pr && lastSession && (
+                          <div style={{ color: "#475569", fontSize: 10, marginBottom: 8 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</div>
                         )}
 
                         <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr auto", gap: 6, alignItems: "center", marginBottom: 6 }}>
@@ -3480,7 +3422,7 @@ export default function App() {
                               <input type="number" placeholder="12" value={set.reps} onChange={e => updateSet(ex.id, sIdx, "reps", e.target.value)} style={{ textAlign: "center" }} />
                               <div style={{ position: "relative" }}>
                                 <input type="number" placeholder="135" value={set.weight} onChange={e => updateSet(ex.id, sIdx, "weight", e.target.value)} style={{ textAlign: "center", borderColor: isPR ? "#fbbf24" : undefined }} />
-                                <button onClick={() => { setPlateWeight(set.weight || ""); setShowPlateCalc(true); }} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", borderRadius: 4, fontSize: 9, padding: "2px 5px", cursor: "pointer", whiteSpace: "nowrap" }}>🏋️</button>
+                                <button onClick={() => { setPlateWeight(set.weight || ""); setShowPlateCalc(true); }} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", borderRadius: 4, fontSize: 9, padding: "2px 6px", cursor: "pointer" }}>🏋️</button>
                                 {isPR && <span style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", fontSize: 9, color: "#fbbf24" }}>PR!</span>}
                               </div>
                               <input type="text" placeholder="easy / pain..." value={set.notes || ""} onChange={e => updateSet(ex.id, sIdx, "notes", e.target.value)} style={{ fontSize: 10, padding: "6px 8px", color: "#64748b" }} />
@@ -3508,6 +3450,10 @@ export default function App() {
                   );
                 })}
 
+                </div>
+                <div style={{ marginBottom: 10 }}>
+                  <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>SESSION NOTES (OPTIONAL)</div>
+                  <textarea placeholder="How did the session feel?" value={workoutForm.sessionNotes || ""} onChange={e => setWorkoutForm(f => ({ ...f, sessionNotes: e.target.value }))} style={{ width: "100%", boxSizing: "border-box", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "6px 8px", resize: "none", minHeight: 48, outline: "none" }} />
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, flexWrap: "wrap", gap: 8 }}>
                   <button onClick={addExercise} style={{ background: "none", border: "1px solid #1e3a5f", color: "#60a5fa", fontSize: 11, padding: "8px 16px", borderRadius: 8, letterSpacing: 1 }}>
@@ -3654,18 +3600,7 @@ export default function App() {
                               {w.name || "Workout"} <span style={{ fontSize: 13, color: "#475569", fontFamily: "inherit" }}>· {w.date}</span>
                             </div>
                             <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>
-                            {w.activityType && w.activityType !== "strength" ? (
-                              <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>
-                                {w.activityType === "run" ? "🏃" : w.activityType === "cycle" ? "🚴" : w.activityType === "hike" ? "🥾" : w.activityType === "swim" ? "🏊" : w.activityType === "yoga" ? "🧘" : "⚡"} {w.activityType}
-                                {w.duration && ` · ${w.duration}${w.durationUnit || "min"}`}
-                                {w.intensity && ` · ${w.intensity}`}
-                                {w.distance && ` · ${w.distance}${w.distanceUnit || "km"}`}
-                              </div>
-                            ) : (
-                              <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>
-                                {w.exercises.length} exercise{w.exercises.length !== 1 ? "s" : ""} · {w.exercises.reduce((s, e) => s + e.sets.length, 0)} sets
-                              </div>
-                            )}
+                              {w.activityType && w.activityType !== "strength" ? `${w.activityType}${w.duration ? " 00b7 " + w.duration + (w.durationUnit || "min") : ""}${w.intensity ? " 00b7 " + w.intensity : ""}` : `${w.exercises.length} exercise${w.exercises.length !== 1 ? "s" : ""} 00b7 ${w.exercises.reduce((s, e) => s + e.sets.length, 0)} sets`}
                             </div>
                           </div>
                           <span style={{ color: "#334155", fontSize: 14 }}>{selectedWorkout === (w.id || i) ? "▲" : "▼"}</span>
