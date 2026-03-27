@@ -1056,6 +1056,7 @@ export default function App() {
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [showShortcutModal, setShowShortcutModal] = useState(false);
   const [showCircuitTimer, setShowCircuitTimer] = useState(false);
+  const [summaryPeriod, setSummaryPeriod] = useState("7");
   const [circuitPhase, setCircuitPhase] = useState("build");
   const [circuitRunning, setCircuitRunning] = useState(false);
   const [circuitConfig, setCircuitConfig] = useState({ work: 40, rest: 20, rounds: 4, restBetween: 60 });
@@ -3844,7 +3845,6 @@ export default function App() {
 
         {/* WEEKLY REPORT */}
         {tab === "Weekly Report" && (() => {
-          const [summaryPeriod, setSummaryPeriod] = React.useState("7");
           const days = parseInt(summaryPeriod);
           const periodLogs = logs.filter(l => {
             const d = getDaysBetween(l.date, getLocalDateStr());
