@@ -1894,9 +1894,9 @@ export default function App() {
                     <div style={{ fontSize: 11, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 16 }}>Auto-fill today's steps from Apple Watch, Fitness, or Health app</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
                       {[
-                        { num: "1", text: "Tap Install Shortcut below and add it to your Shortcuts app" },
+                        { num: "1", text: "Tap Install Shortcut and add it to your Shortcuts app — keep the name as-is" },
                         { num: "2", text: "When prompted, tap Allow Access to Health" },
-                        { num: "3", text: "Each day, tap the shortcut — it reads your steps and opens the app with them pre-filled" },
+                        { num: "3", text: "Tap Sync Now below each day to pull your steps automatically" },
                       ].map(({ num, text }) => (
                         <div key={num} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                           <div style={{ background: "#1e2d40", color: "#60a5fa", fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{num}</div>
@@ -1909,6 +1909,7 @@ export default function App() {
                       📲 INSTALL SHORTCUT
                     </a>
                     <div style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Works with Apple Watch, Fitness app, and Health app</div>
+                    <button onClick={() => { window.location.href = "shortcuts://run-shortcut?name=Find%20Health%20Samples%20Where"; setShowShortcutModal(false); }} style={{ width: "100%", background: "linear-gradient(135deg,#065f3a,#10b981)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, marginTop: 10 }}>⚡ SYNC NOW</button>
                     <div style={{ borderTop: "1px solid #131929", paddingTop: 12, marginTop: 8 }}>
                       <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>HAVE YOUR OWN SHORTCUT? PASTE URL:</div>
                       <div style={{ display: "flex", gap: 6 }}>
@@ -2095,7 +2096,7 @@ export default function App() {
                 </div>
               )}
               <div className="section-title" style={{ marginBottom: 10, fontSize: 9 }}>Today's Log</div>
-              <button onClick={() => { window.location.href = "shortcuts://run-shortcut?name=Find%20Health%20Samples%20Where"; }} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
+              <button onClick={() => setShowShortcutModal(true)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
               {today ? (
                 <>
                   <div className="today-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
