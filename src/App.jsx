@@ -2257,7 +2257,7 @@ export default function App() {
               <div className="stat-card" style={{ padding: "12px 16px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                   <div className="field-label" style={{ marginBottom: 0, whiteSpace: "nowrap" }}>Date</div>
-                  <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ flex: 1 }} />
+                  <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ width: "auto" }} />
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                   <div>
@@ -2273,10 +2273,9 @@ export default function App() {
                     <input type="number" placeholder="107.2" step="0.1" value={form.muscleMass} onChange={e => setForm(f => ({ ...f, muscleMass: e.target.value }))} style={{ padding: "6px 8px", fontSize: 13 }} />
                   </div>
                 </div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <button className={`save-btn${saved ? " saved-state" : ""}`} onClick={saveLog}>{saved ? "✓ Saved" : "Save Weigh-in"}</button>
-              </div>
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
+                  <button className={`save-btn${saved ? " saved-state" : ""}`} onClick={saveLog} style={{ fontSize: 12, padding: "7px 16px" }}>{saved ? "✓ Saved" : "Save Weigh-in"}</button>
+                </div>
 
               {/* Biometric trend chart */}
               {weighIns.length >= 2 && (() => {
