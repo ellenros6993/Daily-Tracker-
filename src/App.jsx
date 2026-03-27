@@ -2095,7 +2095,7 @@ export default function App() {
                 </div>
               )}
               <div className="section-title" style={{ marginBottom: 10, fontSize: 9 }}>Today's Log</div>
-              <button onClick={() => { const url = personalShortcutUrl || "https://www.icloud.com/shortcuts/570d154538e648c3bbccac6f7fc3328a"; window.location.href = url; }} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
+              <button onClick={() => { const rawUrl = personalShortcutUrl || "https://www.icloud.com/shortcuts/570d154538e648c3bbccac6f7fc3328a"; const id = rawUrl.split("/").pop(); window.location.href = "shortcuts://run-shortcut?id=" + id; }} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
               {today ? (
                 <>
                   <div className="today-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
