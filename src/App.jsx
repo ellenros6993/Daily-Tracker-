@@ -1903,7 +1903,7 @@ export default function App() {
                         </div>
                       ))}
                     </div>
-                    <a href="https://www.icloud.com/shortcuts/7b5e9c2d1f4a4b8e9c2d1f4a4b8e9c2d"
+                    <a href="https://www.icloud.com/shortcuts/570d154538e648c3bbccac6f7fc3328a"
                       style={{ display: "block", background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", padding: "12px", borderRadius: 10, fontSize: 12, fontWeight: 700, textAlign: "center", textDecoration: "none", letterSpacing: 1, marginBottom: 10 }}>
                       📲 INSTALL SHORTCUT
                     </a>
@@ -1930,7 +1930,7 @@ export default function App() {
                         </div>
                       ))}
                     </div>
-                    <a href="https://www.icloud.com/shortcuts/7b5e9c2d1f4a4b8e9c2d1f4a4b8e9c2d"
+                    <a href="https://www.icloud.com/shortcuts/570d154538e648c3bbccac6f7fc3328a"
                       style={{ display: "block", background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", padding: "12px", borderRadius: 10, fontSize: 12, fontWeight: 700, textAlign: "center", textDecoration: "none", letterSpacing: 1, marginBottom: 10 }}>
                       📲 INSTALL SHORTCUT
                     </a>
