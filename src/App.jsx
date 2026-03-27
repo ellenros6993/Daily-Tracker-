@@ -3432,16 +3432,12 @@ export default function App() {
                           )}
                           <input
                             type="text"
-                          {(() => { const allExNames = [...new Set(workouts.flatMap(w => w.exercises.map(e => e.name.trim())).filter(Boolean))]; const filteredEx = ex.name.length > 0 ? allExNames.filter(n => n.toLowerCase().includes(ex.name.toLowerCase()) && n.toLowerCase() !== ex.name.toLowerCase()) : []; return filteredEx.length > 0 ? (
-                            <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#131929", border: "1px solid #1e2d40", borderRadius: 7, zIndex: 100, maxHeight: 120, overflowY: "auto" }}>
-                              {filteredEx.slice(0,5).map(n => <div key={n} onClick={() => updateExerciseName(ex.id, n)} style={{ padding: "6px 10px", fontSize: 12, color: "#e2e8f0", cursor: "pointer", borderBottom: "1px solid #1e2d4044" }}>{n}</div>)}
-                            </div>) : null; })()}
                             placeholder="Exercise name (e.g. Bench Press)"
                             value={ex.name}
                             onChange={e => updateExerciseName(ex.id, e.target.value)}
                             style={{ flex: 1, fontWeight: 500 }}
-                          {(() => { const allExNames = [...new Set(workouts.flatMap(w => w.exercises.map(e => e.name.trim())).filter(Boolean))]; const filteredEx = ex.name.length > 0 ? allExNames.filter(n => n.toLowerCase().includes(ex.name.toLowerCase()) && n.toLowerCase() !== ex.name.toLowerCase()) : []; return filteredEx.length > 0 ? (<div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#131929", border: "1px solid #1e2d40", borderRadius: 7, zIndex: 100, maxHeight: 120, overflowY: "auto" }}>{filteredEx.slice(0,5).map(n => <div key={n} onClick={() => updateExerciseName(ex.id, n)} style={{ padding: "6px 10px", fontSize: 12, color: "#e2e8f0", cursor: "pointer", borderBottom: "1px solid #1e2d4044" }}>{n}</div>)}</div>) : null; })()}
                           />
+                          {(() => { const allExNames = [...new Set(workouts.flatMap(w => w.exercises.map(e => e.name.trim())).filter(Boolean))]; const filteredEx = ex.name.length > 0 ? allExNames.filter(n => n.toLowerCase().includes(ex.name.toLowerCase()) && n.toLowerCase() !== ex.name.toLowerCase()) : []; return filteredEx.length > 0 ? (<div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#131929", border: "1px solid #1e2d40", borderRadius: 7, zIndex: 100, maxHeight: 120, overflowY: "auto" }}>{filteredEx.slice(0,5).map(n => <div key={n} onClick={() => updateExerciseName(ex.id, n)} style={{ padding: "6px 10px", fontSize: 12, color: "#e2e8f0", cursor: "pointer", borderBottom: "1px solid #1e2d4044" }}>{n}</div>)}</div>) : null; })()}
                           {canSuperset && (
                             <button
                               onClick={() => toggleSuperset(ex.id)}
