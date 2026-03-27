@@ -3626,24 +3626,24 @@ export default function App() {
               {/* Upload form */}
               <div className="stat-card">
                 <div className="section-title" style={{ fontSize: 16 }}>NEW CHECK-IN</div>
-                <div style={{ marginBottom: 14 }}>
-                  <div className="field-label" style={{ marginBottom: 4 }}>Date</div>
-                  <input type="date" value={progressForm.date} onChange={e => setProgressForm(f => ({ ...f, date: e.target.value }))} style={{ maxWidth: 200 }} />
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                  <div className="field-label" style={{ marginBottom: 0 }}>Date</div>
+                  <input type="date" value={progressForm.date} onChange={e => setProgressForm(f => ({ ...f, date: e.target.value }))} style={{ width: "auto" }} />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
                   {["front", "side", "side_flexed", "back"].map(angle => (
                     <div key={angle}>
-                      <div className="field-label" style={{ marginBottom: 6 }}>{angle} photo</div>
+                      <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>{angle.replace("_", " ").toUpperCase()} PHOTO</div>
                       {!progressForm[angle] ? (
-                        <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px dashed #131929", borderRadius: 6, padding: "20px 10px", cursor: "pointer", color: "#334155", fontSize: 11, gap: 6 }}>
-                          <span style={{ fontSize: 22 }}>📷</span>
+                        <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px dashed #131929", borderRadius: 6, padding: "10px 6px", cursor: "pointer", color: "#334155", fontSize: 10, gap: 4 }}>
+                          <span style={{ fontSize: 16 }}>📷</span>
                           <span>Upload {angle.replace("_", " ")}</span>
                           <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleProgressMedia(e.target.files[0], angle)} />
                         </label>
                       ) : (
                         <div style={{ position: "relative" }}>
-                          <img src={progressForm[angle]} alt={angle} style={{ width: "100%", height: 140, objectFit: "cover", borderRadius: 6, display: "block" }} />
-                          <label style={{ position: "absolute", bottom: 6, right: 6, background: "#00000088", color: "#e2e8f0", fontSize: 9, padding: "3px 8px", borderRadius: 3, cursor: "pointer", letterSpacing: 1 }}>
+                          <img src={progressForm[angle]} alt={angle} style={{ width: "100%", height: 100, objectFit: "cover", borderRadius: 6, display: "block" }} />
+                          <label style={{ position: "absolute", bottom: 4, right: 4, background: "#00000088", color: "#e2e8f0", fontSize: 9, padding: "2px 6px", borderRadius: 3, cursor: "pointer", letterSpacing: 1 }}>
                             REPLACE
                             <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleProgressMedia(e.target.files[0], angle)} />
                           </label>
@@ -3651,28 +3651,9 @@ export default function App() {
                       )}
                     </div>
                   ))}
-                  <div>
-                    <div className="field-label" style={{ marginBottom: 6 }}>Video</div>
-                    {!progressForm.video ? (
-                      <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px dashed #131929", borderRadius: 6, padding: "20px 10px", cursor: "pointer", color: "#334155", fontSize: 11, gap: 6 }}>
-                        <span style={{ fontSize: 22 }}>🎥</span>
-                        <span>Upload video</span>
-                        <input type="file" accept="video/*" style={{ display: "none" }} onChange={e => handleProgressMedia(e.target.files[0], "video")} />
-                      </label>
-                    ) : (
-                      <div style={{ position: "relative" }}>
-                        <video src={progressForm.video} style={{ width: "100%", height: 140, objectFit: "cover", borderRadius: 6, display: "block" }} controls />
-                        <label style={{ position: "absolute", bottom: 6, right: 6, background: "#00000088", color: "#e2e8f0", fontSize: 9, padding: "3px 8px", borderRadius: 3, cursor: "pointer", letterSpacing: 1 }}>
-                          REPLACE
-                          <input type="file" accept="video/*" style={{ display: "none" }} onChange={e => handleProgressMedia(e.target.files[0], "video")} />
-                        </label>
-                      </div>
-                    )}
-                  </div>
                 </div>
-                <div style={{ marginBottom: 14 }}>
-                  <div className="field-label" style={{ marginBottom: 4 }}>Notes (optional)</div>
-                  <textarea rows={2} placeholder="How are you feeling? Any visible changes?" value={progressForm.notes} onChange={e => setProgressForm(f => ({ ...f, notes: e.target.value }))} style={{ resize: "vertical" }} />
+                <div style={{ marginBottom: 10 }}>
+                  <textarea rows={2} placeholder="How are you feeling? Any visible changes?" value={progressForm.notes} onChange={e => setProgressForm(f => ({ ...f, notes: e.target.value }))} style={{ resize: "vertical", width: "100%", boxSizing: "border-box" }} />
                 </div>
                 <button className="save-btn" onClick={saveProgressEntry} disabled={!ANGLES.some(a => progressForm[a])}>
                   {progressSaved ? "✓ Saved" : "Save Check-in"}
