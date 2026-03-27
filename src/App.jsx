@@ -3947,7 +3947,7 @@ export default function App() {
               {/* Training */}
               <div className="stat-card">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                  <div className="section-title" style={{ fontSize: 14, margin: 0 }}>TRAINING</div>
+                  <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#60a5fa" }}>TRAINING</div>
                   <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#10b981" }}>{daysTrained}<span style={{ fontSize: 12, color: "#475569" }}>/{days} days</span></div>
                 </div>
                 <div className="bar-bg">
@@ -3959,7 +3959,7 @@ export default function App() {
               {/* Steps */}
               <div className="stat-card">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div className="section-title" style={{ fontSize: 14, margin: 0 }}>STEPS</div>
+                  <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#60a5fa" }}>STEPS</div>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal {STEPS_MIN.toLocaleString()}</div>
                 </div>
                 <SummaryBar data={stepsData} color="#60a5fa" unit="" goal={STEPS_MIN} />
