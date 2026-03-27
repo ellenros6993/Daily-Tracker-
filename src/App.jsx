@@ -1909,8 +1909,6 @@ export default function App() {
                       📲 INSTALL SHORTCUT
                     </a>
                     <div style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Works with Apple Watch, Fitness app, and Health app</div>
-                  </div>
-                </div>
                     <div style={{ borderTop: "1px solid #131929", paddingTop: 12, marginTop: 8 }}>
                       <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>HAVE YOUR OWN SHORTCUT? PASTE URL:</div>
                       <div style={{ display: "flex", gap: 6 }}>
@@ -1919,8 +1917,7 @@ export default function App() {
                         <button onClick={() => { localStorage.setItem("dat-personal-shortcut", personalShortcutUrl); setShowShortcutModal(false); }} style={{ background: "#10b981", border: "none", color: "#fff", padding: "6px 12px", borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>SAVE</button>
                       </div>
                     </div>
-              )}
-              {/* Shortcut Setup Modal */}
+                  </div>
                 </div>
               )}
             {(() => { const d = getDaysSinceLastProgress(progressEntries); return (d === null || d >= PROGRESS_INTERVAL_DAYS) ? (
@@ -2098,7 +2095,6 @@ export default function App() {
                 </div>
               )}
               <div className="section-title" style={{ marginBottom: 10, fontSize: 9 }}>Today's Log</div>
-              <button onClick={() => { const url = personalShortcutUrl || "https://www.icloud.com/shortcuts/570d154538e648c3bbccac6f7fc3328a"; window.location.href = url; }} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
               <button onClick={() => { const url = personalShortcutUrl || "https://www.icloud.com/shortcuts/570d154538e648c3bbccac6f7fc3328a"; window.location.href = url; }} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
               {today ? (
                 <>
