@@ -1203,6 +1203,7 @@ export default function App() {
       setCircuitState(s => {
         if (s.secondsLeft > 1) return { ...s, secondsLeft: s.secondsLeft - 1 };
         haptic("medium");
+        try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = s.isWork ? 440 : 880; g.gain.setValueAtTime(0.3, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.3); } catch(e) {}
         if (s.isBetween) return { ...s, isBetween: false, isWork: true, secondsLeft: circuitConfig.work };
         if (s.isWork) return { ...s, isWork: false, secondsLeft: circuitConfig.rest };
         if (s.round >= circuitConfig.rounds) return { ...s, done: true };
