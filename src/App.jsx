@@ -3421,8 +3421,8 @@ export default function App() {
                               <div style={{ color: "#475569", fontSize: 11, width: 24, textAlign: "center" }}>{sIdx + 1}</div>
                               <input type="number" placeholder="12" value={set.reps} onChange={e => updateSet(ex.id, sIdx, "reps", e.target.value)} style={{ textAlign: "center" }} />
                               <div style={{ position: "relative" }}>
-                                <input type="number" placeholder="135" value={set.weight} onChange={e => updateSet(ex.id, sIdx, "weight", e.target.value)} style={{ textAlign: "center", borderColor: isPR ? "#fbbf24" : undefined }} />
-                                <button onClick={() => { setPlateWeight(set.weight || ""); setShowPlateCalc(true); }} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", borderRadius: 4, fontSize: 9, padding: "2px 6px", cursor: "pointer" }}>🏋️</button>
+                                <input type="number" placeholder="135" value={set.weight} onChange={e => updateSet(ex.id, sIdx, "weight", e.target.value)} style={{ textAlign: "center", borderColor: isPR ? "#fbbf24" : undefined, paddingRight: 20 }} />
+                                <button onClick={() => { setPlateWeight(set.weight || ""); setShowPlateCalc(true); }} style={{ position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#334155", fontSize: 10, cursor: "pointer", padding: 0, lineHeight: 1 }}>🏋️</button>
                                 {isPR && <span style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", fontSize: 9, color: "#fbbf24" }}>PR!</span>}
                               </div>
                               <input type="text" placeholder="easy / pain..." value={set.notes || ""} onChange={e => updateSet(ex.id, sIdx, "notes", e.target.value)} style={{ fontSize: 10, padding: "6px 8px", color: "#64748b" }} />
