@@ -1203,7 +1203,7 @@ export default function App() {
       setCircuitState(s => {
         if (s.secondsLeft > 1) return { ...s, secondsLeft: s.secondsLeft - 1 };
         haptic("medium");
-        try { const AudioCtx = window.AudioContext || window.webkitAudioContext; if (AudioCtx) { const ctx = new AudioCtx(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = s.isWork ? 880 : 440; o.type = "sine"; g.gain.setValueAtTime(0.4, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4); o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.4); ctx.resume(); } } catch(e) {}
+        try { const AudioCtx = window.AudioContext || window.webkitAudioContext; if (AudioCtx) { const ctx = new AudioCtx(); ctx.resume().then(() => { const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = s.isWork ? 880 : 440; o.type = "sine"; g.gain.setValueAtTime(0.5, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5); o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.5); }); } } catch(e) {}
         try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = s.isWork ? 440 : 880; g.gain.setValueAtTime(0.3, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.3); } catch(e) {}
         try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = s.isWork ? 440 : 880; g.gain.setValueAtTime(0.3, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.3); } catch(e) {}
         if (s.isBetween) return { ...s, isBetween: false, isWork: true, secondsLeft: circuitConfig.work };
@@ -3191,7 +3191,7 @@ export default function App() {
                   )}
                   <div style={{ display: "flex", gap: 6, marginTop: 10, justifyContent: "center" }}>
                     {restTimerRemaining === 0 ? (
-                      <button onClick={stopRestTimer} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", color: "#fff", border: "none", padding: "6px 16px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Done</button>
+                      <button onClick={stopRestTimer} style={{ background: "linear-gradient(135deg,#059669,#10b981)", color: "#fff", border: "none", padding: "6px 16px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Done</button>
                     ) : (
                       <>
                         <button onClick={() => startRestTimer(restTimerPreset)} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "4px 10px", borderRadius: 6, fontSize: 10, cursor: "pointer" }}>↺</button>
@@ -3203,7 +3203,7 @@ export default function App() {
               )}
 
               {/* Circuit Timer button */}
-              {/* Circuit Timer button */}
+
               <div style={{ display: "flex", justifyContent: "center" }}>
                 <button onClick={() => setShowCircuitTimer(true)} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", padding: "10px 24px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, display: "flex", alignItems: "center", gap: 8 }}>⏱ CIRCUIT TIMER</button>
               </div>
@@ -3289,6 +3289,227 @@ export default function App() {
                 </div>
               )}
 
+
+              {/* New workout form */}
+              <div className="stat-card">
+                <div className="section-title" style={{ fontSize: 16 }}>LOG WORKOUT</div>
+                <div style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "flex-end" }}>
+                  <div style={{ flex: "0 0 auto" }}>
+                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DATE</div>
+                    <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} style={{ width: "auto", fontSize: 12, padding: "5px 8px" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>SESSION NAME</div>
+                    <input type="text" placeholder="e.g. Push Day" value={workoutForm.name} onChange={e => setWorkoutForm(f => ({ ...f, name: e.target.value }))} style={{ fontSize: 12, padding: "5px 8px" }} />
+                  </div>
+                  <div style={{ flex: "0 0 auto" }}>
+                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>TYPE</div>
+                    <select value={workoutForm.activityType || "strength"} onChange={e => setWorkoutForm(f => ({ ...f, activityType: e.target.value }))}
+                      style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 12, padding: "5px 8px", cursor: "pointer", outline: "none" }}>
+                      <option value="strength">🏋️ Strength</option>
+                      <option value="run">🏃 Run</option>
+                      <option value="cycle">🚴 Cycle</option>
+                      <option value="hike">🥾 Hike</option>
+                      <option value="swim">🏊 Swim</option>
+                      <option value="yoga">🧘 Yoga</option>
+                      <option value="other">⚡ Other</option>
+                    </select>
+                  </div>
+                </div>
+                {(workoutForm.activityType || "strength") === "strength" ? (
+                  <>
+
+                <div style={{ marginLeft: 20 }}>
+                {workoutForm.exercises.map((ex, exIdx) => {
+                  const lastSession = getLastSessionForExercise(ex.name, workoutForm.date);
+                  const pr = ex.name ? getPRForExercise(ex.name) : 0;
+                  const isInSuperset = ex.supersetWith || (exIdx > 0 && workoutForm.exercises[exIdx - 1]?.supersetWith === ex.id);
+                  const isSupStart = !!ex.supersetWith;
+                  const isSupEnd = exIdx > 0 && workoutForm.exercises[exIdx - 1]?.supersetWith === ex.id;
+                  const canSuperset = exIdx < workoutForm.exercises.length - 1;
+                  const ssLetter = (() => {
+                    // assign superset group letters A, B, C...
+                    let letter = null, groupIdx = 0;
+                    for (let i = 0; i < workoutForm.exercises.length; i++) {
+                      if (workoutForm.exercises[i].supersetWith) {
+                        if (workoutForm.exercises[i].id === ex.id || workoutForm.exercises[i].supersetWith === ex.id) {
+                          letter = String.fromCharCode(65 + groupIdx);
+                          break;
+                        }
+                        groupIdx++;
+                      }
+                    }
+                    return letter;
+                  })();
+
+                  return (
+                    <div key={ex.id} style={{ position: "relative" }}>
+                      {/* Superset bracket */}
+                      {isInSuperset && (
+                        <div style={{
+                          position: "absolute", left: -18, top: isSupStart ? 16 : 0,
+                          bottom: isSupEnd ? 16 : 0,
+                          width: 12,
+                          borderLeft: "2px solid #10b981",
+                          borderTop: isSupStart ? "2px solid #10b981" : "none",
+                          borderBottom: isSupEnd ? "2px solid #10b981" : "none",
+                          borderRadius: isSupStart ? "4px 0 0 0" : isSupEnd ? "0 0 0 4px" : "0",
+                        }} />
+                      )}
+                      {isSupStart && (
+                        <div style={{ position: "absolute", left: -52, top: "50%", transform: "translateY(-50%)", background: "#10b981", color: "#000", fontSize: 9, fontFamily: "'Bebas Neue', sans-serif", letterSpacing: 1, padding: "2px 5px", borderRadius: 3 }}>
+                          SS{ssLetter}
+                        </div>
+                      )}
+
+                      <div style={{ background: isInSuperset ? "#0d1520" : "#0f1623", border: `1px solid ${isInSuperset ? "#046c4e33" : "#131929"}`, borderRadius: 6, padding: 14, marginBottom: isSupStart ? 2 : 10 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                          {isInSuperset && ssLetter && (
+                            <span style={{ background: "#046c4e22", color: "#10b981", fontSize: 10, fontFamily: "'Bebas Neue', sans-serif", padding: "2px 7px", borderRadius: 3, letterSpacing: 1, flexShrink: 0 }}>
+                              {ssLetter}{isSupStart ? "1" : "2"}
+                            </span>
+                          )}
+                          <input
+                            type="text"
+                            placeholder="Exercise name (e.g. Bench Press)"
+                            value={ex.name}
+                            onChange={e => updateExerciseName(ex.id, e.target.value)}
+                            style={{ flex: 1, fontWeight: 500 }}
+                          />
+                          {canSuperset && (
+                            <button
+                              onClick={() => toggleSuperset(ex.id)}
+                              title={ex.supersetWith ? "Ungroup superset" : "Group with next exercise as superset"}
+                              style={{
+                                background: ex.supersetWith ? "#046c4e22" : "none",
+                                border: `1px solid ${ex.supersetWith ? "#10b981" : "#131929"}`,
+                                color: ex.supersetWith ? "#10b981" : "#475569",
+                                fontSize: 9, padding: "3px 7px", borderRadius: 3, letterSpacing: 1, cursor: "pointer", flexShrink: 0
+                              }}
+                            >
+                              {ex.supersetWith ? "SS ✓" : "SS"}
+                            </button>
+                          )}
+                          <button onClick={() => removeExercise(ex.id)} style={{ background: "none", border: "none", color: "#f87171", fontSize: 16, padding: "0 4px" }}>✕</button>
+                        </div>
+
+                        {ex.name && pr > 0 && (
+                          <div style={{ color: "#fbbf24", fontSize: 10, letterSpacing: 1, marginBottom: 8 }}>
+                            🏆 PR: {pr} lb
+                            {lastSession && <span style={{ color: "#475569", marginLeft: 12 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</span>}
+                          </div>
+                        )}
+                        {ex.name && !pr && lastSession && (
+                          <div style={{ color: "#475569", fontSize: 10, marginBottom: 8 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</div>
+                        )}
+
+                        <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr auto", gap: 6, alignItems: "center", marginBottom: 6 }}>
+                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>SET</div>
+                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>REPS</div>
+                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>WEIGHT (lb)</div>
+                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>NOTES</div>
+                          <div />
+                        </div>
+
+                        {ex.sets.map((set, sIdx) => {
+                          const isPR = ex.name && parseFloat(set.weight) > 0 && parseFloat(set.weight) >= getPRForExercise(ex.name) && parseFloat(set.weight) > pr;
+                          return (
+                            <div key={sIdx} style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr auto", gap: 6, alignItems: "center", marginBottom: 4 }}>
+                              <div style={{ color: "#475569", fontSize: 11, width: 24, textAlign: "center" }}>{sIdx + 1}</div>
+                              <input type="number" placeholder="12" value={set.reps} onChange={e => updateSet(ex.id, sIdx, "reps", e.target.value)} style={{ textAlign: "center" }} />
+                              <div style={{ position: "relative" }}>
+                                <input type="number" placeholder="135" value={set.weight} onChange={e => updateSet(ex.id, sIdx, "weight", e.target.value)} style={{ textAlign: "center", borderColor: isPR ? "#fbbf24" : undefined }} />
+                                {isPR && <span style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", fontSize: 9, color: "#fbbf24" }}>PR!</span>}
+                              </div>
+                              <input type="text" placeholder="easy / pain..." value={set.notes || ""} onChange={e => updateSet(ex.id, sIdx, "notes", e.target.value)} style={{ fontSize: 10, padding: "6px 8px", color: "#64748b" }} />
+                              <button onClick={() => removeSet(ex.id, sIdx)} style={{ background: "none", border: "none", color: "#334155", fontSize: 13, padding: "0 4px" }}>✕</button>
+                            </div>
+                          );
+                        })}
+
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
+                          <button onClick={() => addSet(ex.id)} style={{ background: "none", border: "1px solid #131929", color: "#475569", fontSize: 10, padding: "4px 12px", borderRadius: 3, letterSpacing: 1 }}>
+                            + ADD SET
+                          </button>
+                          <div style={{ marginLeft: "auto", display: "flex", gap: 4, alignItems: "center" }}>
+                            <span style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>REST</span>
+                            {[60, 90, 120].map(s => (
+                              <button key={s} onClick={() => { setRestTimerPreset(s); startRestTimer(s); }}
+                                style={{ background: restTimerActive && restTimerPreset === s ? "#10b98122" : "none", border: `1px solid ${restTimerActive && restTimerPreset === s ? "#10b98155" : "#131929"}`, color: restTimerActive && restTimerPreset === s ? "#10b981" : "#475569", fontSize: 9, padding: "3px 7px", borderRadius: 4, cursor: "pointer", fontFamily: "'DM Mono',monospace", transition: "all 0.15s" }}>
+                                {s}s
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, flexWrap: "wrap", gap: 8 }}>
+                  <button onClick={addExercise} style={{ background: "none", border: "1px solid #1e3a5f", color: "#60a5fa", fontSize: 11, padding: "8px 16px", borderRadius: 8, letterSpacing: 1 }}>
+                    + Add Exercise
+                  </button>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={saveTemplate} style={{ background: "transparent", border: "1px solid #60a5fa55", color: "#60a5fa", padding: "8px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+                      <BookTemplate size={13} /> Save Template
+                    </button>
+                    <button className="save-btn" onClick={saveWorkout}>{workoutSaved ? "✓ Saved" : "Save Workout"}</button>
+                  </div>
+                </div>
+                  </>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                      <div>
+                        <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DURATION</div>
+                        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                          <input type="number" placeholder="45" value={workoutForm.duration || ""} onChange={e => setWorkoutForm(f => ({ ...f, duration: e.target.value }))}
+                            style={{ flex: 1, fontSize: 13, padding: "6px 8px" }} />
+                          <select value={workoutForm.durationUnit || "min"} onChange={e => setWorkoutForm(f => ({ ...f, durationUnit: e.target.value }))}
+                            style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 11, padding: "6px 6px", outline: "none" }}>
+                            <option value="min">min</option>
+                            <option value="hr">hr</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>INTENSITY</div>
+                        <select value={workoutForm.intensity || ""} onChange={e => setWorkoutForm(f => ({ ...f, intensity: e.target.value }))}
+                          style={{ width: "100%", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: workoutForm.intensity ? "#e2e8f0" : "#475569", fontSize: 12, padding: "6px 8px", outline: "none", cursor: "pointer" }}>
+                          <option value="">-- select</option>
+                          <option value="easy">😌 Easy</option>
+                          <option value="moderate">💪 Moderate</option>
+                          <option value="hard">🔥 Hard</option>
+                          <option value="max">⚡ Max Effort</option>
+                        </select>
+                      </div>
+                    </div>
+                    {["run","cycle","hike","swim"].includes(workoutForm.activityType) && (<div>
+                      <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DISTANCE (OPTIONAL)</div>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        <input type="number" placeholder="5.0" step="0.1" value={workoutForm.distance || ""} onChange={e => setWorkoutForm(f => ({ ...f, distance: e.target.value }))}
+                          style={{ flex: 1, fontSize: 13, padding: "6px 8px" }} />
+                        <select value={workoutForm.distanceUnit || "km"} onChange={e => setWorkoutForm(f => ({ ...f, distanceUnit: e.target.value }))}
+                          style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 11, padding: "6px 6px", outline: "none" }}>
+                          <option value="km">km</option>
+                          <option value="mi">mi</option>
+                          <option value="m">m</option>
+                        </select>
+                      </div>
+                    </div>)}
+                    <div>
+                      <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>NOTES (OPTIONAL)</div>
+                      <textarea placeholder="How did it feel? Any details..." value={workoutForm.cardioNotes || ""} onChange={e => setWorkoutForm(f => ({ ...f, cardioNotes: e.target.value }))}
+                        style={{ width: "100%", boxSizing: "border-box", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "8px 10px", resize: "none", minHeight: 60, outline: "none" }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                      <button className="save-btn" onClick={saveWorkout}>{workoutSaved ? "✓ Saved" : "Save Workout"}</button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Workout Templates */}
               <div className="stat-card">
@@ -3852,228 +4073,6 @@ export default function App() {
                     localStorage.removeItem("dat-onboarded");
                     alert("Reload the page to see the onboarding wizard.");
                   }
-
-              {/* New workout form */}
-              <div className="stat-card">
-                <div className="section-title" style={{ fontSize: 16 }}>LOG WORKOUT</div>
-                <div style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "flex-end" }}>
-                  <div style={{ flex: "0 0 auto" }}>
-                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DATE</div>
-                    <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} style={{ width: "auto", fontSize: 12, padding: "5px 8px" }} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>SESSION NAME</div>
-                    <input type="text" placeholder="e.g. Push Day" value={workoutForm.name} onChange={e => setWorkoutForm(f => ({ ...f, name: e.target.value }))} style={{ fontSize: 12, padding: "5px 8px" }} />
-                  </div>
-                  <div style={{ flex: "0 0 auto" }}>
-                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>TYPE</div>
-                    <select value={workoutForm.activityType || "strength"} onChange={e => setWorkoutForm(f => ({ ...f, activityType: e.target.value }))}
-                      style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 12, padding: "5px 8px", cursor: "pointer", outline: "none" }}>
-                      <option value="strength">🏋️ Strength</option>
-                      <option value="run">🏃 Run</option>
-                      <option value="cycle">🚴 Cycle</option>
-                      <option value="hike">🥾 Hike</option>
-                      <option value="swim">🏊 Swim</option>
-                      <option value="yoga">🧘 Yoga</option>
-                      <option value="other">⚡ Other</option>
-                    </select>
-                  </div>
-                </div>
-                {(workoutForm.activityType || "strength") === "strength" ? (
-                  <>
-
-                <div style={{ marginLeft: 20 }}>
-                {workoutForm.exercises.map((ex, exIdx) => {
-                  const lastSession = getLastSessionForExercise(ex.name, workoutForm.date);
-                  const pr = ex.name ? getPRForExercise(ex.name) : 0;
-                  const isInSuperset = ex.supersetWith || (exIdx > 0 && workoutForm.exercises[exIdx - 1]?.supersetWith === ex.id);
-                  const isSupStart = !!ex.supersetWith;
-                  const isSupEnd = exIdx > 0 && workoutForm.exercises[exIdx - 1]?.supersetWith === ex.id;
-                  const canSuperset = exIdx < workoutForm.exercises.length - 1;
-                  const ssLetter = (() => {
-                    // assign superset group letters A, B, C...
-                    let letter = null, groupIdx = 0;
-                    for (let i = 0; i < workoutForm.exercises.length; i++) {
-                      if (workoutForm.exercises[i].supersetWith) {
-                        if (workoutForm.exercises[i].id === ex.id || workoutForm.exercises[i].supersetWith === ex.id) {
-                          letter = String.fromCharCode(65 + groupIdx);
-                          break;
-                        }
-                        groupIdx++;
-                      }
-                    }
-                    return letter;
-                  })();
-
-                  return (
-                    <div key={ex.id} style={{ position: "relative" }}>
-                      {/* Superset bracket */}
-                      {isInSuperset && (
-                        <div style={{
-                          position: "absolute", left: -18, top: isSupStart ? 16 : 0,
-                          bottom: isSupEnd ? 16 : 0,
-                          width: 12,
-                          borderLeft: "2px solid #10b981",
-                          borderTop: isSupStart ? "2px solid #10b981" : "none",
-                          borderBottom: isSupEnd ? "2px solid #10b981" : "none",
-                          borderRadius: isSupStart ? "4px 0 0 0" : isSupEnd ? "0 0 0 4px" : "0",
-                        }} />
-                      )}
-                      {isSupStart && (
-                        <div style={{ position: "absolute", left: -52, top: "50%", transform: "translateY(-50%)", background: "#10b981", color: "#000", fontSize: 9, fontFamily: "'Bebas Neue', sans-serif", letterSpacing: 1, padding: "2px 5px", borderRadius: 3 }}>
-                          SS{ssLetter}
-                        </div>
-                      )}
-
-                      <div style={{ background: isInSuperset ? "#0d1520" : "#0f1623", border: `1px solid ${isInSuperset ? "#046c4e33" : "#131929"}`, borderRadius: 6, padding: 14, marginBottom: isSupStart ? 2 : 10 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                          {isInSuperset && ssLetter && (
-                            <span style={{ background: "#046c4e22", color: "#10b981", fontSize: 10, fontFamily: "'Bebas Neue', sans-serif", padding: "2px 7px", borderRadius: 3, letterSpacing: 1, flexShrink: 0 }}>
-                              {ssLetter}{isSupStart ? "1" : "2"}
-                            </span>
-                          )}
-                          <input
-                            type="text"
-                            placeholder="Exercise name (e.g. Bench Press)"
-                            value={ex.name}
-                            onChange={e => updateExerciseName(ex.id, e.target.value)}
-                            style={{ flex: 1, fontWeight: 500 }}
-                          />
-                          {canSuperset && (
-                            <button
-                              onClick={() => toggleSuperset(ex.id)}
-                              title={ex.supersetWith ? "Ungroup superset" : "Group with next exercise as superset"}
-                              style={{
-                                background: ex.supersetWith ? "#046c4e22" : "none",
-                                border: `1px solid ${ex.supersetWith ? "#10b981" : "#131929"}`,
-                                color: ex.supersetWith ? "#10b981" : "#475569",
-                                fontSize: 9, padding: "3px 7px", borderRadius: 3, letterSpacing: 1, cursor: "pointer", flexShrink: 0
-                              }}
-                            >
-                              {ex.supersetWith ? "SS ✓" : "SS"}
-                            </button>
-                          )}
-                          <button onClick={() => removeExercise(ex.id)} style={{ background: "none", border: "none", color: "#f87171", fontSize: 16, padding: "0 4px" }}>✕</button>
-                        </div>
-
-                        {ex.name && pr > 0 && (
-                          <div style={{ color: "#fbbf24", fontSize: 10, letterSpacing: 1, marginBottom: 8 }}>
-                            🏆 PR: {pr} lb
-                            {lastSession && <span style={{ color: "#475569", marginLeft: 12 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</span>}
-                          </div>
-                        )}
-                        {ex.name && !pr && lastSession && (
-                          <div style={{ color: "#475569", fontSize: 10, marginBottom: 8 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</div>
-                        )}
-
-                        <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr auto", gap: 6, alignItems: "center", marginBottom: 6 }}>
-                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>SET</div>
-                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>REPS</div>
-                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>WEIGHT (lb)</div>
-                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>NOTES</div>
-                          <div />
-                        </div>
-
-                        {ex.sets.map((set, sIdx) => {
-                          const isPR = ex.name && parseFloat(set.weight) > 0 && parseFloat(set.weight) >= getPRForExercise(ex.name) && parseFloat(set.weight) > pr;
-                          return (
-                            <div key={sIdx} style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr auto", gap: 6, alignItems: "center", marginBottom: 4 }}>
-                              <div style={{ color: "#475569", fontSize: 11, width: 24, textAlign: "center" }}>{sIdx + 1}</div>
-                              <input type="number" placeholder="12" value={set.reps} onChange={e => updateSet(ex.id, sIdx, "reps", e.target.value)} style={{ textAlign: "center" }} />
-                              <div style={{ position: "relative" }}>
-                                <input type="number" placeholder="135" value={set.weight} onChange={e => updateSet(ex.id, sIdx, "weight", e.target.value)} style={{ textAlign: "center", borderColor: isPR ? "#fbbf24" : undefined }} />
-                                {isPR && <span style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", fontSize: 9, color: "#fbbf24" }}>PR!</span>}
-                              </div>
-                              <input type="text" placeholder="easy / pain..." value={set.notes || ""} onChange={e => updateSet(ex.id, sIdx, "notes", e.target.value)} style={{ fontSize: 10, padding: "6px 8px", color: "#64748b" }} />
-                              <button onClick={() => removeSet(ex.id, sIdx)} style={{ background: "none", border: "none", color: "#334155", fontSize: 13, padding: "0 4px" }}>✕</button>
-                            </div>
-                          );
-                        })}
-
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-                          <button onClick={() => addSet(ex.id)} style={{ background: "none", border: "1px solid #131929", color: "#475569", fontSize: 10, padding: "4px 12px", borderRadius: 3, letterSpacing: 1 }}>
-                            + ADD SET
-                          </button>
-                          <div style={{ marginLeft: "auto", display: "flex", gap: 4, alignItems: "center" }}>
-                            <span style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>REST</span>
-                            {[60, 90, 120].map(s => (
-                              <button key={s} onClick={() => { setRestTimerPreset(s); startRestTimer(s); }}
-                                style={{ background: restTimerActive && restTimerPreset === s ? "#10b98122" : "none", border: `1px solid ${restTimerActive && restTimerPreset === s ? "#10b98155" : "#131929"}`, color: restTimerActive && restTimerPreset === s ? "#10b981" : "#475569", fontSize: 9, padding: "3px 7px", borderRadius: 4, cursor: "pointer", fontFamily: "'DM Mono',monospace", transition: "all 0.15s" }}>
-                                {s}s
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, flexWrap: "wrap", gap: 8 }}>
-                  <button onClick={addExercise} style={{ background: "none", border: "1px solid #065f3a44", color: "#60a5fa", fontSize: 11, padding: "8px 16px", borderRadius: 8, letterSpacing: 1 }}>
-                    + Add Exercise
-                  </button>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button onClick={saveTemplate} style={{ background: "transparent", border: "1px solid #60a5fa55", color: "#60a5fa", padding: "8px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-                      <BookTemplate size={13} /> Save Template
-                    </button>
-                    <button className="save-btn" onClick={saveWorkout}>{workoutSaved ? "✓ Saved" : "Save Workout"}</button>
-                  </div>
-                </div>
-                  </>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                      <div>
-                        <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DURATION</div>
-                        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                          <input type="number" placeholder="45" value={workoutForm.duration || ""} onChange={e => setWorkoutForm(f => ({ ...f, duration: e.target.value }))}
-                            style={{ flex: 1, fontSize: 13, padding: "6px 8px" }} />
-                          <select value={workoutForm.durationUnit || "min"} onChange={e => setWorkoutForm(f => ({ ...f, durationUnit: e.target.value }))}
-                            style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 11, padding: "6px 6px", outline: "none" }}>
-                            <option value="min">min</option>
-                            <option value="hr">hr</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>INTENSITY</div>
-                        <select value={workoutForm.intensity || ""} onChange={e => setWorkoutForm(f => ({ ...f, intensity: e.target.value }))}
-                          style={{ width: "100%", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: workoutForm.intensity ? "#e2e8f0" : "#475569", fontSize: 12, padding: "6px 8px", outline: "none", cursor: "pointer" }}>
-                          <option value="">-- select</option>
-                          <option value="easy">😌 Easy</option>
-                          <option value="moderate">💪 Moderate</option>
-                          <option value="hard">🔥 Hard</option>
-                          <option value="max">⚡ Max Effort</option>
-                        </select>
-                      </div>
-                    </div>
-                    {["run","cycle","hike","swim"].includes(workoutForm.activityType) && (<div>
-                      <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DISTANCE (OPTIONAL)</div>
-                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                        <input type="number" placeholder="5.0" step="0.1" value={workoutForm.distance || ""} onChange={e => setWorkoutForm(f => ({ ...f, distance: e.target.value }))}
-                          style={{ flex: 1, fontSize: 13, padding: "6px 8px" }} />
-                        <select value={workoutForm.distanceUnit || "km"} onChange={e => setWorkoutForm(f => ({ ...f, distanceUnit: e.target.value }))}
-                          style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 11, padding: "6px 6px", outline: "none" }}>
-                          <option value="km">km</option>
-                          <option value="mi">mi</option>
-                          <option value="m">m</option>
-                        </select>
-                      </div>
-                    </div>)}
-                    <div>
-                      <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>NOTES (OPTIONAL)</div>
-                      <textarea placeholder="How did it feel? Any details..." value={workoutForm.cardioNotes || ""} onChange={e => setWorkoutForm(f => ({ ...f, cardioNotes: e.target.value }))}
-                        style={{ width: "100%", boxSizing: "border-box", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "8px 10px", resize: "none", minHeight: 60, outline: "none" }} />
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                      <button className="save-btn" onClick={saveWorkout}>{workoutSaved ? "✓ Saved" : "Save Workout"}</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
                 }} style={{ background: "none", border: "1px solid #7f1d1d55", color: "#f87171", padding: "8px 16px", borderRadius: 8, fontSize: 12, cursor: "pointer", fontFamily: "'DM Mono',monospace" }}>
                   Reset Onboarding
                 </button>
