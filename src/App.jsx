@@ -3227,6 +3227,8 @@ export default function App() {
                     </select>
                   </div>
                 </div>
+                {(workoutForm.activityType || "strength") === "strength" ? (
+                  <>
 
                 <div style={{ marginLeft: 20 }}>
                 {workoutForm.exercises.map((ex, exIdx) => {
@@ -3367,6 +3369,57 @@ export default function App() {
                     <button className="save-btn" onClick={saveWorkout}>{workoutSaved ? "✓ Saved" : "Save Workout"}</button>
                   </div>
                 </div>
+                  </>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                      <div>
+                        <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DURATION</div>
+                        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                          <input type="number" placeholder="45" value={workoutForm.duration || ""} onChange={e => setWorkoutForm(f => ({ ...f, duration: e.target.value }))}
+                            style={{ flex: 1, fontSize: 13, padding: "6px 8px" }} />
+                          <select value={workoutForm.durationUnit || "min"} onChange={e => setWorkoutForm(f => ({ ...f, durationUnit: e.target.value }))}
+                            style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 11, padding: "6px 6px", outline: "none" }}>
+                            <option value="min">min</option>
+                            <option value="hr">hr</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>INTENSITY</div>
+                        <select value={workoutForm.intensity || ""} onChange={e => setWorkoutForm(f => ({ ...f, intensity: e.target.value }))}
+                          style={{ width: "100%", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: workoutForm.intensity ? "#e2e8f0" : "#475569", fontSize: 12, padding: "6px 8px", outline: "none", cursor: "pointer" }}>
+                          <option value="">-- select</option>
+                          <option value="easy">😌 Easy</option>
+                          <option value="moderate">💪 Moderate</option>
+                          <option value="hard">🔥 Hard</option>
+                          <option value="max">⚡ Max Effort</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DISTANCE (OPTIONAL)</div>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        <input type="number" placeholder="5.0" step="0.1" value={workoutForm.distance || ""} onChange={e => setWorkoutForm(f => ({ ...f, distance: e.target.value }))}
+                          style={{ flex: 1, fontSize: 13, padding: "6px 8px" }} />
+                        <select value={workoutForm.distanceUnit || "km"} onChange={e => setWorkoutForm(f => ({ ...f, distanceUnit: e.target.value }))}
+                          style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 11, padding: "6px 6px", outline: "none" }}>
+                          <option value="km">km</option>
+                          <option value="mi">mi</option>
+                          <option value="m">m</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>NOTES (OPTIONAL)</div>
+                      <textarea placeholder="How did it feel? Any details..." value={workoutForm.cardioNotes || ""} onChange={e => setWorkoutForm(f => ({ ...f, cardioNotes: e.target.value }))}
+                        style={{ width: "100%", boxSizing: "border-box", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "8px 10px", resize: "none", minHeight: 60, outline: "none" }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                      <button className="save-btn" onClick={saveWorkout}>{workoutSaved ? "✓ Saved" : "Save Workout"}</button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Circuit Timer button */}
