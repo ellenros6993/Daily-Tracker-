@@ -3409,7 +3409,7 @@ export default function App() {
                           <option value="m">m</option>
                         </select>
                       </div>
-                    </div>
+                    </div>)}
                     <div>
                       <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>NOTES (OPTIONAL)</div>
                       <textarea placeholder="How did it feel? Any details..." value={workoutForm.cardioNotes || ""} onChange={e => setWorkoutForm(f => ({ ...f, cardioNotes: e.target.value }))}
