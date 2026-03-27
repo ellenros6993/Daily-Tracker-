@@ -2274,7 +2274,9 @@ export default function App() {
                   </div>
                 </div>
               </div>
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <button className={`save-btn${saved ? " saved-state" : ""}`} onClick={saveLog}>{saved ? "✓ Saved" : "Save Weigh-in"}</button>
+              </div>
               </div>
 
               {/* Biometric trend chart */}
