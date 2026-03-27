@@ -634,7 +634,7 @@ export default function App() {
   const [activeMealSlot, setActiveMealSlot] = useState(null);
   const [showManualMacros, setShowManualMacros] = useState(false);
   const [manualMacros, setManualMacros] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-manual-macros") || "{}"); } catch { return {}; } });
-  function getManualToday() { return manualMacros[getLocalDateStr()] || {}; }
+  function getManualToday(date) { return manualMacros[date || getLocalDateStr()] || {}; }
   function saveManualMacro(field, val) {
     const today = getLocalDateStr();
     const updated = { ...manualMacros, [today]: { ...getManualToday(), [field]: val } };
@@ -3059,7 +3059,7 @@ export default function App() {
 
               {/* Macro history + daily summary */}
               {(() => {
-                const last14 = Array.from({ length: 14 }, (_, i) => {
+                const last7 = Array.from({ length: 7 }, (_, i) => {
                   const d = new Date(); d.setDate(d.getDate() - (13 - i));
                   const ds = getLocalDateStr(d);
                   let cal = 0, pro = 0;
@@ -3078,12 +3078,12 @@ export default function App() {
                   return { date: ds, cal, pro };
                 }).reverse(); // most recent first
 
-                const today = last14[0];
-                const hasAnyData = last14.some(d => d.cal > 0 || d.pro > 0);
+                const today = last7[0];
+                const hasAnyData = last7.some(d => d.cal > 0 || d.pro > 0);
 
                 return (
                   <div className="stat-card">
-                    <div className="section-title" style={{ marginBottom: 12, fontSize: 14 }}>14-DAY HISTORY</div>
+                    <div className="section-title" style={{ marginBottom: 12, fontSize: 14 }}>7-DAY HISTORY</div>
 
                     {/* Today's summary */}
                     {(today.cal > 0 || today.pro > 0) && (() => {
@@ -3121,7 +3121,7 @@ export default function App() {
                             </tr>
                           </thead>
                           <tbody>
-                            {last14.filter(r => r.cal > 0 || r.pro > 0).map((row, i) => {
+                            {last7.filter(r => r.cal > 0 || r.pro > 0).map((row, i) => {
                               const isToday = row.date === getLocalDateStr();
                               const calHit = row.cal >= CALORIES_MIN && row.cal <= CALORIES_MAX;
                               const calOver = row.cal > CALORIES_MAX;
