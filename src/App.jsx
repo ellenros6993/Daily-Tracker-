@@ -3926,19 +3926,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Weight */}
-              <div className="stat-card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div className="section-title" style={{ fontSize: 14, margin: 0 }}>WEIGHT</div>
-                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal {GOAL_WEIGHT}lbs</div>
-                </div>
-                <SummaryBar data={weightData} color="#34d399" unit="lbs" />
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>start {periodWeights[0]?.weight || "—"}lbs</div>
-                  <div style={{ fontSize: 10, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>latest {periodWeights[periodWeights.length-1]?.weight || "—"}lbs</div>
-                </div>
-              </div>
-
               {/* Calories */}
               <div className="stat-card">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
