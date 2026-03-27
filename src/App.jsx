@@ -2326,7 +2326,6 @@ export default function App() {
                     <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 5 }}><div style={{ width: 16, height: 2, background: "linear-gradient(to right,#059669,#34d399)", borderRadius: 1 }} /><span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Weight</span></div>
                       {bfPath && <div style={{ display: "flex", alignItems: "center", gap: 5 }}><div style={{ width: 16, height: 2, background: "#a78bfa", borderRadius: 1 }} /><span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Body Fat %</span></div>}
-                      <div style={{ display: "flex", alignItems: "center", gap: 5 }}><div style={{ width: 16, height: 1, background: "#10b98166", borderRadius: 1, borderTop: "1px dashed #10b98166" }} /><span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Projected to Aug 23 ({predWeight.toFixed(1)} lb)</span></div>
                     </div>
                   </div>
                 );
@@ -2336,39 +2335,36 @@ export default function App() {
               {weighIns.length > 0 && (
                 <div className="stat-card">
                   <div className="section-title" style={{ fontSize: 14 }}>WEIGHT JOURNEY</div>
-                  {/* BF% goal arc — if any BF data exists */}
-                  {weighIns.some(w => w.bodyFat) && (() => {
-                    const latestBF = [...weighIns].reverse().find(w => w.bodyFat);
-                    const bfVal = latestBF ? parseFloat(latestBF.bodyFat) : null;
+                  {/* Weight loss progress arc */}
+                  {weighIns.length > 0 && (() => {
+                    const startW = parseFloat(START_WEIGHT);
+                    const goalW = parseFloat(GOAL_WEIGHT);
+                    const currentW = parseFloat([...weighIns].sort((a,b) => b.date.localeCompare(a.date))[0]?.weight || startW);
+                    const totalToLose = startW - goalW;
+                    const lost = startW - currentW;
+                    const pct = Math.max(0, Math.min(1, lost / totalToLose));
                     const R = 30, CIRC = 2 * Math.PI * R;
-                    const pct = bfVal ? Math.max(0, Math.min(1, (50 - bfVal) / (50 - bfGoal))) : 0;
                     const dash = pct * CIRC;
-                    const col = bfVal <= bfGoal ? "#34d399" : bfVal <= bfGoal + 5 ? "#fbbf24" : "#f87171";
+                    const col = pct >= 1 ? "#34d399" : pct >= 0.5 ? "#fbbf24" : "#60a5fa";
                     return (
                       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16, paddingBottom: 16, borderBottom: "1px solid #131929" }}>
                         <svg width={74} height={74}>
                           <circle cx="37" cy="37" r={R} fill="none" stroke="#131929" strokeWidth="5" />
                           <circle cx="37" cy="37" r={R} fill="none" stroke={col} strokeWidth="5"
                             strokeDasharray={`${dash} ${CIRC}`} transform="rotate(-90 37 37)"
-                            strokeLinecap="round" className="bf-arc" />
-                          <text x="37" y="33" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="13" fontFamily="'Bebas Neue',sans-serif">{bfVal}%</text>
-                          <text x="37" y="47" textAnchor="middle" fill="#475569" fontSize="7" fontFamily="'DM Mono',monospace">body fat</text>
+                            strokeLinecap="round" />
+                          <text x="37" y="33" textAnchor="middle" dominantBaseline="central" fill={darkMode ? "#e2e8f0" : "#0f172a"} fontSize="13" fontFamily="'Bebas Neue',sans-serif">{Math.round(pct*100)}%</text>
+                          <text x="37" y="47" textAnchor="middle" fill="#475569" fontSize="7" fontFamily="'DM Mono',monospace">to goal</text>
                         </svg>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>BF% GOAL</div>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <input type="range" min="10" max="35" value={bfGoal} onChange={e => setBfGoal(Number(e.target.value))}
-                              style={{ flex: 1, accentColor: "#10b981", background: "none", border: "none", padding: 0, cursor: "pointer" }} />
-                            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#10b981", minWidth: 36 }}>{bfGoal}%</span>
-                          </div>
-                          <div style={{ fontSize: 10, color: col, fontFamily: "'DM Mono',monospace", marginTop: 2 }}>
-                            {bfVal <= bfGoal ? "✓ Goal reached!" : `${(bfVal - bfGoal).toFixed(1)}% to goal`}
-                          </div>
+                          <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>WEIGHT LOSS PROGRESS</div>
+                          <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: col, lineHeight: 1 }}>{lost > 0 ? lost.toFixed(1) : 0}<span style={{ fontSize: 12, color: "#475569" }}> lbs lost</span></div>
+                          <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 4 }}>{Math.max(0, (currentW - goalW).toFixed(1))} lbs to goal ({goalW} lbs)</div>
+                          <div className="bar-bg" style={{ marginTop: 6 }}><div className="bar-fill" style={{ width: `${Math.round(pct*100)}%`, background: col }} /></div>
                         </div>
                       </div>
                     );
                   })()}
-
                   {/* Vertical timeline */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {[...weighIns].reverse().map((w, i) => {
