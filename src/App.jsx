@@ -1908,11 +1908,6 @@ export default function App() {
                       📲 INSTALL SHORTCUT
                     </a>
                     <div style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Works with Apple Watch, Fitness app, and Health app</div>
-                    <div style={{ borderTop: "1px solid #131929", paddingTop: 12, marginTop: 8 }}>
-                      <div style={{ display: "flex", gap: 6 }}>
-                          style={{ flex: 1, background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "6px 8px", outline: "none" }} />
-                      </div>
-                    </div>
                   </div>
                 </div>
               )}
