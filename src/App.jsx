@@ -1055,7 +1055,6 @@ export default function App() {
   const [workoutSaved, setWorkoutSaved] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [showShortcutModal, setShowShortcutModal] = useState(false);
-  const [personalShortcutUrl, setPersonalShortcutUrl] = useState(() => localStorage.getItem("dat-personal-shortcut") || "");
   const [showCircuitTimer, setShowCircuitTimer] = useState(false);
   const [circuitPhase, setCircuitPhase] = useState("build");
   const [circuitRunning, setCircuitRunning] = useState(false);
@@ -1910,13 +1909,9 @@ export default function App() {
                     </a>
                     <div style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Works with Apple Watch, Fitness app, and Health app</div>
                     <button onClick={() => { window.location.href = "shortcuts://run-shortcut?name=Find%20Health%20Samples%20Where"; setShowShortcutModal(false); }} style={{ width: "100%", background: "linear-gradient(135deg,#065f3a,#10b981)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, marginTop: 10 }}>⚡ SYNC NOW</button>
-                    <button onClick={() => { window.location.href = "shortcuts://run-shortcut?name=Find%20Health%20Samples%20Where"; setShowShortcutModal(false); }} style={{ width: "100%", background: "linear-gradient(135deg,#065f3a,#10b981)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, marginTop: 10 }}>⚡ SYNC NOW</button>
                     <div style={{ borderTop: "1px solid #131929", paddingTop: 12, marginTop: 8 }}>
-                      <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>HAVE YOUR OWN SHORTCUT? PASTE URL:</div>
                       <div style={{ display: "flex", gap: 6 }}>
-                        <input value={personalShortcutUrl} onChange={e => setPersonalShortcutUrl(e.target.value)} placeholder="https://www.icloud.com/shortcuts/..."
                           style={{ flex: 1, background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "6px 8px", outline: "none" }} />
-                        <button onClick={() => { localStorage.setItem("dat-personal-shortcut", personalShortcutUrl); setShowShortcutModal(false); }} style={{ background: "#10b981", border: "none", color: "#fff", padding: "6px 12px", borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>SAVE</button>
                       </div>
                     </div>
                   </div>
