@@ -2277,6 +2277,7 @@ export default function App() {
                   <button className={`save-btn${saved ? " saved-state" : ""}`} onClick={saveLog} style={{ fontSize: 12, padding: "7px 16px" }}>{saved ? "✓ Saved" : "Save Weigh-in"}</button>
                 </div>
 
+              </div>
               {/* Biometric trend chart */}
               {weighIns.length >= 2 && (() => {
                 const pts = weighIns.slice(-12);
