@@ -2249,7 +2249,7 @@ export default function App() {
 
               {isWeighInDay && (
                 <div style={{ background: "#071910", border: "1px solid #10b98133", borderRadius: 10, padding: "10px 16px", color: "#34d399", fontSize: 11 }}>
-                  ⚖️ Today is a weigh-in day — upload your RENPHO screenshot below
+                  ⚖️ Today is a weigh-in day — log your weight below
                 </div>
               )}
 
