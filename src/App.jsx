@@ -2253,32 +2253,27 @@ export default function App() {
                 </div>
               )}
 
-              {/* Date */}
-              <div className="stat-card">
-                <div className="field-label" style={{ marginBottom: 6 }}>Date</div>
-                <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ maxWidth: 200 }} />
-              </div>
-
-              {/* Body Metrics — manual input */}
-              <div className="stat-card">
-                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, letterSpacing: 2, color: "#e2e8f0", marginBottom: 16 }}>⚖️ Body Metrics</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {/* Date + Body Metrics combined */}
+              <div className="stat-card" style={{ padding: "12px 16px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                  <div className="field-label" style={{ marginBottom: 0, whiteSpace: "nowrap" }}>Date</div>
+                  <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ flex: 1 }} />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                   <div>
-                    <div className="field-label" style={{ marginBottom: 5 }}>Weight (lbs)</div>
-                    <input type="number" placeholder="e.g. 205.0" step="0.1" value={form.weight} onChange={e => setForm(f => ({ ...f, weight: e.target.value }))} />
+                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>WEIGHT (LBS)</div>
+                    <input type="number" placeholder="205.0" step="0.1" value={form.weight} onChange={e => setForm(f => ({ ...f, weight: e.target.value }))} style={{ padding: "6px 8px", fontSize: 13 }} />
                   </div>
                   <div>
-                    <div className="field-label" style={{ marginBottom: 5 }}>Body Fat %</div>
-                    <input type="number" placeholder="e.g. 44.5" step="0.1" value={form.bodyFat} onChange={e => setForm(f => ({ ...f, bodyFat: e.target.value }))} />
+                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>BODY FAT %</div>
+                    <input type="number" placeholder="44.5" step="0.1" value={form.bodyFat} onChange={e => setForm(f => ({ ...f, bodyFat: e.target.value }))} style={{ padding: "6px 8px", fontSize: 13 }} />
                   </div>
                   <div>
-                    <div className="field-label" style={{ marginBottom: 5 }}>Lean Muscle Mass (lbs)</div>
-                    <input type="number" placeholder="e.g. 107.2" step="0.1" value={form.muscleMass} onChange={e => setForm(f => ({ ...f, muscleMass: e.target.value }))} />
+                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>MUSCLE (LBS)</div>
+                    <input type="number" placeholder="107.2" step="0.1" value={form.muscleMass} onChange={e => setForm(f => ({ ...f, muscleMass: e.target.value }))} style={{ padding: "6px 8px", fontSize: 13 }} />
                   </div>
                 </div>
               </div>
-
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <button className={`save-btn${saved ? " saved-state" : ""}`} onClick={saveLog}>{saved ? "✓ Saved" : "Save Weigh-in"}</button>
               </div>
 
