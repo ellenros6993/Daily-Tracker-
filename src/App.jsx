@@ -1809,7 +1809,7 @@ export default function App() {
           ))}
           <div className="nav-section">Reports</div>
           {[
-            { id: "Weekly Report", Icon: BarChart2, label: "Weekly Report" },
+            { id: "Weekly Report", Icon: BarChart2, label: "Summary" },
             { id: "Progress Photos", Icon: Camera, label: "Progress" },
           ].map(({ id, Icon, label }) => (
             <button key={id} className={`nav-btn${tab === id ? " active" : ""}`} onClick={() => navigateTo(id)}>
@@ -1868,7 +1868,7 @@ export default function App() {
           { id: "Nutrition", Icon: Utensils, label: "Nutrition" },
           { id: "Training", Icon: Dumbbell, label: "Train" },
           { id: "Weight Tracker", Icon: Scale, label: "Weight" },
-          { id: "Weekly Report", Icon: BarChart2, label: "Report" },
+          { id: "Weekly Report", Icon: BarChart2, label: "Summary" },
           { id: "Progress Photos", Icon: Camera, label: "Progress" },
         ].map(({ id, Icon, label }) => (
           <button key={id} onClick={() => navigateTo(id)} style={{ background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 6px", color: tab === id ? "#10b981" : "#334155", transition: "color 0.15s" }}>
@@ -3844,256 +3844,176 @@ export default function App() {
 
         {/* WEEKLY REPORT */}
         {tab === "Weekly Report" && (() => {
-          const weekLogs = getWeekLogs(logs, reportWeek);
-          const stats = weekLogs.length > 0 ? buildWeekStats(weekLogs) : null;
-          const weekEnd = new Date(reportWeek);
-          weekEnd.setDate(weekEnd.getDate() + 6);
+          const [summaryPeriod, setSummaryPeriod] = React.useState("7");
+          const days = parseInt(summaryPeriod);
+          const periodLogs = logs.filter(l => {
+            const d = getDaysBetween(l.date, getLocalDateStr());
+            return d >= 0 && d < days;
+          }).sort((a,b) => a.date.localeCompare(b.date));
+          const periodWeights = weighIns.filter(w => {
+            const d = getDaysBetween(w.date, getLocalDateStr());
+            return d >= 0 && d < days;
+          }).sort((a,b) => a.date.localeCompare(b.date));
+          const periodWorkouts = workouts.filter(w => {
+            const d = getDaysBetween(w.date, getLocalDateStr());
+            return d >= 0 && d < days;
+          });
+          const periodSleep = Object.entries(sleepData).filter(([date]) => {
+            const d = getDaysBetween(date, getLocalDateStr());
+            return d >= 0 && d < days;
+          });
+
+          // KPIs
+          const daysWithData = periodLogs.length;
+          const goalsHit = periodLogs.filter(l => calcScore(l) === 4).length;
+          const goalHitRate = daysWithData > 0 ? Math.round(goalsHit / daysWithData * 100) : 0;
+          const sleepEntries = periodSleep.filter(([,s]) => s.hours);
+          const avgSleep = sleepEntries.length > 0 ? (sleepEntries.reduce((sum,[,s]) => sum + parseFloat(s.hours), 0) / sleepEntries.length).toFixed(1) : null;
+          const avgSleepQuality = sleepEntries.length > 0 ? Math.round(sleepEntries.reduce((sum,[,s]) => sum + (s.quality||0), 0) / sleepEntries.length) : 0;
+          const qualityLabels = ["","😴","😕","😊","😌","🌟"];
+          const weightTrend = (() => {
+            if (periodWeights.length < 2) return null;
+            const first = parseFloat(periodWeights[0].weight);
+            const last = parseFloat(periodWeights[periodWeights.length-1].weight);
+            const diff = last - first;
+            if (diff < -0.5) return { label: "↓ Losing", color: "#34d399" };
+            if (diff > 0.5) return { label: "↑ Gaining", color: "#f87171" };
+            return { label: "→ Maintaining", color: "#fbbf24" };
+          })();
+          const daysTrained = periodWorkouts.length;
+
+          // Bar chart helper
+          const BarChart = ({ data, color, unit, goal }) => {
+            if (!data.length) return <div style={{ color: "#334155", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "12px 0" }}>No data for this period</div>;
+            const max = Math.max(...data.map(d => d.val || 0), goal || 1);
+            return (
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 80, marginTop: 8 }}>
+                {data.map((d, i) => (
+                  <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                    <div style={{ width: "100%", background: d.val ? color : "#131929", borderRadius: "3px 3px 0 0", height: d.val ? `${Math.max(4, Math.round((d.val/max)*72))}px` : "4px", transition: "height 0.3s", position: "relative" }}
+                      title={d.val ? `${d.val}${unit}` : "No data"}>
+                      {goal && d.val >= goal && <div style={{ position: "absolute", top: -4, left: "50%", transform: "translateX(-50%)", width: 4, height: 4, borderRadius: "50%", background: "#34d399" }} />}
+                    </div>
+                    {data.length <= 14 && <div style={{ fontSize: 7, color: "#334155", fontFamily: "'DM Mono',monospace", writingMode: "vertical-rl", transform: "rotate(180deg)", height: 20 }}>{d.label}</div>}
+                  </div>
+                ))}
+              </div>
+            );
+          };
+
+          // Build chart data
+          const allDays = Array.from({ length: days }, (_, i) => {
+            const d = new Date(); d.setDate(d.getDate() - (days - 1 - i));
+            const ds = getLocalDateStr(d);
+            const label = `${d.getMonth()+1}/${d.getDate()}`;
+            const log = periodLogs.find(l => l.date === ds);
+            const weight = periodWeights.find(w => w.date === ds);
+            return { ds, label, log, weight };
+          });
+
+          const stepsData = allDays.map(d => ({ label: d.label, val: d.log?.steps ? parseInt(d.log.steps) : 0 }));
+          const calData = allDays.map(d => ({ label: d.label, val: d.log?.calories ? parseInt(d.log.calories) : 0 }));
+          const proData = allDays.map(d => ({ label: d.label, val: d.log?.protein ? parseInt(d.log.protein) : 0 }));
+          const weightData = allDays.map(d => ({ label: d.label, val: d.weight?.weight ? parseFloat(d.weight.weight) : 0 }));
 
           return (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-                <div className="section-title" style={{ marginBottom: 0 }}>WEEKLY REPORT</div>
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <button onClick={() => setMonthViewOpen(o => !o)}
-                    style={{ background: monthViewOpen ? "linear-gradient(135deg,#052e1c,#0a3d26)" : "#0f1623", border: `1px solid ${monthViewOpen ? "#065f3a44" : "#1e2d40"}`, color: monthViewOpen ? "#34d399" : "#475569", padding: "5px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, transition: "all 0.2s", cursor: "pointer" }}>
-                    {monthViewOpen ? "Week View" : "Month View"}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {/* Period selector */}
+              <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                {[["7","7 Days"],["14","14 Days"],["30","30 Days"]].map(([val, label]) => (
+                  <button key={val} onClick={() => setSummaryPeriod(val)}
+                    style={{ padding: "6px 18px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Mono',monospace", letterSpacing: 1, border: `1px solid ${summaryPeriod === val ? "#10b981" : "#1e2d40"}`, background: summaryPeriod === val ? "#065f3a" : "#0f1623", color: summaryPeriod === val ? "#34d399" : "#475569" }}>
+                    {label}
                   </button>
-                  <select value={reportWeek} onChange={e => setReportWeek(e.target.value)} style={{ width: "auto", fontSize: 11 }}>
-                    {allWeekStarts.length === 0
-                      ? <option value={getPreviousWeekStart()}>Week of {getPreviousWeekStart()}</option>
-                      : allWeekStarts.map(w => {
-                          const we = new Date(w); we.setDate(we.getDate() + 6);
-                          return <option key={w} value={w}>Week of {w} – {getLocalDateStr(we)}</option>;
-                        })
-                    }
-                  </select>
-                  {stats && <button className="dl-btn" onClick={() => downloadReport(reportWeek)}>↓ DOWNLOAD</button>}
+                ))}
+              </div>
+
+              {/* KPI row */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                <div className="stat-card" style={{ padding: "12px 10px", textAlign: "center" }}>
+                  <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>GOAL HIT RATE</div>
+                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: goalHitRate >= 80 ? "#34d399" : goalHitRate >= 50 ? "#fbbf24" : "#f87171", lineHeight: 1 }}>{goalHitRate}%</div>
+                  <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{goalsHit}/{daysWithData} days</div>
+                </div>
+                <div className="stat-card" style={{ padding: "12px 10px", textAlign: "center" }}>
+                  <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>AVG SLEEP</div>
+                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: "#a855f7", lineHeight: 1 }}>{avgSleep || "—"}<span style={{ fontSize: 14 }}>{avgSleep ? "h" : ""}</span></div>
+                  <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{avgSleepQuality > 0 ? qualityLabels[avgSleepQuality] : "no data"}</div>
+                </div>
+                <div className="stat-card" style={{ padding: "12px 10px", textAlign: "center" }}>
+                  <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>WEIGHT TREND</div>
+                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: weightTrend?.color || "#334155", lineHeight: 1, marginTop: 6 }}>{weightTrend?.label || "—"}</div>
+                  <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{periodWeights.length} weigh-ins</div>
                 </div>
               </div>
 
-              {isSunday() && <div style={{ background: "#071910", border: "1px solid #4ade8033", borderRadius: 6, padding: "10px 16px", color: "#34d399", fontSize: 11 }}>📊 It's Sunday — showing last week's report automatically.</div>}
+              {/* Training */}
+              <div className="stat-card">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <div className="section-title" style={{ fontSize: 14, margin: 0 }}>TRAINING</div>
+                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#10b981" }}>{daysTrained}<span style={{ fontSize: 12, color: "#475569" }}>/{days} days</span></div>
+                </div>
+                <div className="bar-bg">
+                  <div className="bar-fill" style={{ width: `${Math.round(daysTrained/days*100)}%`, background: "#10b981" }} />
+                </div>
+                <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 4 }}>{Math.round(daysTrained/days*100)}% training frequency</div>
+              </div>
 
-              {/* Monthly calendar heatmap view */}
-              {monthViewOpen && (() => {
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = now.getMonth();
-                const firstDay = new Date(year, month, 1);
-                const lastDay = new Date(year, month + 1, 0);
-                const startOffset = firstDay.getDay(); // 0=Sun
-                const days = [];
-                for (let i = 0; i < startOffset; i++) days.push(null);
-                for (let d = 1; d <= lastDay.getDate(); d++) days.push(new Date(year, month, d));
-                const scoreColor = s => s < 0 ? "transparent" : s === 0 ? "#131929" : s === 1 ? "#064e35" : s === 2 ? "#065f3a" : s === 3 ? "#059669" : "#10b981";
-                const monthName = firstDay.toLocaleDateString(undefined, { month: "long", year: "numeric" });
-                return (
-                  <div className="stat-card">
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                      <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, letterSpacing: 2, color: "#10b981" }}>{monthName}</div>
-                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Score heatmap</div>
-                    </div>
-                    {/* Day labels */}
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 4, marginBottom: 4 }}>
-                      {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
-                        <div key={d} style={{ textAlign: "center", fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{d}</div>
-                      ))}
-                    </div>
-                    {/* Day cells */}
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 4 }}>
-                      {days.map((day, i) => {
-                        if (!day) return <div key={`empty-${i}`} />;
-                        const ds = getLocalDateStr(day);
-                        const log = logs.find(l => l.date === ds);
-                        const score = log ? calcScore(log) : -1;
-                        const isToday = ds === getLocalDateStr();
-                        return (
-                          <div key={ds} title={`${ds}: ${score < 0 ? "no log" : `${score}/4`}`}
-                            style={{ aspectRatio: "1", borderRadius: 6, background: scoreColor(score), display: "flex", alignItems: "center", justifyContent: "center", border: isToday ? "1px solid #10b981" : "1px solid transparent", transition: "all 0.15s", cursor: "default" }}>
-                            <span style={{ fontSize: 9, color: score > 0 ? "#ffffff88" : "#334155", fontFamily: "'DM Mono',monospace" }}>{day.getDate()}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {/* Legend */}
-                    <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap", alignItems: "center" }}>
-                      {[[-1,"No log"],[0,"0/4"],[1,"1/4"],[2,"2/4"],[3,"3/4"],[4,"4/4"]].map(([s,label]) => (
-                        <div key={label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          <div style={{ width: 10, height: 10, borderRadius: 3, background: scoreColor(s), border: s < 0 ? "1px solid #131929" : "none" }} />
-                          <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{label}</span>
-                        </div>
-                      ))}
-                    </div>
-                    {/* Month summary stats */}
-                    {(() => {
-                      const monthLogs = logs.filter(l => {
-                        const d = new Date(l.date + "T12:00:00");
-                        return d.getFullYear() === year && d.getMonth() === month;
-                      });
-                      const perfect = monthLogs.filter(l => calcScore(l) === 4).length;
-                      const totalDays = lastDay.getDate();
-                      const logged = monthLogs.length;
-                      const avgScore = logged ? (monthLogs.reduce((s,l) => s + calcScore(l), 0) / logged).toFixed(1) : null;
-                      return monthLogs.length > 0 ? (
-                        <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #131929", display: "flex", gap: 20, flexWrap: "wrap" }}>
-                          {[
-                            { label: "Days Logged", val: `${logged}/${totalDays}` },
-                            { label: "Perfect Days", val: perfect, color: "#34d399" },
-                            { label: "Avg Score", val: avgScore ? `${avgScore}/4` : "—" },
-                          ].map(({ label, val, color }) => (
-                            <div key={label}>
-                              <div className="label" style={{ fontSize: 9 }}>{label}</div>
-                              <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: color || "#10b981", lineHeight: 1 }}>{val}</div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : null;
-                    })()}
-                  </div>
-                );
-              })()}
+              {/* Steps */}
+              <div className="stat-card">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div className="section-title" style={{ fontSize: 14, margin: 0 }}>STEPS</div>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal {STEPS_MIN.toLocaleString()}</div>
+                </div>
+                <BarChart data={stepsData} color="#60a5fa" unit="" goal={STEPS_MIN} />
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {stepsData.filter(d=>d.val).length ? Math.round(stepsData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/stepsData.filter(d=>d.val).length).toLocaleString() : "—"}</div>
+                  <div style={{ fontSize: 10, color: "#60a5fa", fontFamily: "'DM Mono',monospace" }}>{stepsData.filter(d=>d.val>=STEPS_MIN).length} days hit goal</div>
+                </div>
+              </div>
 
-              {!stats || weekLogs.length === 0 ? (
-                <div className="stat-card" style={{ color: "#334155", textAlign: "center", padding: 40 }}>No logs found for this week.</div>
-              ) : (
-                <>
-                  {/* Weight */}
-                  <div className="stat-card">
-                    <div className="section-title" style={{ fontSize: 18 }}>WEIGHT</div>
-                    <div className="grid3">
-                      {[
-                        { label: "Week Start", val: stats.startW ? `${stats.startW} lb` : "—", color: "#10b981" },
-                        { label: "Week End", val: stats.endW ? `${stats.endW} lb` : "—", color: "#10b981" },
-                        { label: "Week Loss", val: stats.weekLoss ? `${parseFloat(stats.weekLoss) > 0 ? "-" : "+"}${Math.abs(stats.weekLoss)} lb` : "—", color: stats.weekLoss && parseFloat(stats.weekLoss) > 0 ? "#34d399" : "#f87171" },
-                      ].map(({ label, val, color }) => (
-                        <div key={label} style={{ textAlign: "center" }}>
-                          <div className="label">{label}</div>
-                          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, color, lineHeight: 1 }}>{val}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid #131929", display: "flex", gap: 32 }}>
-                      <div>
-                        <div className="label">Total Lost Since Start</div>
-                        <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, color: "#34d399" }}>{stats.endW ? (START_WEIGHT - stats.endW).toFixed(1) : "—"} lb</div>
-                      </div>
-                      <div>
-                        <div className="label">Projected Aug 23</div>
-                        <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, color: projected && parseFloat(projected) <= GOAL_WEIGHT ? "#34d399" : projected && parseFloat(projected) <= GOAL_WEIGHT + 5 ? "#fbbf24" : "#f87171" }}>
-                          {projected || "—"} lb
-                        </div>
-                        <div style={{ color: "#64748b", fontSize: 10, marginTop: 2 }}>{projected ? (parseFloat(projected) <= GOAL_WEIGHT ? "✓ on track" : `${(parseFloat(projected) - GOAL_WEIGHT).toFixed(1)} lb above goal`) : ""}</div>
-                      </div>
-                    </div>
-                  </div>
+              {/* Weight */}
+              <div className="stat-card">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div className="section-title" style={{ fontSize: 14, margin: 0 }}>WEIGHT</div>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal {WEIGHT_GOAL}lbs</div>
+                </div>
+                <BarChart data={weightData} color="#34d399" unit="lbs" />
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>start {periodWeights[0]?.weight || "—"}lbs</div>
+                  <div style={{ fontSize: 10, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>latest {periodWeights[periodWeights.length-1]?.weight || "—"}lbs</div>
+                </div>
+              </div>
 
-                  {/* Nutrition */}
-                  <div className="stat-card">
-                    <div className="section-title" style={{ fontSize: 18 }}>NUTRITION AVERAGES</div>
-                    {[
-                      { label: "Avg Calories", val: stats.avgCals, display: stats.avgCals, target: `${CALORIES_MIN}–${CALORIES_MAX}`, pct: stats.avgCals ? Math.min(100, Math.round(stats.avgCals / CALORIES_MAX * 100)) : 0, color: stats.avgCals && stats.avgCals >= CALORIES_MIN && stats.avgCals <= CALORIES_MAX ? "#34d399" : "#f87171", hitRate: stats.calHitRate },
-                      { label: "Avg Protein", val: stats.avgPro, display: stats.avgPro ? `${stats.avgPro}g` : null, target: "≥120g", pct: stats.avgPro ? Math.min(100, Math.round(stats.avgPro / PROTEIN_MIN * 100)) : 0, color: stats.avgPro && stats.avgPro >= PROTEIN_MIN ? "#34d399" : "#fbbf24", hitRate: stats.proHitRate },
-                      { label: "Avg Steps", val: stats.avgSteps, display: stats.avgSteps ? stats.avgSteps.toLocaleString() : null, target: "≥8,000", pct: stats.avgSteps ? Math.min(100, Math.round(stats.avgSteps / STEPS_MIN * 100)) : 0, color: "#60a5fa", hitRate: stats.stepHitRate },
-                    ].map(({ label, display, target, pct, color, hitRate }) => (
-                      <div key={label} style={{ marginBottom: 16 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
-                          <span className="label">{label}</span>
-                          <div style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
-                            <span style={{ color: "#475569", fontSize: 10 }}>hit {hitRate}% of days</span>
-                            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, color, lineHeight: 1 }}>{display || "—"}</span>
-                          </div>
-                        </div>
-                        <div className="bar-bg"><div className="bar-fill" style={{ width: `${pct}%`, background: color }} /></div>
-                        <div style={{ color: "#475569", fontSize: 10, marginTop: 3 }}>target {target}</div>
-                      </div>
-                    ))}
-                  </div>
+              {/* Calories */}
+              <div className="stat-card">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div className="section-title" style={{ fontSize: 14, margin: 0 }}>CALORIES</div>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>target {CALORIES_MIN}–{CALORIES_MAX}</div>
+                </div>
+                <BarChart data={calData} color="#fbbf24" unit="kcal" goal={CALORIES_MIN} />
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {calData.filter(d=>d.val).length ? Math.round(calData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/calData.filter(d=>d.val).length) : "—"} kcal</div>
+                  <div style={{ fontSize: 10, color: "#fbbf24", fontFamily: "'DM Mono',monospace" }}>{calData.filter(d=>d.val>=CALORIES_MIN&&d.val<=CALORIES_MAX).length} days on target</div>
+                </div>
+              </div>
 
-                  {/* Training */}
-                  <div className="stat-card">
-                    <div className="section-title" style={{ fontSize: 18 }}>TRAINING</div>
-                    <div className="grid2">
-                      <div style={{ textAlign: "center" }}>
-                        <div className="label">Training Days</div>
-                        <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 48, color: stats.trainingDays >= 5 ? "#34d399" : stats.trainingDays >= 3 ? "#fbbf24" : "#f87171", lineHeight: 1 }}>
-                          {stats.trainingDays}<span style={{ fontSize: 24, color: "#334155" }}>/5</span>
-                        </div>
-                        <div style={{ color: "#64748b", fontSize: 11, marginTop: 4 }}>target: Tue–Sat</div>
-                      </div>
-                      <div style={{ textAlign: "center" }}>
-                        <div className="label">Week Compliance</div>
-                        <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 48, color: stats.compliance >= 80 ? "#34d399" : stats.compliance >= 60 ? "#fbbf24" : "#f87171", lineHeight: 1 }}>
-                          {stats.compliance}<span style={{ fontSize: 24, color: "#334155" }}>%</span>
-                        </div>
-                        <div style={{ color: "#64748b", fontSize: 11, marginTop: 4 }}>{stats.totalScore}/{stats.maxPossible} pts</div>
-                      </div>
-                    </div>
-                  </div>
+              {/* Protein */}
+              <div className="stat-card">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div className="section-title" style={{ fontSize: 14, margin: 0 }}>PROTEIN</div>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal ≥{PROTEIN_MIN}g</div>
+                </div>
+                <BarChart data={proData} color="#10b981" unit="g" goal={PROTEIN_MIN} />
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {proData.filter(d=>d.val).length ? Math.round(proData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/proData.filter(d=>d.val).length) : "—"}g</div>
+                  <div style={{ fontSize: 10, color: "#10b981", fontFamily: "'DM Mono',monospace" }}>{proData.filter(d=>d.val>=PROTEIN_MIN).length} days hit goal</div>
+                </div>
+              </div>
 
-                  {/* Score bar chart */}
-                  <div className="stat-card">
-                    <div className="section-title" style={{ fontSize: 14 }}>DAILY SCORE CHART</div>
-                    <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 80, padding: "0 4px" }}>
-                      {weekLogs.map((row) => {
-                        const score = row.score ?? calcScore(row);
-                        const pct = (score / 4) * 100;
-                        const color = score === 4 ? "#10b981" : score === 3 ? "#34d399" : score === 2 ? "#fbbf24" : score === 1 ? "#f97316" : "#f87171";
-                        const dayLabel = new Date(row.date + "T12:00:00").toLocaleDateString(undefined, { weekday: "short" });
-                        return (
-                          <div key={row.date} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                            <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{score}/4</div>
-                            <div style={{ width: "100%", height: 56, background: "#131929", borderRadius: 4, overflow: "hidden", display: "flex", alignItems: "flex-end" }}>
-                              <div style={{ width: "100%", height: `${pct}%`, background: color, borderRadius: "3px 3px 0 0", transition: "height 0.6s cubic-bezier(0.34,1.56,0.64,1)", minHeight: score > 0 ? 4 : 0 }} />
-                            </div>
-                            <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{dayLabel}</div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Day by day */}
-                  <div className="stat-card">
-                    <div className="section-title" style={{ fontSize: 18 }}>DAY-BY-DAY</div>
-                    <div style={{ overflowX: "auto" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
-                        <thead>
-                          <tr style={{ borderBottom: "1px solid #131929" }}>
-                            {["Date", "Weight", "Cal", "Pro", "Steps", "Training", "Score"].map(h => (
-                              <th key={h} style={{ padding: "6px 10px", color: "#475569", fontWeight: 400, letterSpacing: 1, fontSize: 10, textTransform: "uppercase", textAlign: "left" }}>{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {weekLogs.map((row, i) => {
-                            const calHit = row.calories && parseInt(row.calories) >= CALORIES_MIN && parseInt(row.calories) <= CALORIES_MAX;
-                            const proHit = row.protein && parseInt(row.protein) >= PROTEIN_MIN;
-                            const stepHit = row.steps && parseInt(row.steps) >= STEPS_MIN;
-                            return (
-                              <tr key={row.date} className={i % 2 === 0 ? "row-even" : "row-odd"}>
-                                <td style={{ padding: "6px 10px", color: "#94a3b8" }}>{row.date.slice(5)}</td>
-                                <td style={{ padding: "6px 10px", color: "#10b981" }}>{row.weight || "—"}</td>
-                                <td style={{ padding: "6px 10px", color: calHit ? "#34d399" : row.calories ? "#f87171" : "#334155" }}>{row.calories || "—"}</td>
-                                <td style={{ padding: "6px 10px", color: proHit ? "#34d399" : row.protein ? "#f87171" : "#334155" }}>{row.protein ? row.protein + "g" : "—"}</td>
-                                <td style={{ padding: "6px 10px", color: "#60a5fa" }}>{row.steps ? parseInt(row.steps).toLocaleString() : "—"}</td>
-                                <td style={{ padding: "6px 10px", color: row.training ? "#34d399" : "#334155", maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.training || "—"}</td>
-                                <td style={{ padding: "6px 10px", fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: row.score === 4 ? "#34d399" : row.score >= 3 ? "#fbbf24" : "#f87171" }}>{row.score ?? "—"}<span style={{ fontSize: 11, color: "#334155" }}>/4</span></td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-                    <button className="dl-btn" onClick={() => downloadReport(reportWeek)}>↓ Download Report</button>
-                  </div>
-                </>
-              )}
             </div>
           );
         })()}
-
         })()}
 
         {/* ── SETTINGS TAB ── */}
