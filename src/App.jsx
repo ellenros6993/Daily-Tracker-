@@ -1195,7 +1195,7 @@ export default function App() {
 
   // Dismiss loading skeletons after mount
   useEffect(() => { const t = setTimeout(() => setIsLoading(false), 600); return () => clearTimeout(t); }, []);
-  useEffect(() => { try { const p = new URLSearchParams(window.location.search); const s = p.get("steps"); const w = p.get("workout"); const c = p.get("calories"); if(s || w || c) { setForm(f => ({ ...f, ...(s && {steps:s}), ...(w && {training:w}), ...(c && {calories:c}) })); setTab("Training"); setTimeout(() => window.history.replaceState({}, "", window.location.pathname), 500); } } catch(e) {} }, []);
+  useEffect(() => { try { const p = new URLSearchParams(window.location.search); const s = p.get("steps"); const w = p.get("workout"); const c = p.get("calories"); if(s || w || c) { const rounded = s ? Math.round(parseFloat(s)).toString() : null; setForm(f => ({ ...f, ...(rounded && {steps:rounded}), ...(w && {training:w}), ...(c && {calories:c}) })); if (rounded) { const today = getLocalDateStr(); setLogs(ls => { const existing = ls.find(l => l.date === today); if (existing) { return ls.map(l => l.date === today ? { ...l, steps: rounded } : l); } return [...ls, { date: today, steps: rounded }]; }); } setTimeout(() => window.history.replaceState({}, "", window.location.pathname), 500); } } catch(e) {} }, []);
   useEffect(() => {
     if (!circuitRunning || circuitState.done) return;
     const t = setTimeout(() => {
