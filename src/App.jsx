@@ -1204,6 +1204,7 @@ export default function App() {
         if (s.secondsLeft > 1) return { ...s, secondsLeft: s.secondsLeft - 1 };
         haptic("medium");
         try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = s.isWork ? 440 : 880; g.gain.setValueAtTime(0.3, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.3); } catch(e) {}
+        try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = s.isWork ? 440 : 880; g.gain.setValueAtTime(0.3, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.3); } catch(e) {}
         if (s.isBetween) return { ...s, isBetween: false, isWork: true, secondsLeft: circuitConfig.work };
         if (s.isWork) return { ...s, isWork: false, secondsLeft: circuitConfig.rest };
         if (s.round >= circuitConfig.rounds) return { ...s, done: true };
@@ -3203,14 +3204,27 @@ export default function App() {
               {/* New workout form */}
               <div className="stat-card">
                 <div className="section-title" style={{ fontSize: 16 }}>LOG WORKOUT</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
-                  <div>
-                    <div className="field-label" style={{ marginBottom: 4 }}>Date</div>
-                    <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} style={{ width: "auto" }} />
+                <div style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "flex-end" }}>
+                  <div style={{ flex: "0 0 auto" }}>
+                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DATE</div>
+                    <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} style={{ width: "auto", fontSize: 12, padding: "5px 8px" }} />
                   </div>
-                  <div>
-                    <div className="field-label" style={{ marginBottom: 4 }}>Session Name (optional)</div>
-                    <input type="text" placeholder="e.g. Upper Body, Push Day" value={workoutForm.name} onChange={e => setWorkoutForm(f => ({ ...f, name: e.target.value }))} />
+                  <div style={{ flex: 1 }}>
+                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>SESSION NAME</div>
+                    <input type="text" placeholder="e.g. Push Day" value={workoutForm.name} onChange={e => setWorkoutForm(f => ({ ...f, name: e.target.value }))} style={{ fontSize: 12, padding: "5px 8px" }} />
+                  </div>
+                  <div style={{ flex: "0 0 auto" }}>
+                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>TYPE</div>
+                    <select value={workoutForm.activityType || "strength"} onChange={e => setWorkoutForm(f => ({ ...f, activityType: e.target.value }))}
+                      style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 12, padding: "5px 8px", cursor: "pointer", outline: "none" }}>
+                      <option value="strength">🏋️ Strength</option>
+                      <option value="run">🏃 Run</option>
+                      <option value="cycle">🚴 Cycle</option>
+                      <option value="hike">🥾 Hike</option>
+                      <option value="swim">🏊 Swim</option>
+                      <option value="yoga">🧘 Yoga</option>
+                      <option value="other">⚡ Other</option>
+                    </select>
                   </div>
                 </div>
 
