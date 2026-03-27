@@ -3572,7 +3572,7 @@ export default function App() {
                 return allExerciseNames.length > 0 ? (
                   <div className="stat-card">
                     <div className="section-title" style={{ fontSize: 16 }}>🏆 PR BOARD</div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
                       {allExerciseNames.map(name => {
                         const pr = getPRForExercise(name);
                         const allSessions = workouts.filter(w => w.exercises.some(e => e.name.toLowerCase() === name));
@@ -3927,7 +3927,6 @@ export default function App() {
 
             </div>
           );
-        })()}
         })()}
 
         {/* ── SETTINGS TAB ── */}
