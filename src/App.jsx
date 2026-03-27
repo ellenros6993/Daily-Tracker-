@@ -2135,6 +2135,7 @@ export default function App() {
                       );
                     })}
                   </div>
+                  <button onClick={() => setShowShortcutModal(true)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
                   <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ color: "#334155", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>Score</span>
