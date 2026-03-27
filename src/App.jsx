@@ -3397,7 +3397,7 @@ export default function App() {
                         </select>
                       </div>
                     </div>
-                    <div>
+                    {["run","cycle","hike","swim"].includes(workoutForm.activityType) && (<div>
                       <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DISTANCE (OPTIONAL)</div>
                       <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                         <input type="number" placeholder="5.0" step="0.1" value={workoutForm.distance || ""} onChange={e => setWorkoutForm(f => ({ ...f, distance: e.target.value }))}
