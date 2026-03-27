@@ -1875,7 +1875,7 @@ export default function App() {
           { id: "Weekly Report", Icon: BarChart2, label: "Summary" },
           { id: "Progress Photos", Icon: Camera, label: "Progress" },
         ].map(({ id, Icon, label }) => (
-          <button key={id} onClick={() => navigateTo(id)} style={{ background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 6px", color: tab === id ? "#10b981" : "#334155", transition: "color 0.15s" }}>
+          <button key={id} onClick={() => navigateTo(id)} style={{ background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 6px", color: tab === id ? (id === "Training" ? "#60a5fa" : id === "Weight Tracker" ? "#34d399" : id === "Progress Photos" ? "#a855f7" : "#10b981") : "#334155", transition: "color 0.15s" }}>
             <Icon size={18} />
             <span style={{ fontSize: 9, letterSpacing: 0.3, fontFamily: "'DM Mono',monospace" }}>{label}</span>
           </button>
@@ -3172,26 +3172,26 @@ export default function App() {
           return (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div className="sticky-header">
-                <div className="section-title" style={{ marginBottom: 0 }}>TRAINING LOG</div>
+                <div className="section-title" style={{ marginBottom: 0, color: "#60a5fa" }}>TRAINING LOG</div>
               </div>
 
               {/* Floating Rest Timer */}
               {(restTimerActive || restTimerRemaining !== null) && (
                 <div style={{ position: "fixed", bottom: 100, right: 16, zIndex: 200, background: "rgba(11,13,21,0.95)", backdropFilter: "blur(16px)", border: `1px solid ${restTimerRemaining === 0 ? "#34d399" : "#10b98155"}`, borderRadius: 16, padding: "14px 20px", minWidth: 160, boxShadow: "0 8px 32px #00000066", animation: "fadeUp 0.2s ease" }}>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>REST TIMER</div>
-                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 48, color: restTimerRemaining === 0 ? "#34d399" : restTimerRemaining <= 10 ? "#f87171" : "#10b981", lineHeight: 1, textAlign: "center" }}>
+                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 48, color: restTimerRemaining === 0 ? "#34d399" : restTimerRemaining <= 10 ? "#f87171" : "#60a5fa", lineHeight: 1, textAlign: "center" }}>
                     {restTimerRemaining === 0 ? "GO!" : `${Math.floor(restTimerRemaining / 60)}:${String(restTimerRemaining % 60).padStart(2,"0")}`}
                   </div>
                   {restTimerRemaining > 0 && (
                     <div style={{ marginTop: 8 }}>
                       <div style={{ height: 3, background: "#131929", borderRadius: 2, overflow: "hidden" }}>
-                        <div style={{ height: "100%", background: restTimerRemaining <= 10 ? "#f87171" : "#10b981", width: `${(restTimerRemaining / restTimerPreset) * 100}%`, transition: "width 1s linear", borderRadius: 2 }} />
+                        <div style={{ height: "100%", background: restTimerRemaining <= 10 ? "#f87171" : "#60a5fa", width: `${(restTimerRemaining / restTimerPreset) * 100}%`, transition: "width 1s linear", borderRadius: 2 }} />
                       </div>
                     </div>
                   )}
                   <div style={{ display: "flex", gap: 6, marginTop: 10, justifyContent: "center" }}>
                     {restTimerRemaining === 0 ? (
-                      <button onClick={stopRestTimer} style={{ background: "linear-gradient(135deg,#059669,#10b981)", color: "#fff", border: "none", padding: "6px 16px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Done</button>
+                      <button onClick={stopRestTimer} style={{ background: "linear-gradient(135deg,#1e3a5f,#60a5fa)", color: "#fff", border: "none", padding: "6px 16px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Done</button>
                     ) : (
                       <>
                         <button onClick={() => startRestTimer(restTimerPreset)} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "4px 10px", borderRadius: 6, fontSize: 10, cursor: "pointer" }}>↺</button>
@@ -3248,7 +3248,7 @@ export default function App() {
                           setCircuitState({ round: 1, isWork: true, secondsLeft: circuitConfig.work });
                           setCircuitPhase("run");
                           setCircuitRunning(true);
-                        }} style={{ background: "linear-gradient(135deg,#065f3a,#10b981)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: 1 }}>
+                        }} style={{ background: "linear-gradient(135deg,#1e3a5f,#60a5fa)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: 1 }}>
                           START
                         </button>
                       </div>
@@ -3259,7 +3259,7 @@ export default function App() {
                         {circuitState.done ? (
                           <div style={{ textAlign: "center" }}>
                             <div style={{ fontSize: 48, marginBottom: 8 }}>🎉</div>
-                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: "#34d399", letterSpacing: 2 }}>DONE!</div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: "#60a5fa", letterSpacing: 2 }}>DONE!</div>
                             <div style={{ fontSize: 11, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 4 }}>{circuitConfig.rounds} rounds complete</div>
                             <button onClick={() => { setCircuitPhase("build"); setCircuitRunning(false); }} style={{ marginTop: 16, background: "#131929", border: "1px solid #1e2d40", color: "#e2e8f0", padding: "10px 24px", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>Edit Timer</button>
                           </div>
@@ -3273,7 +3273,7 @@ export default function App() {
                             </div>
                             <div style={{ display: "flex", gap: 10, width: "100%" }}>
                               <button onClick={() => setCircuitRunning(r => !r)}
-                                style={{ flex: 1, background: circuitRunning ? "#131929" : "linear-gradient(135deg,#065f3a,#10b981)", border: "1px solid #1e2d40", color: "#e2e8f0", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                                style={{ flex: 1, background: circuitRunning ? "#131929" : "linear-gradient(135deg,#1e3a5f,#60a5fa)", border: "1px solid #1e2d40", color: "#e2e8f0", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                                 {circuitRunning ? "PAUSE" : "RESUME"}
                               </button>
                               <button onClick={() => { setCircuitPhase("build"); setCircuitRunning(false); setCircuitState({ round: 1, isWork: true, secondsLeft: circuitConfig.work }); }}
@@ -3292,7 +3292,7 @@ export default function App() {
 
               {/* New workout form */}
               <div className="stat-card">
-                <div className="section-title" style={{ fontSize: 16 }}>LOG WORKOUT</div>
+                <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>LOG WORKOUT</div>
                 <div style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "flex-end" }}>
                   <div style={{ flex: "0 0 auto" }}>
                     <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DATE</div>
@@ -3350,14 +3350,14 @@ export default function App() {
                           position: "absolute", left: -18, top: isSupStart ? 16 : 0,
                           bottom: isSupEnd ? 16 : 0,
                           width: 12,
-                          borderLeft: "2px solid #10b981",
-                          borderTop: isSupStart ? "2px solid #10b981" : "none",
-                          borderBottom: isSupEnd ? "2px solid #10b981" : "none",
+                          borderLeft: "2px solid #60a5fa",
+                          borderTop: isSupStart ? "2px solid #60a5fa" : "none",
+                          borderBottom: isSupEnd ? "2px solid #60a5fa" : "none",
                           borderRadius: isSupStart ? "4px 0 0 0" : isSupEnd ? "0 0 0 4px" : "0",
                         }} />
                       )}
                       {isSupStart && (
-                        <div style={{ position: "absolute", left: -52, top: "50%", transform: "translateY(-50%)", background: "#10b981", color: "#000", fontSize: 9, fontFamily: "'Bebas Neue', sans-serif", letterSpacing: 1, padding: "2px 5px", borderRadius: 3 }}>
+                        <div style={{ position: "absolute", left: -52, top: "50%", transform: "translateY(-50%)", background: "#60a5fa", color: "#000", fontSize: 9, fontFamily: "'Bebas Neue', sans-serif", letterSpacing: 1, padding: "2px 5px", borderRadius: 3 }}>
                           SS{ssLetter}
                         </div>
                       )}
@@ -3365,7 +3365,7 @@ export default function App() {
                       <div style={{ background: isInSuperset ? "#0d1520" : "#0f1623", border: `1px solid ${isInSuperset ? "#046c4e33" : "#131929"}`, borderRadius: 6, padding: 14, marginBottom: isSupStart ? 2 : 10 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                           {isInSuperset && ssLetter && (
-                            <span style={{ background: "#046c4e22", color: "#10b981", fontSize: 10, fontFamily: "'Bebas Neue', sans-serif", padding: "2px 7px", borderRadius: 3, letterSpacing: 1, flexShrink: 0 }}>
+                            <span style={{ background: "#046c4e22", color: "#60a5fa", fontSize: 10, fontFamily: "'Bebas Neue', sans-serif", padding: "2px 7px", borderRadius: 3, letterSpacing: 1, flexShrink: 0 }}>
                               {ssLetter}{isSupStart ? "1" : "2"}
                             </span>
                           )}
@@ -3382,8 +3382,8 @@ export default function App() {
                               title={ex.supersetWith ? "Ungroup superset" : "Group with next exercise as superset"}
                               style={{
                                 background: ex.supersetWith ? "#046c4e22" : "none",
-                                border: `1px solid ${ex.supersetWith ? "#10b981" : "#131929"}`,
-                                color: ex.supersetWith ? "#10b981" : "#475569",
+                                border: `1px solid ${ex.supersetWith ? "#60a5fa" : "#131929"}`,
+                                color: ex.supersetWith ? "#60a5fa" : "#475569",
                                 fontSize: 9, padding: "3px 7px", borderRadius: 3, letterSpacing: 1, cursor: "pointer", flexShrink: 0
                               }}
                             >
@@ -3435,7 +3435,7 @@ export default function App() {
                             <span style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>REST</span>
                             {[60, 90, 120].map(s => (
                               <button key={s} onClick={() => { setRestTimerPreset(s); startRestTimer(s); }}
-                                style={{ background: restTimerActive && restTimerPreset === s ? "#10b98122" : "none", border: `1px solid ${restTimerActive && restTimerPreset === s ? "#10b98155" : "#131929"}`, color: restTimerActive && restTimerPreset === s ? "#10b981" : "#475569", fontSize: 9, padding: "3px 7px", borderRadius: 4, cursor: "pointer", fontFamily: "'DM Mono',monospace", transition: "all 0.15s" }}>
+                                style={{ background: restTimerActive && restTimerPreset === s ? "#10b98122" : "none", border: `1px solid ${restTimerActive && restTimerPreset === s ? "#10b98155" : "#131929"}`, color: restTimerActive && restTimerPreset === s ? "#60a5fa" : "#475569", fontSize: 9, padding: "3px 7px", borderRadius: 4, cursor: "pointer", fontFamily: "'DM Mono',monospace", transition: "all 0.15s" }}>
                                 {s}s
                               </button>
                             ))}
@@ -3513,7 +3513,7 @@ export default function App() {
 
               {/* Workout Templates */}
               <div className="stat-card">
-                <div className="section-title" style={{ fontSize: 16 }}>TEMPLATES</div>
+                <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>TEMPLATES</div>
                 {templates.length === 0 ? (
                   <div style={{ color: "#334155", fontSize: 11, fontFamily: "'DM Mono',monospace" }}>No templates yet — save a workout below to reuse it.</div>
                 ) : (
@@ -3525,7 +3525,7 @@ export default function App() {
                           <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{t.exercises.length} exercise{t.exercises.length !== 1 ? "s" : ""}</div>
                         </div>
                         <div style={{ display: "flex", gap: 8 }}>
-                          <button onClick={() => loadTemplate(t)} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "5px 12px", borderRadius: 7, fontSize: 11, fontWeight: 600 }}>Load</button>
+                          <button onClick={() => loadTemplate(t)} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #065f3a44", color: "#60a5fa", padding: "5px 12px", borderRadius: 7, fontSize: 11, fontWeight: 600 }}>Load</button>
                           <button onClick={() => deleteTemplate(t.id)} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "5px 8px", borderRadius: 7, fontSize: 11, display: "flex", alignItems: "center" }}><Trash2 size={12} /></button>
                         </div>
                       </div>
@@ -3548,14 +3548,14 @@ export default function App() {
                 const heatColor = (vol, trained) => {
                   if (!trained) return "#0f1623";
                   const intensity = vol / maxVol;
-                  if (intensity > 0.7) return "#10b981";
-                  if (intensity > 0.4) return "#059669";
-                  if (intensity > 0) return "#065f3a";
+                  if (intensity > 0.7) return "#60a5fa";
+                  if (intensity > 0.4) return "#1e3a5f";
+                  if (intensity > 0) return "#1e3a5f";
                   return "#064e35";
                 };
                 return (
                   <div className="stat-card">
-                    <div className="section-title" style={{ fontSize: 14 }}>TRAINING FREQUENCY</div>
+                    <div className="section-title" style={{ fontSize: 14, color: "#60a5fa" }}>TRAINING FREQUENCY</div>
                     <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 8 }}>56-day volume heatmap — brighter = more weight lifted</div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(14, 1fr)", gap: 3 }}>
                       {cells.map(({ ds, vol, trained }) => (
@@ -3564,7 +3564,7 @@ export default function App() {
                       ))}
                     </div>
                     <div style={{ display: "flex", gap: 10, marginTop: 8, alignItems: "center" }}>
-                      {[["#0f1623","Rest"],["#064e35","Light"],["#059669","Medium"],["#10b981","Heavy"]].map(([c,l]) => (
+                      {[["#0f1623","Rest"],["#064e35","Light"],["#1e3a5f","Medium"],["#60a5fa","Heavy"]].map(([c,l]) => (
                         <div key={l} style={{ display: "flex", alignItems: "center", gap: 4 }}>
                           <div style={{ width: 10, height: 10, borderRadius: 2, background: c }} />
                           <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{l}</span>
@@ -3579,7 +3579,7 @@ export default function App() {
               {/* Workout history */}
               {workouts.length > 0 && (
                 <div className="stat-card">
-                  <div className="section-title" style={{ fontSize: 16 }}>HISTORY</div>
+                  <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>HISTORY</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     {[...workouts].reverse().map((w, i) => (
                       <div key={w.id || i} style={{ borderBottom: i < workouts.length - 1 ? "1px solid #131929" : "none", paddingBottom: i < workouts.length - 1 ? 12 : 0 }}>
@@ -3588,7 +3588,7 @@ export default function App() {
                           onClick={() => setSelectedWorkout(selectedWorkout === (w.id || i) ? null : (w.id || i))}
                         >
                           <div>
-                            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: "#10b981", letterSpacing: 2 }}>
+                            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: "#60a5fa", letterSpacing: 2 }}>
                               {w.name || "Workout"} <span style={{ fontSize: 13, color: "#475569", fontFamily: "inherit" }}>· {w.date}</span>
                             </div>
                             <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>
@@ -3617,7 +3617,7 @@ export default function App() {
                                     {isNewPR && <span style={{ background: "#1a1400", border: "1px solid #fbbf24", color: "#fbbf24", fontSize: 9, padding: "1px 6px", borderRadius: 3, letterSpacing: 1 }}>🏆 PR</span>}
                                   </div>
                                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
-                                    {ex.supersetWith && <span style={{ background: "#046c4e22", color: "#10b981", fontSize: 9, padding: "1px 6px", borderRadius: 3, letterSpacing: 1 }}>SS</span>}
+                                    {ex.supersetWith && <span style={{ background: "#046c4e22", color: "#60a5fa", fontSize: 9, padding: "1px 6px", borderRadius: 3, letterSpacing: 1 }}>SS</span>}
                                     {ex.sets.map((s, si) => (
                                       <span key={si} className="chip" style={{ color: "#e2e8f0" }}>
                                         {s.reps && s.weight ? `${s.reps} × ${s.weight}lb` : s.reps ? `${s.reps} reps` : `${s.weight}lb`}
@@ -3641,7 +3641,7 @@ export default function App() {
                 const allExerciseNames = [...new Set(workouts.flatMap(w => w.exercises.map(e => e.name.trim().toLowerCase())).filter(Boolean))];
                 return allExerciseNames.length > 0 ? (
                   <div className="stat-card">
-                    <div className="section-title" style={{ fontSize: 16 }}>🏆 PR BOARD</div>
+                    <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>🏆 PR BOARD</div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
                       {allExerciseNames.map(name => {
                         const pr = getPRForExercise(name);
