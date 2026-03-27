@@ -6,7 +6,7 @@ const Icon = ({ d, size = 16, ...p }) => (
 );
 const LayoutDashboard = ({ size = 16, ...p }) => <Icon size={size} {...p} d={<><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></>} />;
 const Utensils = ({ size = 16, ...p }) => <Icon size={size} {...p} d={<><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></>} />;
-const Dumbbell = ({ size = 16, ...p }) => <Icon size={size} {...p} d={<><path d="M6 5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h1v4H6a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-1h6v1a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1V9h1a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v1H9V6a1 1 0 0 0-1-1H6z" strokeWidth="0" fill="currentColor"/></>} />;
+const Dumbbell = ({ size = 16, ...p }) => <Icon size={size} {...p} d={<><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/><rect x="5" y="8" width="3" height="8" rx="1"/><rect x="16" y="8" width="3" height="8" rx="1"/><line x1="8" y1="12" x2="16" y2="12" strokeWidth="2"/></>} />;
 const Scale = ({ size = 16, ...p }) => <Icon size={size} {...p} d={<><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></>} />;
 const BarChart2 = ({ size = 16, ...p }) => <Icon size={size} {...p} d={<><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></>} />;
 const Camera = ({ size = 16, ...p }) => <Icon size={size} {...p} d={<><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></>} />;
@@ -3205,7 +3205,7 @@ export default function App() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
                   <div>
                     <div className="field-label" style={{ marginBottom: 4 }}>Date</div>
-                    <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} />
+                    <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} style={{ width: "auto" }} />
                   </div>
                   <div>
                     <div className="field-label" style={{ marginBottom: 4 }}>Session Name (optional)</div>
