@@ -3948,10 +3948,10 @@ export default function App() {
               <div className="stat-card">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                   <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#60a5fa" }}>TRAINING</div>
-                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#10b981" }}>{daysTrained}<span style={{ fontSize: 12, color: "#475569" }}>/{days} days</span></div>
+                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#60a5fa" }}>{daysTrained}<span style={{ fontSize: 12, color: "#475569" }}>/{days} days</span></div>
                 </div>
                 <div className="bar-bg">
-                  <div className="bar-fill" style={{ width: `${Math.round(daysTrained/days*100)}%`, background: "#10b981" }} />
+                  <div className="bar-fill" style={{ width: `${Math.round(daysTrained/days*100)}%`, background: "#60a5fa" }} />
                 </div>
                 <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 4 }}>{Math.round(daysTrained/days*100)}% training frequency</div>
               </div>
