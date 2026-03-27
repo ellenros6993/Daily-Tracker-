@@ -3204,7 +3204,7 @@ export default function App() {
 
               {/* Circuit Timer button */}
 
-              <div style={{ display: "flex", justifyContent: "center" }}>
+              <div style={{ display: "flex" }}>
                 <button onClick={() => setShowCircuitTimer(true)} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", padding: "10px 24px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, display: "flex", alignItems: "center", gap: 8 }}>⏱ CIRCUIT TIMER</button>
               </div>
 
@@ -3455,7 +3455,7 @@ export default function App() {
                     <button onClick={saveTemplate} style={{ background: "transparent", border: "1px solid #60a5fa55", color: "#60a5fa", padding: "8px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
                       <BookTemplate size={13} /> Save Template
                     </button>
-                    <button className="save-btn" onClick={saveWorkout}>{workoutSaved ? "✓ Saved" : "Save Workout"}</button>
+                    <button style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", padding: "8px 20px", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }} onClick={saveWorkout}>{workoutSaved ? "✓ Saved" : "Save Workout"}</button>
                   </div>
                 </div>
                   </>
@@ -3505,7 +3505,7 @@ export default function App() {
                         style={{ width: "100%", boxSizing: "border-box", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "8px 10px", resize: "none", minHeight: 60, outline: "none" }} />
                     </div>
                     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                      <button className="save-btn" onClick={saveWorkout}>{workoutSaved ? "✓ Saved" : "Save Workout"}</button>
+                      <button style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", padding: "8px 20px", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }} onClick={saveWorkout}>{workoutSaved ? "✓ Saved" : "Save Workout"}</button>
                     </div>
                   </div>
                 )}
