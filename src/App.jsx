@@ -3883,23 +3883,21 @@ export default function App() {
           const daysTrained = periodWorkouts.length;
 
           // Bar chart helper
-          const BarChart = ({ data, color, unit, goal }) => {
-            if (!data.length) return <div style={{ color: "#334155", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "12px 0" }}>No data for this period</div>;
-            const max = Math.max(...data.map(d => d.val || 0), goal || 1);
-            return (
-              <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 80, marginTop: 8 }}>
-                {data.map((d, i) => (
-                  <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                    <div style={{ width: "100%", background: d.val ? color : "#131929", borderRadius: "3px 3px 0 0", height: d.val ? `${Math.max(4, Math.round((d.val/max)*72))}px` : "4px", transition: "height 0.3s", position: "relative" }}
-                      title={d.val ? `${d.val}${unit}` : "No data"}>
-                      {goal && d.val >= goal && <div style={{ position: "absolute", top: -4, left: "50%", transform: "translateX(-50%)", width: 4, height: 4, borderRadius: "50%", background: "#34d399" }} />}
-                    </div>
-                    {data.length <= 14 && <div style={{ fontSize: 7, color: "#334155", fontFamily: "'DM Mono',monospace", writingMode: "vertical-rl", transform: "rotate(180deg)", height: 20 }}>{d.label}</div>}
-                  </div>
-                ))}
-              </div>
-            );
-          };
+        const SummaryBar = ({ data, color, unit, goal }) => {
+          if (!data || !data.length) return <div style={{ color: "#334155", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "12px 0" }}>No data for this period</div>;
+          const max = Math.max(...data.map(d => d.val || 0), goal || 1);
+          return (
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 80, marginTop: 8 }}>
+              {data.map((d, i) => (
+                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                  <div style={{ width: "100%", background: d.val ? color : "#131929", borderRadius: "3px 3px 0 0", height: d.val ? `${Math.max(4, Math.round((d.val/max)*72))}px` : "4px" }}
+                    title={d.val ? `${d.val}${unit}` : "No data"} />
+                  {data.length <= 14 && <div style={{ fontSize: 7, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{d.label}</div>}
+                </div>
+              ))}
+            </div>
+          );
+        };
 
           // Build chart data
           const allDays = Array.from({ length: days }, (_, i) => {
@@ -3965,7 +3963,7 @@ export default function App() {
                   <div className="section-title" style={{ fontSize: 14, margin: 0 }}>STEPS</div>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal {STEPS_MIN.toLocaleString()}</div>
                 </div>
-                <BarChart data={stepsData} color="#60a5fa" unit="" goal={STEPS_MIN} />
+                <SummaryBar data={stepsData} color="#60a5fa" unit="" goal={STEPS_MIN} />
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {stepsData.filter(d=>d.val).length ? Math.round(stepsData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/stepsData.filter(d=>d.val).length).toLocaleString() : "—"}</div>
                   <div style={{ fontSize: 10, color: "#60a5fa", fontFamily: "'DM Mono',monospace" }}>{stepsData.filter(d=>d.val>=STEPS_MIN).length} days hit goal</div>
@@ -3976,9 +3974,9 @@ export default function App() {
               <div className="stat-card">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div className="section-title" style={{ fontSize: 14, margin: 0 }}>WEIGHT</div>
-                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal {WEIGHT_GOAL}lbs</div>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal {GOAL_WEIGHT}lbs</div>
                 </div>
-                <BarChart data={weightData} color="#34d399" unit="lbs" />
+                <SummaryBar data={weightData} color="#34d399" unit="lbs" />
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>start {periodWeights[0]?.weight || "—"}lbs</div>
                   <div style={{ fontSize: 10, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>latest {periodWeights[periodWeights.length-1]?.weight || "—"}lbs</div>
@@ -3991,7 +3989,7 @@ export default function App() {
                   <div className="section-title" style={{ fontSize: 14, margin: 0 }}>CALORIES</div>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>target {CALORIES_MIN}–{CALORIES_MAX}</div>
                 </div>
-                <BarChart data={calData} color="#fbbf24" unit="kcal" goal={CALORIES_MIN} />
+                <SummaryBar data={calData} color="#fbbf24" unit="kcal" goal={CALORIES_MIN} />
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {calData.filter(d=>d.val).length ? Math.round(calData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/calData.filter(d=>d.val).length) : "—"} kcal</div>
                   <div style={{ fontSize: 10, color: "#fbbf24", fontFamily: "'DM Mono',monospace" }}>{calData.filter(d=>d.val>=CALORIES_MIN&&d.val<=CALORIES_MAX).length} days on target</div>
@@ -4004,7 +4002,7 @@ export default function App() {
                   <div className="section-title" style={{ fontSize: 14, margin: 0 }}>PROTEIN</div>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal ≥{PROTEIN_MIN}g</div>
                 </div>
-                <BarChart data={proData} color="#10b981" unit="g" goal={PROTEIN_MIN} />
+                <SummaryBar data={proData} color="#10b981" unit="g" goal={PROTEIN_MIN} />
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {proData.filter(d=>d.val).length ? Math.round(proData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/proData.filter(d=>d.val).length) : "—"}g</div>
                   <div style={{ fontSize: 10, color: "#10b981", fontFamily: "'DM Mono',monospace" }}>{proData.filter(d=>d.val>=PROTEIN_MIN).length} days hit goal</div>
