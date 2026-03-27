@@ -3207,59 +3207,6 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step Count */}
-              <div className="stat-card">
-                <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>STEP COUNT</div>
-                <div style={{ marginBottom: 10 }}>
-                  <div className="field-label" style={{ marginBottom: 4 }}>Date</div>
-                  <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ maxWidth: 200, marginBottom: 10 }} />
-                </div>
-                <div style={{ marginBottom: 10 }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-                    <div className="field-label" style={{ marginBottom: 0 }}>Steps Today</div>
-                  <div style={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
-                    <div className="field-label" style={{ marginBottom: 0 }}>Steps Today</div>
-                  </div>
-                  </div>
-                  <input type="number" placeholder="8500" value={form.steps} onChange={e => setForm(f => ({ ...f, steps: e.target.value }))} />
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  {form.steps && <div style={{ fontSize: 11, color: parseInt(form.steps) >= STEPS_MIN ? "#60a5fa" : "#94a3b8" }}>{parseInt(form.steps) >= STEPS_MIN ? "✓ Goal hit!" : `${(STEPS_MIN - parseInt(form.steps)).toLocaleString()} steps to go`}</div>}
-                  <button style={{ marginLeft: "auto", fontSize: 14, padding: "8px 20px", background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", borderRadius: 8, fontWeight: 600, cursor: "pointer" }} onClick={saveLog}>{saved ? "✓ Saved" : "Save Steps"}</button>
-                </div>
-              </div>
-
-              {/* Step Count History */}
-              {logs.filter(l => l.steps && parseInt(l.steps) > 0).length > 0 && (
-                <div className="stat-card">
-                  <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>STEP HISTORY</div>
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-                      <thead>
-                        <tr style={{ borderBottom: "1px solid #131929" }}>
-                          {["Date", "Steps", "Goal"].map(h => (
-                            <th key={h} style={{ padding: "8px 12px", color: "#475569", fontWeight: 400, letterSpacing: 1, fontSize: 10, textTransform: "uppercase", textAlign: "left" }}>{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[...logs].reverse().filter(l => l.steps && parseInt(l.steps) > 0).map((row, i) => {
-                          const hit = parseInt(row.steps) >= STEPS_MIN;
-                          return (
-                            <tr key={row.date} className={i % 2 === 0 ? "row-even" : "row-odd"}>
-                              <td style={{ padding: "8px 12px", color: "#94a3b8" }}>{row.date}</td>
-                              <td style={{ padding: "8px 12px", fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: "#60a5fa" }}>{parseInt(row.steps).toLocaleString()}</td>
-                              <td style={{ padding: "8px 12px", fontSize: 11, color: "#60a5fa" }}>{hit ? "✓ Hit" : `${(STEPS_MIN - parseInt(row.steps)).toLocaleString()} short`}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-
-              {/* Training frequency heatmap */}
               {/* New workout form */}
               <div className="stat-card">
                 <div className="section-title" style={{ fontSize: 16 }}>LOG WORKOUT</div>
