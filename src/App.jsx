@@ -1055,6 +1055,7 @@ export default function App() {
   const [workoutSaved, setWorkoutSaved] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [showShortcutModal, setShowShortcutModal] = useState(false);
+  const [personalShortcutUrl, setPersonalShortcutUrl] = useState(() => localStorage.getItem("dat-personal-shortcut") || "");
   const [showCircuitTimer, setShowCircuitTimer] = useState(false);
   const [circuitPhase, setCircuitPhase] = useState("build");
   const [circuitRunning, setCircuitRunning] = useState(false);
@@ -1910,32 +1911,16 @@ export default function App() {
                     <div style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Works with Apple Watch, Fitness app, and Health app</div>
                   </div>
                 </div>
+                    <div style={{ borderTop: "1px solid #131929", paddingTop: 12, marginTop: 8 }}>
+                      <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6, letterSpacing: 1 }}>HAVE YOUR OWN SHORTCUT? PASTE URL:</div>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <input value={personalShortcutUrl} onChange={e => setPersonalShortcutUrl(e.target.value)} placeholder="https://www.icloud.com/shortcuts/..."
+                          style={{ flex: 1, background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "6px 8px", outline: "none" }} />
+                        <button onClick={() => { localStorage.setItem("dat-personal-shortcut", personalShortcutUrl); setShowShortcutModal(false); }} style={{ background: "#10b981", border: "none", color: "#fff", padding: "6px 12px", borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>SAVE</button>
+                      </div>
+                    </div>
               )}
               {/* Shortcut Setup Modal */}
-              {showShortcutModal && (
-                <div style={{ position: "fixed", inset: 0, background: "#07080dee", zIndex: 1001, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-                  <div style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 16, width: "100%", maxWidth: 380, padding: 24, position: "relative" }}>
-                    <button onClick={() => setShowShortcutModal(false)} style={{ position: "absolute", top: 12, right: 12, background: "none", border: "none", color: "#475569", fontSize: 20, cursor: "pointer" }}>✕</button>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0", marginBottom: 4, letterSpacing: 2, fontFamily: "'DM Mono',monospace" }}>⚡ SYNC STEPS</div>
-                    <div style={{ fontSize: 11, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 16 }}>Auto-fill today's steps from Apple Watch, Fitness, or Health app</div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
-                      {[
-                        { num: "1", text: "Tap Install Shortcut below and add it to your Shortcuts app" },
-                        { num: "2", text: "When prompted, tap Allow Access to Health" },
-                        { num: "3", text: "Each day, tap the shortcut — it reads your steps and opens the app with them pre-filled" },
-                      ].map(({ num, text }) => (
-                        <div key={num} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                          <div style={{ background: "#1e2d40", color: "#60a5fa", fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{num}</div>
-                          <div style={{ fontSize: 11, color: "#94a3b8", fontFamily: "'DM Mono',monospace", lineHeight: 1.6 }}>{text}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <a href="https://www.icloud.com/shortcuts/570d154538e648c3bbccac6f7fc3328a"
-                      style={{ display: "block", background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", padding: "12px", borderRadius: 10, fontSize: 12, fontWeight: 700, textAlign: "center", textDecoration: "none", letterSpacing: 1, marginBottom: 10 }}>
-                      📲 INSTALL SHORTCUT
-                    </a>
-                    <div style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Works with Apple Watch, Fitness app, and Health app</div>
-                  </div>
                 </div>
               )}
             {(() => { const d = getDaysSinceLastProgress(progressEntries); return (d === null || d >= PROGRESS_INTERVAL_DAYS) ? (
@@ -2113,8 +2098,8 @@ export default function App() {
                 </div>
               )}
               <div className="section-title" style={{ marginBottom: 10, fontSize: 9 }}>Today's Log</div>
-              <button onClick={() => setShowShortcutModal(true)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
-              <button onClick={() => setShowShortcutModal(true)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
+              <button onClick={() => { const url = personalShortcutUrl || "https://www.icloud.com/shortcuts/570d154538e648c3bbccac6f7fc3328a"; window.location.href = url; }} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
+              <button onClick={() => { const url = personalShortcutUrl || "https://www.icloud.com/shortcuts/570d154538e648c3bbccac6f7fc3328a"; window.location.href = url; }} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
               {today ? (
                 <>
                   <div className="today-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
