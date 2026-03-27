@@ -3831,17 +3831,26 @@ export default function App() {
 
           // Bar chart helper
         const SummaryBar = ({ data, color, unit, goal }) => {
+          const [activeIdx, setActiveIdx] = useState(null);
           if (!data || !data.length) return <div style={{ color: "#334155", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "12px 0" }}>No data for this period</div>;
           const max = Math.max(...data.map(d => d.val || 0), goal || 1);
           return (
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 80, marginTop: 8 }}>
-              {data.map((d, i) => (
-                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                  <div style={{ width: "100%", background: d.val ? color : "#131929", borderRadius: "3px 3px 0 0", height: d.val ? `${Math.max(4, Math.round((d.val/max)*72))}px` : "4px" }}
-                    title={d.val ? `${d.val}${unit}` : "No data"} />
-                  {data.length <= 14 && <div style={{ fontSize: 7, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{d.label}</div>}
+            <div style={{ position: "relative" }}>
+              {activeIdx !== null && data[activeIdx] && (
+                <div style={{ position: "absolute", top: -28, left: `${(activeIdx / data.length) * 100}%`, transform: "translateX(-50%)", background: "#1e2d40", color: "#e2e8f0", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "3px 8px", borderRadius: 5, whiteSpace: "nowrap", zIndex: 10, border: "1px solid #334155" }}>
+                  {data[activeIdx].label}: {data[activeIdx].val ? `${data[activeIdx].val.toLocaleString()}${unit}` : "No data"}
                 </div>
-              ))}
+              )}
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 80, marginTop: 8 }}>
+                {data.map((d, i) => (
+                  <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}
+                    onTouchStart={() => setActiveIdx(i)} onTouchEnd={() => setTimeout(() => setActiveIdx(null), 1500)}
+                    onMouseEnter={() => setActiveIdx(i)} onMouseLeave={() => setActiveIdx(null)}>
+                    <div style={{ width: "100%", background: d.val ? (activeIdx === i ? "#fff" : color) : "#131929", borderRadius: "3px 3px 0 0", height: d.val ? `${Math.max(4, Math.round((d.val/max)*72))}px` : "4px", transition: "all 0.15s" }} />
+                    {data.length <= 14 && <div style={{ fontSize: 7, color: activeIdx === i ? "#e2e8f0" : "#334155", fontFamily: "'DM Mono',monospace" }}>{d.label}</div>}
+                  </div>
+                ))}
+              </div>
             </div>
           );
         };
