@@ -3577,9 +3577,9 @@ export default function App() {
                         const pr = getPRForExercise(name);
                         const allSessions = workouts.filter(w => w.exercises.some(e => e.name.toLowerCase() === name));
                         return pr > 0 ? (
-                          <div key={name} style={{ background: "#0f1623", border: "1px solid #131929", borderRadius: 6, padding: 12 }}>
-                            <div style={{ color: "#64748b", fontSize: 10, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{name}</div>
-                            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 26, color: "#fbbf24", lineHeight: 1 }}>{pr}<span style={{ fontSize: 13, color: "#475569" }}> lb</span></div>
+                          <div key={name} style={{ background: "#0f1623", border: "1px solid #131929", borderRadius: 6, padding: 8 }}>
+                            <div style={{ color: "#64748b", fontSize: 8, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4, height: 24, overflow: "hidden", lineHeight: 1.3 }}>{name}</div>
+                            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: "#fbbf24", lineHeight: 1 }}>{pr}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div>
                             <div style={{ color: "#334155", fontSize: 10, marginTop: 3 }}>{allSessions.length} session{allSessions.length !== 1 ? "s" : ""}</div>
                           </div>
                         ) : null;
