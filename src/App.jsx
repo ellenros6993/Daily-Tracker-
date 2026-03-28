@@ -214,9 +214,9 @@ function buildWeekStats(weekLogs) {
   const startW = weighIns.length ? parseFloat(weighIns[0].weight) : null;
   const endW = weighIns.length ? parseFloat(weighIns[weighIns.length - 1].weight) : null;
   const weekLoss = startW && endW ? (startW - endW).toFixed(1) : null;
-  const bestDay = weekLogs.length ? weekLogs.reduce((b, l) => (l.score || 0) > (b.score || 0) ? l : b, weekLogs[0]) : null;
-  const worstDay = weekLogs.length ? weekLogs.reduce((b, l) => (l.score || 0) < (b.score || 0) ? l : b, weekLogs[0]) : null;
-  const totalScore = weekLogs.reduce((s, l) => s + (l.score || 0), 0);
+  const bestDay = weekLogs.length ? weekLogs.reduce((b, l) => calcScore(l) > calcScore(b) ? l : b, weekLogs[0]) : null;
+  const worstDay = weekLogs.length ? weekLogs.reduce((b, l) => calcScore(l) < calcScore(b) ? l : b, weekLogs[0]) : null;
+  const totalScore = weekLogs.reduce((s, l) => s + calcScore(l), 0);
   // Smart max with max 2 rest days cap
   let restCount = 0;
   const maxPossible = weekLogs.reduce((s, l) => {
@@ -1558,7 +1558,7 @@ export default function App() {
   const latestWeight = [...logs].reverse().find(l => l.weight && parseFloat(l.weight) > 0);
   const projected = getProjectedWeight(logs);
   const daysLeft = getDeadlineDays();
-  const totalScore = logs.reduce((s, l) => s + (l.score || 0), 0);
+  const totalScore = logs.reduce((s, l) => s + calcScore(l, workouts), 0);
   // Smart max with 2 rest days cap applied per week
   const maxScore = (() => {
     const byWeek = {};
