@@ -2534,23 +2534,23 @@ export default function App() {
               <div className="stat-card fade-up-4" style={{ padding: "12px 12px", flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
                   <Droplets size={14} style={{ color: "#60a5fa" }} />
-                  <div style={{ fontSize: 12, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Water</div>
+                  <div style={{ fontSize: 12, fontWeight: 600 }}>Water</div>
                 </div>
                 <div style={{ display: "flex", gap: 3, marginBottom: 5 }}>
                   {WATER_UNITS.map(u => (
                     <button key={u.id} onClick={() => { setWaterUnit(u.id); localStorage.setItem("dat-water-unit", u.id); }}
-                      style={{ flex: 1, background: waterUnit === u.id ? "#1d4ed8" : "#0f1623", border: `1px solid ${waterUnit === u.id ? "#3b82f6" : "#1e2d40"}`, color: waterUnit === u.id ? "#fff" : "#475569", padding: "2px 1px", borderRadius: 5, fontSize: 9, cursor: "pointer", fontFamily: "'DM Mono',monospace" }}>
+                      style={{ flex: 1, background: waterUnit === u.id ? "#1d4ed8" : "#0f1623", border: "1px solid " + (waterUnit === u.id ? "#3b82f6" : "#1e2d40"), color: waterUnit === u.id ? "#fff" : "#475569", padding: "2px 1px", borderRadius: 5, fontSize: 9, cursor: "pointer" }}>
                       {u.label}
                     </button>
                   ))}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 3, marginBottom: 8 }}>
-                  <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>GOAL:</span>
+                  <span style={{ fontSize: 9, color: "#475569" }}>GOAL:</span>
                   {WATER_UNITS.map(u => (
                     <button key={u.id} onClick={() => saveWaterGoalMl(waterGoalMlState - u.ml)}
                       style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 16, height: 16, borderRadius: 4, cursor: "pointer", fontSize: 10, alignItems: "center", justifyContent: "center" }}>{"-"}</button>
                   ))}
-                  <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: "#60a5fa" }}>{waterGoalDisplay()}<span style={{ fontSize: 8, color: "#334155" }}>{WATER_UNITS.find(u => u.id === waterUnit)?.label}</span></span>
+                  <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: "#60a5fa" }}>{waterGoalDisplay()}</span>
                   {WATER_UNITS.map(u => (
                     <button key={u.id} onClick={() => saveWaterGoalMl(waterGoalMlState + u.ml)}
                       style={{ display: waterUnit === u.id ? "flex" : "none", background: "#0f1623", border: "1px solid #1e2d40", color: "#475569", width: 16, height: 16, borderRadius: 4, cursor: "pointer", fontSize: 10, alignItems: "center", justifyContent: "center" }}>{"+"}</button>
@@ -2563,22 +2563,21 @@ export default function App() {
                   return (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
                       <div onClick={addWater} style={{ cursor: "pointer", width: 48, height: 80, border: "2px solid #1e3a5f", borderRadius: "4px 4px 6px 6px", overflow: "hidden", position: "relative", background: "#07080d" }}>
-                        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: `${fillPct}%`, background: done ? "linear-gradient(180deg,#3b82f6,#1d4ed8)" : "linear-gradient(180deg,#2563eb,#1e3a5f)", transition: "height 0.5s ease", borderRadius: "0 0 4px 4px" }} />
-                        {done && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#93c5fd", fontSize: 18, fontWeight: 700 }}>✓</div>}
-                        {!done && fillPct > 15 && <div style={{ position: "absolute", bottom: `${fillPct - 8}%`, left: 0, right: 0, height: 2, background: "#60a5fa44", transition: "bottom 0.5s ease" }} />}
+                        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: fillPct + "%", background: done ? "linear-gradient(180deg,#3b82f6,#1d4ed8)" : "linear-gradient(180deg,#2563eb,#1e3a5f)", transition: "height 0.5s ease", borderRadius: "0 0 4px 4px" }} />
+                        {done && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#93c5fd", fontSize: 18 }}>{"\u2713"}</div>}
                       </div>
                       <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "#60a5fa", lineHeight: 1 }}>
-                        {waterDisplayVal()}<span style={{ fontSize: 9, color: "#475569" }}>/{waterGoalDisplay()}{WATER_UNITS.find(u => u.id === waterUnit)?.label}</span>
+                        {waterDisplayVal()}<span style={{ fontSize: 9, color: "#475569" }}>/{waterGoalDisplay()}{(WATER_UNITS.find(u => u.id === waterUnit) || {}).label}</span>
                       </div>
                       <div style={{ display: "flex", gap: 6 }}>
-                        <button onClick={removeWater} style={{ background: "#0f1623", border: "1px solid #1e2d40", color: "#60a5fa", padding: "3px 14px", borderRadius: 6, cursor: "pointer", fontSize: 14 }}>−</button>
-                        <button onClick={addWater} style={{ background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", border: "none", color: "#fff", padding: "3px 8px", borderRadius: 6, cursor: "pointer", fontSize: 10, fontWeight: 700 }}>+{WATER_UNITS.find(u => u.id === waterUnit)?.label}</button>
+                        <button onClick={removeWater} style={{ background: "#0f1623", border: "1px solid #1e2d40", color: "#60a5fa", padding: "3px 14px", borderRadius: 6, cursor: "pointer", fontSize: 14 }}>{"-"}</button>
+                        <button onClick={addWater} style={{ background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", border: "none", color: "#fff", padding: "3px 8px", borderRadius: 6, cursor: "pointer", fontSize: 10, fontWeight: 700 }}>{"+"}{(WATER_UNITS.find(u => u.id === waterUnit) || {}).label}</button>
                       </div>
                     </div>
                   );
                 })()}
               </div>
-              </div>
+
 
               {/* Sleep Tracker */}
               {(() => {
@@ -2626,7 +2625,7 @@ export default function App() {
                 );
               })()}
             </div>
-            <div className="stat-card" style={{ padding: 0, overflow: "hidden" }}>
+              <div className="stat-card" style={{ padding: 0, overflow: "hidden" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer" }} onClick={() => setShowManualMacros(v => !v)}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 14 }}>✏️</span>
