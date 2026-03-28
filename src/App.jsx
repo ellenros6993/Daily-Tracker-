@@ -3380,10 +3380,10 @@ export default function App() {
                           position: "absolute", right: -18, top: isSupStart ? 16 : 0,
                           bottom: isSupEnd ? 16 : 0,
                           width: 12,
-                          borderLeft: "2px solid #60a5fa",
+                          borderRight: "2px solid #60a5fa",
                           borderTop: isSupStart ? "2px solid #60a5fa" : "none",
                           borderBottom: isSupEnd ? "2px solid #60a5fa" : "none",
-                          borderRadius: isSupStart ? "4px 0 0 0" : isSupEnd ? "0 0 0 4px" : "0",
+                          borderRadius: isSupStart ? "0 4px 0 0" : isSupEnd ? "0 0 4px 0" : "0",
                         }} />
                       )}
                       {isSupStart && (
