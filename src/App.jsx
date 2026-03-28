@@ -3418,7 +3418,7 @@ export default function App() {
                                 fontSize: 9, padding: "3px 7px", borderRadius: 3, letterSpacing: 1, cursor: "pointer", flexShrink: 0
                               }}
                             >
-                              {ex.supersetWith ? "SS ✓" : "SS"}
+                              {ex.supersetWith ? "Superset ✓" : "Superset"}
                             </button>
                           )}
                           <button onClick={() => removeExercise(ex.id)} style={{ background: "none", border: "none", color: "#f87171", fontSize: 16, padding: "0 4px" }}>✕</button>
@@ -3653,7 +3653,7 @@ export default function App() {
                                     {isNewPR && <span style={{ background: "#1a1400", border: "1px solid #fbbf24", color: "#fbbf24", fontSize: 9, padding: "1px 6px", borderRadius: 3, letterSpacing: 1 }}>🏆 PR</span>}
                                   </div>
                                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
-                                    {ex.supersetWith && <span style={{ background: "#046c4e22", color: "#60a5fa", fontSize: 9, padding: "1px 6px", borderRadius: 3, letterSpacing: 1 }}>SS</span>}
+                                    {ex.supersetWith && <span style={{ background: "#046c4e22", color: "#60a5fa", fontSize: 9, padding: "1px 6px", borderRadius: 3, letterSpacing: 1 }}>Superset</span>}
                                     {ex.sets.map((s, si) => (
                                       <span key={si} className="chip" style={{ color: "#e2e8f0" }}>
                                         {s.reps && s.weight ? `${s.reps} × ${s.weight}lb` : s.reps ? `${s.reps} reps` : `${s.weight}lb`}
