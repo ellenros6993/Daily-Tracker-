@@ -1865,11 +1865,13 @@ export default function App() {
               {darkMode ? <Sun size={13} /> : <Moon size={13} />}
             </button>
             {isSunday() && <div className="status-pill" style={{ borderColor: "#065f3a55", color: "#34d399" }}><span>📊</span>Report Day</div>}
-            <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 20, padding: "3px 6px" }}>
-              <button onClick={() => { const d = new Date(viewedDate + "T12:00:00"); d.setDate(d.getDate()-1); setViewedDate(getLocalDateStr(d)); }} style={{ background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 14, padding: "0 2px", lineHeight: 1 }}>‹</button>
-              <span className="status-dot" style={{ background: viewedDate === getLocalDateStr() ? "#10b981" : "#fbbf24" }} />
-              <span onClick={() => setViewedDate(getLocalDateStr())} style={{ fontSize: 11, color: viewedDate === getLocalDateStr() ? "#e2e8f0" : "#fbbf24", cursor: "pointer", fontFamily: "'DM Mono',monospace" }}>{viewedDate}</span>
-              <button onClick={() => { const d = new Date(viewedDate + "T12:00:00"); d.setDate(d.getDate()+1); const nxt = getLocalDateStr(d); if (nxt <= getLocalDateStr()) setViewedDate(nxt); }} style={{ background: "none", border: "none", color: viewedDate === getLocalDateStr() ? "#334155" : "#475569", cursor: viewedDate === getLocalDateStr() ? "default" : "pointer", fontSize: 14, padding: "0 2px", lineHeight: 1 }}>›</button>
+            <div style={{ position: "relative" }}>
+              <div style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 20, padding: "3px 10px", display: "flex", alignItems: "center", gap: 5, cursor: "pointer" }} onClick={() => document.getElementById('hdr-date').focus()}>
+                <span className="status-dot" style={{ background: viewedDate === getLocalDateStr() ? "#10b981" : "#fbbf24", flexShrink: 0 }} />
+                <span style={{ fontSize: 11, color: viewedDate === getLocalDateStr() ? "#e2e8f0" : "#fbbf24", fontFamily: "'DM Mono',monospace", whiteSpace: "nowrap" }}>{viewedDate}</span>
+              </div>
+              <input id="hdr-date" type="date" value={viewedDate} max={getLocalDateStr()} onChange={e => e.target.value && setViewedDate(e.target.value)}
+                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer", fontSize: 0 }} />
             </div>
           </div>
         </div>
