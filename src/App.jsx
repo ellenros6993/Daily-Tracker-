@@ -2538,7 +2538,7 @@ export default function App() {
                 </div>
                 <div style={{ display: "flex", gap: 3, marginBottom: 5 }}>
                   {WATER_UNITS.map(u => (
-                    <button key={u.id} onClick={() => { setWaterUnit(u.id); localStorage.setItem("dat-water-unit", u.id); }}
+                    <button key={u.id} onClick={() => { const curMl = waterTotalMl(); const newUnitMl = u.ml; const newCount = Math.round(curMl / newUnitMl); setWaterUnit(u.id); setWaterCups(newCount); const all = JSON.parse(localStorage.getItem("dat-water") || "{}"); all[getLocalDateStr()] = newCount; localStorage.setItem("dat-water", JSON.stringify(all)); localStorage.setItem("dat-water-unit", u.id); }}
                       style={{ flex: 1, background: waterUnit === u.id ? "#1d4ed8" : "#0f1623", border: "1px solid " + (waterUnit === u.id ? "#3b82f6" : "#1e2d40"), color: waterUnit === u.id ? "#fff" : "#475569", padding: "2px 1px", borderRadius: 5, fontSize: 9, cursor: "pointer" }}>
                       {u.label}
                     </button>
