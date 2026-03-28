@@ -2065,7 +2065,7 @@ export default function App() {
                         const score = l ? calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) : -1;
                         return { ds, score };
                       });
-                      const color = (s) => s < 0 ? "#0f1623" : s === 0 ? "#131929" : s === 1 ? "#3b1f6b" : s === 2 ? "#5b2d8e" : s === 3 ? "#8b3fc8" : "#a855f7";
+                      const color = (s) => s < 0 ? "#0f1623" : s === 0 ? "#2d1f4e" : s === 1 ? "#3b1f6b" : s === 2 ? "#5b2d8e" : s === 3 ? "#8b3fc8" : "#a855f7";
                       return (
                         <div style={{ marginTop: 10 }}>
                           <div style={{ display: "grid", gridTemplateColumns: "repeat(14, 1fr)", gap: 2 }}>
