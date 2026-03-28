@@ -1871,8 +1871,6 @@ export default function App() {
               <span onClick={() => setViewedDate(getLocalDateStr())} style={{ cursor: "pointer", fontSize: 11, color: viewedDate === getLocalDateStr() ? "#e2e8f0" : "#fbbf24" }} title="Click to return to today">{viewedDate}</span>
               <button onClick={() => { const d = new Date(viewedDate + "T12:00:00"); d.setDate(d.getDate()+1); const next = getLocalDateStr(d); if (next <= getLocalDateStr()) setViewedDate(next); }} style={{ background: "none", border: "none", color: viewedDate === getLocalDateStr() ? "#334155" : "#475569", cursor: viewedDate === getLocalDateStr() ? "default" : "pointer", fontSize: 12, padding: "0 2px", lineHeight: 1 }}>›</button>
             </div>
-                style={{ position: "absolute", opacity: 0, width: 1, height: 1, top: 0, left: 0, pointerEvents: "none" }} />
-            </div>
           </div>
         </div>
         {isPulling && <div className="pull-indicator"><RefreshCw size={14} style={{ display: "inline", marginRight: 6, animation: "spin 1s linear infinite" }} />Release to refresh</div>}
