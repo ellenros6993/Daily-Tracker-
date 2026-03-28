@@ -164,14 +164,6 @@ function calcScore(row, wkts, goals) {
   if (hasTrain) s++;
   return s;
 }
-  let s = 0;
-  if (row.calories && parseInt(row.calories) >= CALORIES_MIN && parseInt(row.calories) <= CALORIES_MAX) s++;
-  if (row.protein && parseInt(row.protein) >= PROTEIN_MIN) s++;
-  if (row.steps && parseInt(row.steps) >= STEPS_MIN) s++;
-  const hasTrain = (row.training && row.training.trim() !== "") || (wkts && wkts.some(w => w.date === row.date));
-  if (hasTrain) s++;
-  return s;
-}
 function getProjectedWeight(logs) {
   const weighIns = logs.filter(l => l.weight && parseFloat(l.weight) > 0);
   if (weighIns.length < 2) return null;
