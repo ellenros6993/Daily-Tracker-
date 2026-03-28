@@ -1055,6 +1055,7 @@ export default function App() {
   const [workoutSaved, setWorkoutSaved] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [showShortcutModal, setShowShortcutModal] = useState(false);
+  const [viewedDate, setViewedDate] = useState(getLocalDateStr());
   const [showManualSteps, setShowManualSteps] = useState(false);
   const [manualStepsInput, setManualStepsInput] = useState("");
   const [showCircuitTimer, setShowCircuitTimer] = useState(false);
@@ -1552,7 +1553,7 @@ export default function App() {
     URL.revokeObjectURL(url);
   }
 
-  const today = logs.find(l => l.date === getLocalDateStr());
+  const today = logs.find(l => l.date === viewedDate);
   const latestWeight = [...logs].reverse().find(l => l.weight && parseFloat(l.weight) > 0);
   const projected = getProjectedWeight(logs);
   const daysLeft = getDeadlineDays();
@@ -1864,7 +1865,12 @@ export default function App() {
               {darkMode ? <Sun size={13} /> : <Moon size={13} />}
             </button>
             {isSunday() && <div className="status-pill" style={{ borderColor: "#065f3a55", color: "#34d399" }}><span>📊</span>Report Day</div>}
-            <div className="status-pill"><span className="status-dot" />{getLocalDateStr()}</div>
+            <div className="status-pill" style={{ cursor: "pointer", position: "relative" }}>
+              <span className="status-dot" />
+              <span onClick={() => document.getElementById('header-date-pick').showPicker()} style={{ cursor: "pointer" }}>{viewedDate}</span>
+              <input id="header-date-pick" type="date" value={viewedDate} onChange={e => setViewedDate(e.target.value || getLocalDateStr())}
+                style={{ position: "absolute", opacity: 0, width: 1, height: 1, top: 0, left: 0, pointerEvents: "none" }} />
+            </div>
           </div>
         </div>
         {isPulling && <div className="pull-indicator"><RefreshCw size={14} style={{ display: "inline", marginRight: 6, animation: "spin 1s linear infinite" }} />Release to refresh</div>}
