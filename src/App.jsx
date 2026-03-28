@@ -151,7 +151,15 @@ function getDaysBetween(a, b) {
 function getDeadlineDays() {
   return getDaysBetween(getLocalDateStr(), DEADLINE);
 }
-function calcScore(row) {
+function calcScore(row, wkts) {
+  let s = 0;
+  if (row.calories && parseInt(row.calories) >= CALORIES_MIN && parseInt(row.calories) <= CALORIES_MAX) s++;
+  if (row.protein && parseInt(row.protein) >= PROTEIN_MIN) s++;
+  if (row.steps && parseInt(row.steps) >= STEPS_MIN) s++;
+  const hasTrain = (row.training && row.training.trim() !== "") || (wkts && wkts.some(w => w.date === row.date));
+  if (hasTrain) s++;
+  return s;
+}
   let s = 0;
   if (row.calories && parseInt(row.calories) >= CALORIES_MIN && parseInt(row.calories) <= CALORIES_MAX) s++;
   if (row.protein && parseInt(row.protein) >= PROTEIN_MIN) s++;
@@ -2143,11 +2151,11 @@ export default function App() {
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ color: "#334155", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>Score</span>
                       {Array.from({ length: 4 }, (_, i) => (
-                        <div key={i} style={{ width: 16, height: 16, borderRadius: 3, background: i < calcScore(today) ? "linear-gradient(135deg,#059669,#10b981)" : "#131929", border: `1px solid ${i < calcScore(today) ? "#10b98155" : "#1e2d40"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          {i < calcScore(today) && <span style={{ color: "#fff", fontSize: 8 }}>✓</span>}
+                        <div key={i} style={{ width: 16, height: 16, borderRadius: 3, background: i < calcScore(today, workouts) ? "linear-gradient(135deg,#059669,#10b981)" : "#131929", border: `1px solid ${i < calcScore(today, workouts) ? "#10b98155" : "#1e2d40"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          {i < calcScore(today, workouts) && <span style={{ color: "#fff", fontSize: 8 }}>✓</span>}
                         </div>
                       ))}
-                      <span style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>{calcScore(today)}/4</span>
+                      <span style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>{calcScore(today, workouts)}/4</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       {!today.steps && <button onClick={() => setShowShortcutModal(true)} style={{ background: "none", border: "none", color: "#60a5fa", fontSize: 10, display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }}>⚡ Sync Steps</button>}
