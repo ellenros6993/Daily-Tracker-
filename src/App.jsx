@@ -2558,25 +2558,21 @@ export default function App() {
                 </div>
                 {(() => {
                   const pct = Math.min(1, waterTotalMl() / waterGoalMlState);
-                  const glassH = 80; const glassW = 50;
-                  const fillH = Math.round(pct * (glassH - 10));
-                  const fillY = glassH - 5 - fillH;
                   const done = pct >= 1;
+                  const fillPct = Math.round(pct * 100);
                   return (
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
-                      <svg width={glassW} height={glassH + 8} viewBox={`0 0 ${glassW} ${glassH + 8}`} onClick={addWater} style={{ cursor: "pointer" }}>
-                        <path d={`M7,3 L3,${glassH} L${glassW-3},${glassH} L${glassW-7},3 Z`} fill="none" stroke="#1e2d40" strokeWidth="2" strokeLinejoin="round"/>
-                        <defs><clipPath id="wc"><path d={`M8,4 L4,${glassH-1} L${glassW-4},${glassH-1} L${glassW-8},4 Z`}/></clipPath></defs>
-                        <rect x="0" y={fillY} width={glassW} height={fillH + 10} fill={done ? "#2563eb" : "#1d4ed8"} clipPath="url(#wc)" style={{ transition: "y 0.5s ease, height 0.5s ease, fill 0.3s" }}/>
-                        {done && <text x={glassW/2} y={glassH/2+5} textAnchor="middle" fill="#93c5fd" fontSize="14" fontWeight="bold">✓</text>}
-                        {!done && fillH > 5 && <rect x="0" y={fillY} width={glassW} height="3" fill="#3b82f699" clipPath="url(#wc)" style={{ transition: "y 0.5s ease" }}/>}
-                      </svg>
-                      <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: done ? "#60a5fa" : "#60a5fa", lineHeight: 1 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                      <div onClick={addWater} style={{ cursor: "pointer", width: 48, height: 80, border: "2px solid #1e3a5f", borderRadius: "4px 4px 6px 6px", overflow: "hidden", position: "relative", background: "#07080d" }}>
+                        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: `${fillPct}%`, background: done ? "linear-gradient(180deg,#3b82f6,#1d4ed8)" : "linear-gradient(180deg,#2563eb,#1e3a5f)", transition: "height 0.5s ease", borderRadius: "0 0 4px 4px" }} />
+                        {done && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#93c5fd", fontSize: 18, fontWeight: 700 }}>✓</div>}
+                        {!done && fillPct > 15 && <div style={{ position: "absolute", bottom: `${fillPct - 8}%`, left: 0, right: 0, height: 2, background: "#60a5fa44", transition: "bottom 0.5s ease" }} />}
+                      </div>
+                      <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "#60a5fa", lineHeight: 1 }}>
                         {waterDisplayVal()}<span style={{ fontSize: 9, color: "#475569" }}>/{waterGoalDisplay()}{WATER_UNITS.find(u => u.id === waterUnit)?.label}</span>
                       </div>
                       <div style={{ display: "flex", gap: 6 }}>
                         <button onClick={removeWater} style={{ background: "#0f1623", border: "1px solid #1e2d40", color: "#60a5fa", padding: "3px 14px", borderRadius: 6, cursor: "pointer", fontSize: 14 }}>−</button>
-                        <button onClick={addWater} style={{ background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", border: "none", color: "#fff", padding: "3px 10px", borderRadius: 6, cursor: "pointer", fontSize: 10, fontWeight: 700 }}>+{WATER_UNITS.find(u => u.id === waterUnit)?.label}</button>
+                        <button onClick={addWater} style={{ background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", border: "none", color: "#fff", padding: "3px 8px", borderRadius: 6, cursor: "pointer", fontSize: 10, fontWeight: 700 }}>+{WATER_UNITS.find(u => u.id === waterUnit)?.label}</button>
                       </div>
                     </div>
                   );
