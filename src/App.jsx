@@ -1055,6 +1055,8 @@ export default function App() {
   const [workoutSaved, setWorkoutSaved] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [showShortcutModal, setShowShortcutModal] = useState(false);
+  const [showManualSteps, setShowManualSteps] = useState(false);
+  const [manualStepsInput, setManualStepsInput] = useState("");
   const [showCircuitTimer, setShowCircuitTimer] = useState(false);
   const [summaryPeriod, setSummaryPeriod] = useState("7");
   const [showPlateCalc, setShowPlateCalc] = useState(false);
@@ -2092,7 +2094,22 @@ export default function App() {
                 </div>
               )}
               <div className="section-title" style={{ marginBottom: 10, fontSize: 9 }}>Today's Log</div>
-              <button onClick={() => setShowShortcutModal(true)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", marginBottom: 8, width: "100%", justifyContent: "center" }}>⚡ Sync Steps from Apple Health</button>
+              <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+                <button onClick={() => setShowShortcutModal(true)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer" }}>⚡ Sync Steps</button>
+                <button onClick={() => setShowManualSteps(v => !v)} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", whiteSpace: "nowrap" }}>✏️ Manual</button>
+              </div>
+              {showManualSteps && (
+                <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+                  <input type="number" placeholder="Enter steps..." value={manualStepsInput} onChange={e => setManualStepsInput(e.target.value)}
+                    style={{ flex: 1, fontSize: 13, padding: "6px 10px" }} />
+                  <button onClick={() => {
+                    if (!manualStepsInput) return;
+                    const today = getLocalDateStr();
+                    setLogs(ls => { const existing = ls.find(l => l.date === today); if (existing) { return ls.map(l => l.date === today ? { ...l, steps: manualStepsInput } : l); } return [...ls, { date: today, steps: manualStepsInput, calories: "", protein: "", training: "", weight: "", bodyFat: "", muscleMass: "", visceralFat: "" }]; });
+                    setManualStepsInput(""); setShowManualSteps(false); haptic("light");
+                  }} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", fontSize: 11, fontWeight: 700, padding: "6px 14px", borderRadius: 6, cursor: "pointer" }}>SAVE</button>
+                </div>
+              )}
               {today ? (
                 <>
                   <div className="today-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
