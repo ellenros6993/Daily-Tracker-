@@ -151,7 +151,19 @@ function getDaysBetween(a, b) {
 function getDeadlineDays() {
   return getDaysBetween(getLocalDateStr(), DEADLINE);
 }
-function calcScore(row, wkts) {
+function calcScore(row, wkts, goals) {
+  const cMin = (goals && goals.cMin) || CALORIES_MIN;
+  const cMax = (goals && goals.cMax) || CALORIES_MAX;
+  const pMin = (goals && goals.pMin) || PROTEIN_MIN;
+  const sMin = (goals && goals.sMin) || STEPS_MIN;
+  let s = 0;
+  if (row.calories && parseInt(row.calories) >= cMin && parseInt(row.calories) <= cMax) s++;
+  if (row.protein && parseInt(row.protein) >= pMin) s++;
+  if (row.steps && parseInt(row.steps) >= sMin) s++;
+  const hasTrain = (row.training && row.training.trim() !== "") || (wkts && wkts.some(w => w.date === row.date));
+  if (hasTrain) s++;
+  return s;
+}
   let s = 0;
   if (row.calories && parseInt(row.calories) >= CALORIES_MIN && parseInt(row.calories) <= CALORIES_MAX) s++;
   if (row.protein && parseInt(row.protein) >= PROTEIN_MIN) s++;
@@ -683,7 +695,7 @@ export default function App() {
       const existing = idx >= 0 ? prevLogs[idx] : { date: nutritionDate };
       // Only update calories and protein — preserve everything else (steps, weight, training etc)
       const updated = { ...existing, calories: String(totals.calories), protein: String(totals.protein) };
-      updated.score = calcScore(updated);
+      updated.score = calcScore(updated, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN});
       if (idx >= 0) return prevLogs.map((l, i) => i === idx ? updated : l);
       return [...prevLogs, updated].sort((a, b) => a.date.localeCompare(b.date));
     });
@@ -1178,7 +1190,7 @@ export default function App() {
     const lw = latestWeight ? latestWeight.weight : "?";
     const lost = lostSoFar > 0 ? lostSoFar : 0;
     const streak = getLoggingStreak(logs);
-    const todayScore = today ? calcScore(today) : 0;
+    const todayScore = today ? calcScore(today, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) : 0;
     const text = `📊 Daily Accountability Tracker\n⚖️ Weight: ${lw} lb (${lost} lb lost)\n🔥 Streak: ${streak} days\n✅ Today: ${todayScore}/4\n🎯 Goal: 160 lb by Aug 23`;
     if (navigator.share) {
       navigator.share({ text }).catch(() => {});
@@ -1271,7 +1283,7 @@ export default function App() {
       if (now.getHours() === 20 && now.getMinutes() === 0) {
         const todayStr = getLocalDateStr();
         const todayLog = logs.find(l => l.date === todayStr);
-        if (!todayLog || calcScore(todayLog) < 4) {
+        if (!todayLog || calcScore(todayLog, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) < 4) {
           new Notification("Daily Accountability Tracker", { body: "Don't forget to log today! 💪", icon: "/favicon.ico" });
         }
       }
@@ -1527,7 +1539,7 @@ export default function App() {
 
   function saveLog() {
     const idx = logs.findIndex(l => l.date === form.date);
-    const newLog = { ...form, score: calcScore(form) };
+    const newLog = { ...form, score: calcScore(form, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) };
     const newLogs = idx >= 0
       ? logs.map((l, i) => i === idx ? newLog : l)
       : [...logs, newLog].sort((a, b) => a.date.localeCompare(b.date));
@@ -1558,7 +1570,7 @@ export default function App() {
   const latestWeight = [...logs].reverse().find(l => l.weight && parseFloat(l.weight) > 0);
   const projected = getProjectedWeight(logs);
   const daysLeft = getDeadlineDays();
-  const totalScore = logs.reduce((s, l) => s + calcScore(l, workouts), 0);
+  const totalScore = logs.reduce((s, l) => s + calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}), 0);
   // Smart max with 2 rest days cap applied per week
   const maxScore = (() => {
     const byWeek = {};
@@ -1846,7 +1858,7 @@ export default function App() {
           <div className="topbar-status" style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {/* Score ring — always visible */}
             {(() => {
-              const score = today ? calcScore(today, workouts) : (workouts.find(w => w.date === viewedDate) ? calcScore({date: viewedDate}, workouts) : 0);
+              const score = today ? calcScore(today, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) : (workouts.find(w => w.date === viewedDate) ? calcScore({date: viewedDate}, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) : 0);
               const R = 10, CIRC = 2 * Math.PI * R;
               const dash = (score / 4) * CIRC;
               const col = score === 4 ? "#10b981" : score === 3 ? "#34d399" : score === 2 ? "#fbbf24" : score === 1 ? "#f97316" : "#1e2d40";
@@ -1991,7 +2003,7 @@ export default function App() {
                     const isRest = !trained && restDaysUsed < 2;
                     if (!trained) restDaysUsed++;
                     const possible = isRest ? 3 : 4;
-                    return { hitGoals: acc.hitGoals + calcScore(l), totalGoals: acc.totalGoals + possible };
+                    return { hitGoals: acc.hitGoals + calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}), totalGoals: acc.totalGoals + possible };
                   }, { hitGoals: 0, totalGoals: 0 });
                   const pct = totalGoals > 0 ? Math.round((hitGoals / totalGoals) * 100) : 0;
                   const R = 42, CIRC = 2 * Math.PI * R;
@@ -2027,7 +2039,7 @@ export default function App() {
                   // Weekly streak ring — goal: 5/7 days at any score
                   const weekStart = getCurrentWeekStart();
                   const thisWeekLogs = getWeekLogs(logs, weekStart);
-                  const weekHits = thisWeekLogs.filter(l => calcScore(l) >= 1).length;
+                  const weekHits = thisWeekLogs.filter(l => calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) >= 1).length;
                   const WEEK_GOAL = 7;
                   const ringPct = weekHits / WEEK_GOAL;
                   const R = 42, CIRC = 2 * Math.PI * R;
@@ -2058,7 +2070,7 @@ export default function App() {
                         const d = new Date(); d.setDate(d.getDate() - (27 - i));
                         const ds = getLocalDateStr(d);
                         const l = logs.find(x => x.date === ds);
-                        const score = l ? calcScore(l) : -1;
+                        const score = l ? calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) : -1;
                         return { ds, score };
                       });
                       const color = (s) => s < 0 ? "#0f1623" : s === 0 ? "#131929" : s === 1 ? "#3b1f6b" : s === 2 ? "#5b2d8e" : s === 3 ? "#8b3fc8" : "#a855f7";
@@ -2081,7 +2093,7 @@ export default function App() {
 
 
             {(() => {
-              const score = today ? calcScore(today, workouts) : (workouts.find(w => w.date === viewedDate) ? calcScore({date: viewedDate}, workouts) : 0);
+              const score = today ? calcScore(today, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) : (workouts.find(w => w.date === viewedDate) ? calcScore({date: viewedDate}, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) : 0);
               const glowClass = score === 4 ? "card-glow-4" : score === 3 ? "card-glow-3" : score === 2 ? "card-glow-2" : score === 1 ? "card-glow-1" : "";
               return (
             <div className={`stat-card fade-up-3 ${glowClass}`} style={{ padding: "12px 14px", position: "relative" }}>
@@ -2144,11 +2156,11 @@ export default function App() {
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ color: "#334155", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>Score</span>
                       {Array.from({ length: 4 }, (_, i) => (
-                        <div key={i} style={{ width: 16, height: 16, borderRadius: 3, background: i < calcScore(today, workouts) ? "linear-gradient(135deg,#059669,#10b981)" : "#131929", border: `1px solid ${i < calcScore(today, workouts) ? "#10b98155" : "#1e2d40"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          {i < calcScore(today, workouts) && <span style={{ color: "#fff", fontSize: 8 }}>✓</span>}
+                        <div key={i} style={{ width: 16, height: 16, borderRadius: 3, background: i < calcScore(today, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) ? "linear-gradient(135deg,#059669,#10b981)" : "#131929", border: `1px solid ${i < calcScore(today, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) ? "#10b98155" : "#1e2d40"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          {i < calcScore(today, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) && <span style={{ color: "#fff", fontSize: 8 }}>✓</span>}
                         </div>
                       ))}
-                      <span style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>{calcScore(today, workouts)}/4</span>
+                      <span style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>{calcScore(today, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN})}/4</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       {!today.steps && <button onClick={() => setShowShortcutModal(true)} style={{ background: "none", border: "none", color: "#60a5fa", fontSize: 10, display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }}>⚡ Sync Steps</button>}
@@ -3891,7 +3903,7 @@ export default function App() {
 
           // KPIs
           const daysWithData = periodLogs.length;
-          const goalsHit = periodLogs.filter(l => calcScore(l) === 4).length;
+          const goalsHit = periodLogs.filter(l => calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) === 4).length;
           const goalHitRate = daysWithData > 0 ? Math.round(goalsHit / daysWithData * 100) : 0;
           const sleepEntries = periodSleep.filter(([,s]) => s.hours);
           const avgSleep = sleepEntries.length > 0 ? (sleepEntries.reduce((sum,[,s]) => sum + parseFloat(s.hours), 0) / sleepEntries.length).toFixed(1) : null;
