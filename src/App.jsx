@@ -2566,7 +2566,7 @@ export default function App() {
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
                       <svg width={glassW} height={glassH + 8} viewBox={`0 0 ${glassW} ${glassH + 8}`} onClick={addWater} style={{ cursor: "pointer" }}>
                         <path d={`M7,3 L3,${glassH} L${glassW-3},${glassH} L${glassW-7},3 Z`} fill="none" stroke="#1e2d40" strokeWidth="2" strokeLinejoin="round"/>
-                        <clipPath id="wc"><path d={`M8,4 L4,${glassH-1} L${glassW-4},${glassH-1} L${glassW-8},4 Z`}/></clipPath>
+                        <defs><clipPath id="wc"><path d={`M8,4 L4,${glassH-1} L${glassW-4},${glassH-1} L${glassW-8},4 Z`}/></clipPath></defs>
                         <rect x="0" y={fillY} width={glassW} height={fillH + 10} fill={done ? "#2563eb" : "#1d4ed8"} clipPath="url(#wc)" style={{ transition: "y 0.5s ease, height 0.5s ease, fill 0.3s" }}/>
                         {done && <text x={glassW/2} y={glassH/2+5} textAnchor="middle" fill="#93c5fd" fontSize="14" fontWeight="bold">✓</text>}
                         {!done && fillH > 5 && <rect x="0" y={fillY} width={glassW} height="3" fill="#3b82f699" clipPath="url(#wc)" style={{ transition: "y 0.5s ease" }}/>}
