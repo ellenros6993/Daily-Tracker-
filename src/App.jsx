@@ -1846,7 +1846,7 @@ export default function App() {
           <div className="topbar-status" style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {/* Score ring — always visible */}
             {(() => {
-              const score = today ? calcScore(today) : 0;
+              const score = today ? calcScore(today, workouts) : (workouts.find(w => w.date === viewedDate) ? calcScore({date: viewedDate}, workouts) : 0);
               const R = 10, CIRC = 2 * Math.PI * R;
               const dash = (score / 4) * CIRC;
               const col = score === 4 ? "#10b981" : score === 3 ? "#34d399" : score === 2 ? "#fbbf24" : score === 1 ? "#f97316" : "#1e2d40";
@@ -2081,7 +2081,7 @@ export default function App() {
 
 
             {(() => {
-              const score = today ? calcScore(today) : 0;
+              const score = today ? calcScore(today, workouts) : (workouts.find(w => w.date === viewedDate) ? calcScore({date: viewedDate}, workouts) : 0);
               const glowClass = score === 4 ? "card-glow-4" : score === 3 ? "card-glow-3" : score === 2 ? "card-glow-2" : score === 1 ? "card-glow-1" : "";
               return (
             <div className={`stat-card fade-up-3 ${glowClass}`} style={{ padding: "12px 14px", position: "relative" }}>
