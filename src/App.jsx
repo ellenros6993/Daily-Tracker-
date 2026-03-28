@@ -3349,7 +3349,7 @@ export default function App() {
                 {(workoutForm.activityType || "strength") === "strength" ? (
                   <>
 
-                <div style={{ marginLeft: 20 }}>
+                <div>
                 {workoutForm.exercises.map((ex, exIdx) => {
                   const lastSession = getLastSessionForExercise(ex.name, workoutForm.date);
                   const pr = ex.name ? getPRForExercise(ex.name) : 0;
@@ -3377,7 +3377,7 @@ export default function App() {
                       {/* Superset bracket */}
                       {isInSuperset && (
                         <div style={{
-                          position: "absolute", left: -18, top: isSupStart ? 16 : 0,
+                          position: "absolute", right: -18, top: isSupStart ? 16 : 0,
                           bottom: isSupEnd ? 16 : 0,
                           width: 12,
                           borderLeft: "2px solid #60a5fa",
@@ -3387,7 +3387,7 @@ export default function App() {
                         }} />
                       )}
                       {isSupStart && (
-                        <div style={{ position: "absolute", left: -52, top: "50%", transform: "translateY(-50%)", background: "#60a5fa", color: "#000", fontSize: 9, fontFamily: "'Bebas Neue', sans-serif", letterSpacing: 1, padding: "2px 5px", borderRadius: 3 }}>
+                        <div style={{ position: "absolute", right: -52, top: "50%", transform: "translateY(-50%)", background: "#60a5fa", color: "#000", fontSize: 9, fontFamily: "'Bebas Neue', sans-serif", letterSpacing: 1, padding: "2px 5px", borderRadius: 3 }}>
                           SS{ssLetter}
                         </div>
                       )}
