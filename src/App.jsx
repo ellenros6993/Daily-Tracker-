@@ -2109,7 +2109,7 @@ export default function App() {
                       { label: "Cal", val: today.calories, check: v => parseInt(v) >= CALORIES_MIN && parseInt(v) <= CALORIES_MAX, unit: "kcal" },
                       { label: "Protein", val: today.protein, check: v => parseInt(v) >= PROTEIN_MIN, unit: "g" },
                       { label: "Steps", val: today.steps, check: v => parseInt(v) >= STEPS_MIN, unit: "steps" },
-                      { label: "Training", val: today.training, check: v => v.trim() !== "", unit: "" },
+                      { label: "Training", val: today.training || (workouts.find(w => w.date === viewedDate) ? (workouts.find(w => w.date === viewedDate).name || workouts.find(w => w.date === viewedDate).activityType || "Trained") : null), check: v => v && v.trim() !== "", unit: "" },
                     ].map(({ label, val, check, unit }) => {
                       const hit = val ? check(val) : null;
                       const isSteps = label === "Steps";
