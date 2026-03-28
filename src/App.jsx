@@ -2645,6 +2645,7 @@ export default function App() {
                 );
               })()}
             </div>
+            </div>
               <div className="stat-card" style={{ padding: 0, overflow: "hidden" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer" }} onClick={() => setShowManualMacros(v => !v)}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
