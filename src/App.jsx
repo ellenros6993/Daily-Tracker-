@@ -3093,7 +3093,7 @@ export default function App() {
               {/* Macro history + daily summary */}
               {(() => {
                 const last7 = Array.from({ length: 7 }, (_, i) => {
-                  const d = new Date(); d.setDate(d.getDate() - (13 - i));
+                  const d = new Date(); d.setDate(d.getDate() - (6 - i));
                   const ds = getLocalDateStr(d);
                   let cal = 0, pro = 0;
                   try {
