@@ -1865,11 +1865,11 @@ export default function App() {
               {darkMode ? <Sun size={13} /> : <Moon size={13} />}
             </button>
             {isSunday() && <div className="status-pill" style={{ borderColor: "#065f3a55", color: "#34d399" }}><span>📊</span>Report Day</div>}
-            <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 20, padding: "3px 6px", fontSize: 11, color: "#475569" }}>
-              <button onClick={() => { const d = new Date(viewedDate + "T12:00:00"); d.setDate(d.getDate()-1); setViewedDate(getLocalDateStr(d)); }} style={{ background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 12, padding: "0 2px", lineHeight: 1 }}>‹</button>
+            <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 20, padding: "3px 6px" }}>
+              <button onClick={() => { const d = new Date(viewedDate + "T12:00:00"); d.setDate(d.getDate()-1); setViewedDate(getLocalDateStr(d)); }} style={{ background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 14, padding: "0 2px", lineHeight: 1 }}>‹</button>
               <span className="status-dot" style={{ background: viewedDate === getLocalDateStr() ? "#10b981" : "#fbbf24" }} />
-              <span onClick={() => setViewedDate(getLocalDateStr())} style={{ cursor: "pointer", fontSize: 11, color: viewedDate === getLocalDateStr() ? "#e2e8f0" : "#fbbf24" }} title="Click to return to today">{viewedDate}</span>
-              <button onClick={() => { const d = new Date(viewedDate + "T12:00:00"); d.setDate(d.getDate()+1); const next = getLocalDateStr(d); if (next <= getLocalDateStr()) setViewedDate(next); }} style={{ background: "none", border: "none", color: viewedDate === getLocalDateStr() ? "#334155" : "#475569", cursor: viewedDate === getLocalDateStr() ? "default" : "pointer", fontSize: 12, padding: "0 2px", lineHeight: 1 }}>›</button>
+              <span onClick={() => setViewedDate(getLocalDateStr())} style={{ fontSize: 11, color: viewedDate === getLocalDateStr() ? "#e2e8f0" : "#fbbf24", cursor: "pointer", fontFamily: "'DM Mono',monospace" }}>{viewedDate}</span>
+              <button onClick={() => { const d = new Date(viewedDate + "T12:00:00"); d.setDate(d.getDate()+1); const nxt = getLocalDateStr(d); if (nxt <= getLocalDateStr()) setViewedDate(nxt); }} style={{ background: "none", border: "none", color: viewedDate === getLocalDateStr() ? "#334155" : "#475569", cursor: viewedDate === getLocalDateStr() ? "default" : "pointer", fontSize: 14, padding: "0 2px", lineHeight: 1 }}>›</button>
             </div>
           </div>
         </div>
@@ -4132,6 +4132,7 @@ export default function App() {
         })()}
 
         </div>
+      </div>
       </div>
       {/* ── ONBOARDING OVERLAY ── */}
       {showOnboarding && (() => {
