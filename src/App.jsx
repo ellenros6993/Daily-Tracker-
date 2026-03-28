@@ -2094,22 +2094,6 @@ export default function App() {
                 </div>
               )}
               <div className="section-title" style={{ marginBottom: 10, fontSize: 9 }}>Today's Log</div>
-              <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
-                <button onClick={() => setShowShortcutModal(true)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "none", border: "1px solid #1e2d40", color: "#60a5fa", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer" }}>⚡ Sync Steps</button>
-                <button onClick={() => setShowManualSteps(v => !v)} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "5px 12px", borderRadius: 6, cursor: "pointer", whiteSpace: "nowrap" }}>✏️ Manual</button>
-              </div>
-              {showManualSteps && (
-                <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
-                  <input type="number" placeholder="Enter steps..." value={manualStepsInput} onChange={e => setManualStepsInput(e.target.value)}
-                    style={{ flex: 1, fontSize: 13, padding: "6px 10px" }} />
-                  <button onClick={() => {
-                    if (!manualStepsInput) return;
-                    const today = getLocalDateStr();
-                    setLogs(ls => { const existing = ls.find(l => l.date === today); if (existing) { return ls.map(l => l.date === today ? { ...l, steps: manualStepsInput } : l); } return [...ls, { date: today, steps: manualStepsInput, calories: "", protein: "", training: "", weight: "", bodyFat: "", muscleMass: "", visceralFat: "" }]; });
-                    setManualStepsInput(""); setShowManualSteps(false); haptic("light");
-                  }} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", fontSize: 11, fontWeight: 700, padding: "6px 14px", borderRadius: 6, cursor: "pointer" }}>SAVE</button>
-                </div>
-              )}
               {today ? (
                 <>
                   <div className="today-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
@@ -2120,19 +2104,34 @@ export default function App() {
                       { label: "Training", val: today.training, check: v => v.trim() !== "", unit: "" },
                     ].map(({ label, val, check, unit }) => {
                       const hit = val ? check(val) : null;
+                      const isSteps = label === "Steps";
                       return (
-                        <div key={label} style={{ background: "#0f1623", borderRadius: 8, padding: "10px 8px", textAlign: "center", border: `1px solid ${hit === true ? "#10b98122" : hit === false ? "#f8717122" : "#131929"}` }}>
+                        <div key={label} onClick={() => isSteps && !val && setShowManualSteps(v => !v)}
+                          style={{ background: "#0f1623", borderRadius: 8, padding: "10px 8px", textAlign: "center", border: `1px solid ${hit === true ? "#10b98122" : hit === false ? "#f8717122" : "#131929"}`, cursor: isSteps && !val ? "pointer" : "default", position: "relative" }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, marginBottom: 5 }}>
                             <span className={`status-indicator ${hit === true ? "si-green" : hit === false ? "si-red" : "si-gray"}`} style={{ width: 6, height: 6 }} />
                             <span className="label" style={{ marginBottom: 0, fontSize: 8 }}>{label}</span>
+                            {isSteps && val && <span onClick={e => { e.stopPropagation(); setShowManualSteps(v => !v); }} style={{ fontSize: 7, color: "#334155", cursor: "pointer", marginLeft: 2 }}>✏️</span>}
                           </div>
-                          <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: hit === true ? "#34d399" : hit === false ? "#f87171" : "#1e2d40", lineHeight: 1 }}>{val || "—"}</div>
+                          <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: hit === true ? "#34d399" : hit === false ? "#f87171" : "#1e2d40", lineHeight: 1 }}>{val || (isSteps ? <span style={{ fontSize: 11, color: "#334155" }}>tap</span> : "—")}</div>
                           {unit && val && <div style={{ color: "#334155", fontSize: 9, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>{unit}</div>}
                         </div>
                       );
                     })}
                   </div>
-                  <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  {showManualSteps && (
+                    <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                      <input type="number" placeholder="Enter steps..." value={manualStepsInput} onChange={e => setManualStepsInput(e.target.value)}
+                        style={{ flex: 1, fontSize: 13, padding: "6px 10px" }} />
+                      <button onClick={() => {
+                        if (!manualStepsInput) return;
+                        const tod = getLocalDateStr();
+                        setLogs(ls => { const existing = ls.find(l => l.date === tod); if (existing) { return ls.map(l => l.date === tod ? { ...l, steps: manualStepsInput } : l); } return [...ls, { date: tod, steps: manualStepsInput, calories: "", protein: "", training: "", weight: "", bodyFat: "", muscleMass: "", visceralFat: "" }]; });
+                        setManualStepsInput(""); setShowManualSteps(false); haptic("light");
+                      }} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", fontSize: 11, fontWeight: 700, padding: "6px 14px", borderRadius: 6, cursor: "pointer" }}>SAVE</button>
+                    </div>
+                  )}
+                  <div style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ color: "#334155", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>Score</span>
                       {Array.from({ length: 4 }, (_, i) => (
@@ -2142,7 +2141,10 @@ export default function App() {
                       ))}
                       <span style={{ color: "#475569", fontSize: 10, fontFamily: "'DM Mono',monospace" }}>{calcScore(today)}/4</span>
                     </div>
-                    <button onClick={() => navigateTo("Nutrition")} style={{ background: "none", border: "none", color: "#10b981", fontSize: 10, fontWeight: 500, display: "flex", alignItems: "center", gap: 2 }}>Update <ChevronRight size={11} /></button>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      {!today.steps && <button onClick={() => setShowShortcutModal(true)} style={{ background: "none", border: "none", color: "#60a5fa", fontSize: 10, display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }}>⚡ Sync Steps</button>}
+                      <button onClick={() => navigateTo("Nutrition")} style={{ background: "none", border: "none", color: "#10b981", fontSize: 10, fontWeight: 500, display: "flex", alignItems: "center", gap: 2 }}>Update <ChevronRight size={11} /></button>
+                    </div>
                   </div>
                 </>
               ) : (
