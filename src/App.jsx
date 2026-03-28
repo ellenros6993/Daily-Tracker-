@@ -2133,7 +2133,7 @@ export default function App() {
                         style={{ flex: 1, fontSize: 13, padding: "6px 10px" }} />
                       <button onClick={() => {
                         if (!manualStepsInput) return;
-                        const tod = getLocalDateStr();
+                        const tod = viewedDate;
                         setLogs(ls => { const existing = ls.find(l => l.date === tod); if (existing) { return ls.map(l => l.date === tod ? { ...l, steps: manualStepsInput } : l); } return [...ls, { date: tod, steps: manualStepsInput, calories: "", protein: "", training: "", weight: "", bodyFat: "", muscleMass: "", visceralFat: "" }]; });
                         setManualStepsInput(""); setShowManualSteps(false); haptic("light");
                       }} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", fontSize: 11, fontWeight: 700, padding: "6px 14px", borderRadius: 6, cursor: "pointer" }}>SAVE</button>
