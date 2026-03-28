@@ -637,8 +637,8 @@ export default function App() {
   const [manualMacros, setManualMacros] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-manual-macros") || "{}"); } catch { return {}; } });
   function getManualToday(date) { return manualMacros[date || getLocalDateStr()] || {}; }
   function saveManualMacro(field, val) {
-    const today = getLocalDateStr();
-    const updated = { ...manualMacros, [today]: { ...getManualToday(), [field]: val } };
+    const today = nutritionDate;
+    const updated = { ...manualMacros, [today]: { ...getManualToday(today), [field]: val } };
     setManualMacros(updated);
     localStorage.setItem("dat-manual-macros", JSON.stringify(updated));
   }
@@ -771,7 +771,7 @@ export default function App() {
   }
 
   function getAllDayTotals() {
-    const manual = getManualToday();
+    const manual = getManualToday(nutritionDate);
     const fromFoods = MEAL_SLOTS.reduce((acc, slot) => {
       const t = getMealTotals(slot);
       return { calories: acc.calories + t.calories, protein: acc.protein + t.protein };
@@ -2619,7 +2619,7 @@ export default function App() {
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 14 }}>✏️</span>
                     <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Manual Macro Entry</div>
-                    {Object.keys(getManualToday()).length > 0 && <span style={{ fontSize: 10, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>✓ Entered</span>}
+                    {Object.keys(getManualToday(nutritionDate)).length > 0 && <span style={{ fontSize: 10, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>✓ Entered</span>}
                   </div>
                   <span style={{ color: "#475569", fontSize: 14, transition: "transform 0.2s", display: "inline-block", transform: showManualMacros ? "rotate(90deg)" : "rotate(0deg)" }}>›</span>
                 </div>
@@ -2635,7 +2635,7 @@ export default function App() {
                         { key: "fiber",    label: "Fiber",    unit: "g",    color: "#a78bfa" },
                         { key: "sugar",    label: "Sugar",    unit: "g",    color: "#fb923c" },
                       ].map(({ key, label, unit, color }) => {
-                        const manual = getManualToday();
+                        const manual = getManualToday(nutritionDate);
                         return (
                           <div key={key}>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>{label} <span style={{ color }}>{unit}</span></div>
