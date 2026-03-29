@@ -2048,7 +2048,7 @@ export default function App() {
                       <svg width={100} height={100} style={{ flexShrink: 0, overflow: "visible" }}>
                         <circle cx="50" cy="50" r={R} fill="none" stroke="#131929" strokeWidth="4" />
                         <circle cx="50" cy="50" r={R} fill="none"
-                          stroke="#a855f7"
+                          stroke={ringCol}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
                           transform="rotate(-90 50 50)"
