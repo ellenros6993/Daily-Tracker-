@@ -1986,7 +1986,7 @@ export default function App() {
             {/* Weekly Compliance + Next Milestone + Share */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }} className="kpi-grid">
               {/* Weekly compliance ring */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px 40px 14px", borderLeft: `3px solid ${(() => { const wh = getWeekLogs(logs, getCurrentWeekStart()).filter(l => calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) >= 1).length; const p = getWeekLogs(logs, getCurrentWeekStart()).reduce((a,l) => a + calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}), 0); const tot = getWeekLogs(logs, getCurrentWeekStart()).length * 4 || 1; const pct2 = Math.round(p/tot*100); return pct2 >= 80 ? "#34d399" : pct2 >= 50 ? "#fbbf24" : "#f87171"; })()}` }}>
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px 40px 14px", borderLeft: `3px solid ${(() => { const wh = getWeekLogs(logs, getCurrentWeekStart()).filter(l => calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) >= 1).length; const p = getWeekLogs(logs, getCurrentWeekStart()).reduce((a,l) => a + calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}), 0); const tot = getWeekLogs(logs, getCurrentWeekStart()).length * 4 || 1; const pct2 = Math.round(p/tot*100); const wl = getWeekLogs(logs, getCurrentWeekStart()); let rd=0; const {h,t} = wl.reduce((a,l) => { const tr=l.training&&l.training.trim()!==""; const ir=!tr&&rd<2; if(!tr)rd++; return {h:a.h+calcScore(l,workouts,{cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}),t:a.t+(ir?3:4)}; },{h:0,t:0}); const bp=t>0?Math.round(h/t*100):0; return bp >= 80 ? "#34d399" : bp >= 50 ? "#fbbf24" : "#f87171"; })()}` }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>This Week</div>
                 {(() => {
                   const weekLogs = getWeekLogs(logs, getCurrentWeekStart());
@@ -2048,7 +2048,7 @@ export default function App() {
                       <svg width={100} height={100} style={{ flexShrink: 0, overflow: "visible" }}>
                         <circle cx="50" cy="50" r={R} fill="none" stroke="#131929" strokeWidth="4" />
                         <circle cx="50" cy="50" r={R} fill="none"
-                          stroke={ringCol}
+                          stroke="#a855f7"
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
                           transform="rotate(-90 50 50)"
