@@ -2631,7 +2631,7 @@ export default function App() {
               {/* Daily totals + Water row */}
             <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
               {/* Daily goal ring */}
-              <div className="stat-card" style={{ borderColor: "#a855f722" }}>
+              <div className="stat-card" style={{ borderColor: "#a855f722", flex: 1, minWidth: 0 }}>
                 <div className="section-title" style={{ fontSize: 14, color: "#a855f7", marginBottom: 12 }}>DAILY TOTALS</div>
                 {/* Top row: calories | ring | protein (highlighted) */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 12, alignItems: "center" }}>
@@ -2693,7 +2693,7 @@ export default function App() {
                 <div style={{ marginTop: 4, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "right" }}>✓ Auto-saved</div>
               </div>
               {/* Water Tracker */}
-              <div className="stat-card fade-up-4" style={{ padding: "12px 12px", flex: 1 }}>
+              <div className="stat-card fade-up-4" style={{ padding: "12px 12px", width: 110, flexShrink: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
                   <Droplets size={14} style={{ color: "#60a5fa" }} />
                   <div style={{ fontSize: 12, fontWeight: 600 }}>Water</div>
