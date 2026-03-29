@@ -1336,6 +1336,7 @@ export default function App() {
       prevTabRef.current = tab;
       setTab(newTab);
       setPageVisible(true);
+      window.scrollTo(0, 0);
     }, 120);
   }
 
