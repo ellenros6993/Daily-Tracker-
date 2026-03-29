@@ -2026,7 +2026,7 @@ export default function App() {
                   );
                 })()}
               </div>
-              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #f97316", paddingBottom: "18px", minHeight: 200 }}>
+              <div className="stat-card fade-up-2" style={{ padding: "12px 14px", borderLeft: "3px solid #1d4ed8", paddingBottom: "18px", minHeight: 200 }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 3 }}>Streak</div>
                 {(() => {
                   const streak = getLoggingStreak(logs);
@@ -2041,14 +2041,14 @@ export default function App() {
                   const ringCol = weekHits >= 6 ? "#10b981" : weekHits >= 4 ? "#fbbf24" : weekHits >= 2 ? "#f97316" : "#f87171";
                   return <>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div className="big-num" style={{ fontSize: 26, color: "#f97316" }}>
+                      <div className="big-num" style={{ fontSize: 26, color: "#1d4ed8" }}>
                         {streak}<span style={{ fontSize: 14, color: "#1e2d40", fontFamily: "'Inter',sans-serif", fontWeight: 400 }}> days</span>
                       </div>
                       {/* Weekly ring */}
                       <svg width={100} height={100} style={{ flexShrink: 0, overflow: "visible" }}>
                         <circle cx="50" cy="50" r={R} fill="none" stroke="#131929" strokeWidth="4" />
                         <circle cx="50" cy="50" r={R} fill="none"
-                          stroke="#f97316"
+                          stroke="#1d4ed8"
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
                           transform="rotate(-90 50 50)"
@@ -2068,7 +2068,7 @@ export default function App() {
                         const score = l ? calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) : -1;
                         return { ds, score };
                       });
-                      const color = (s) => s < 0 ? "#0f1623" : s === 0 ? "#2d1f4e" : s === 1 ? "#3b1f6b" : s === 2 ? "#5b2d8e" : s === 3 ? "#8b3fc8" : "#a855f7";
+                      const color = (s) => s < 0 ? "#0f1623" : s === 0 ? "#1e2d5e" : s === 1 ? "#1d3a7a" : s === 2 ? "#1d4ed8" : s === 3 ? "#2563eb" : "#3b82f6";
                       return (
                         <div style={{ marginTop: 10 }}>
                           <div style={{ display: "grid", gridTemplateColumns: "repeat(14, 1fr)", gap: 2 }}>
