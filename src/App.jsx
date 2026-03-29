@@ -2634,7 +2634,7 @@ export default function App() {
               <div className="stat-card" style={{ borderColor: "#a855f722", flex: 1, minWidth: 0 }}>
                 <div className="section-title" style={{ fontSize: 14, color: "#a855f7", marginBottom: 12 }}>DAILY TOTALS</div>
                 {/* Top row: calories | ring | protein (highlighted) */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 12, alignItems: "center" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, alignItems: "center" }}>
                   <div style={{ textAlign: "center" }}>
                     <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 26, color: darkMode ? "#e2e8f0" : "#0f172a", lineHeight: 1 }}>{totalCals.toLocaleString()}</div>
                     <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>CALORIES</div>
@@ -2657,16 +2657,15 @@ export default function App() {
                       </div>
                     );
                   })()}
-                  {/* Protein — highlighted */}
-                  <div style={{ textAlign: "center", background: "#1a0a2e", borderRadius: 10, padding: "10px 6px", border: `1px solid ${proColor}33` }}>
-                    <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: proColor, lineHeight: 1 }}>{Math.round(totalPro)}g</div>
-                    <div style={{ fontSize: 9, color: proColor, fontFamily: "'DM Mono',monospace", fontWeight: 600 }}>PROTEIN</div>
-                    <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>goal {PROTEIN_MIN}g</div>
-                  </div>
                 </div>
 
                 {/* Carbs + Fat row */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 12, paddingTop: 12, borderTop: "1px solid #131929" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 12, paddingTop: 12, borderTop: "1px solid #131929" }}>
+                  <div style={{ textAlign: "center", background: "#1a0a2e", borderRadius: 10, padding: "8px 6px", border: `1px solid ${proColor}33` }}>
+                    <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: proColor, lineHeight: 1 }}>{Math.round(totalPro)}g</div>
+                    <div style={{ fontSize: 9, color: proColor, fontFamily: "'DM Mono',monospace", fontWeight: 600 }}>PROTEIN</div>
+                    <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>goal {PROTEIN_MIN}g</div>
+                  </div>
                   <div style={{ textAlign: "center" }}>
                     <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: "#fbbf24", lineHeight: 1 }}>{totalCarbs}g</div>
                     <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>CARBS</div>
@@ -2677,7 +2676,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Protein + cal bars */}
                 <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", width: 50 }}>PROTEIN</span>
