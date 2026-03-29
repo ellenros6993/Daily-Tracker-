@@ -2642,7 +2642,7 @@ export default function App() {
                   <div className="stat-card fade-up-4" style={{ padding: "12px 12px", flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
                       <span style={{ fontSize: 14 }}>😴</span>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Sleep</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Last Night's Sleep</div>
                       {sleep.hours && <span style={{ marginLeft: "auto", fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "#60a5fa" }}>{sleep.hours}h</span>}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
