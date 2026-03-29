@@ -2397,6 +2397,56 @@ export default function App() {
                       </div>
                     );
                   })()}
+                  {/* Projection */}
+                  {weighIns.length >= 2 && (() => {
+                    const sorted = [...weighIns].sort((a,b) => a.date.localeCompare(b.date));
+                    const first = sorted[0]; const last = sorted[sorted.length-1];
+                    const daysDiff = (new Date(last.date) - new Date(first.date)) / 86400000;
+                    const lbsDiff = parseFloat(first.weight) - parseFloat(last.weight);
+                    const ratePerDay = daysDiff > 0 ? lbsDiff / daysDiff : 0;
+                    const lbsToGo = parseFloat(last.weight) - parseFloat(GOAL_WEIGHT);
+                    const daysToGoal = ratePerDay > 0 ? Math.round(lbsToGo / ratePerDay) : null;
+                    const goalDate = daysToGoal ? new Date(new Date(last.date).getTime() + daysToGoal * 86400000) : null;
+                    const goalDateStr = goalDate ? goalDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : null;
+                    const weeklyRate = (ratePerDay * 7).toFixed(2);
+                    const allPts = sorted.map(w => ({ d: new Date(w.date), w: parseFloat(w.weight) }));
+                    const projPts = goalDate ? [{ d: new Date(last.date), w: parseFloat(last.weight) }, { d: goalDate, w: parseFloat(GOAL_WEIGHT) }] : [];
+                    const allDates = [...allPts.map(p=>p.d), ...projPts.map(p=>p.d)];
+                    const allWeights = [...allPts.map(p=>p.w), parseFloat(GOAL_WEIGHT)];
+                    const minD = Math.min(...allDates.map(d=>d.getTime())); const maxD = Math.max(...allDates.map(d=>d.getTime()));
+                    const minW = Math.min(...allWeights) - 2; const maxW = Math.max(...allWeights) + 2;
+                    const W = 300; const H = 100;
+                    const px = d => ((d.getTime()-minD)/(maxD-minD||1))*(W-20)+10;
+                    const py = w => H - ((w-minW)/(maxW-minW||1))*(H-16)-8;
+                    const actPath = allPts.map((p,i) => `${i===0?"M":"L"}${px(p.d).toFixed(1)},${py(p.w).toFixed(1)}`).join(" ");
+                    const projPath = projPts.map((p,i) => `${i===0?"M":"L"}${px(p.d).toFixed(1)},${py(p.w).toFixed(1)}`).join(" ");
+                    const goalY = py(parseFloat(GOAL_WEIGHT));
+                    return (
+                      <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: "1px solid #131929" }}>
+                        <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 8, letterSpacing: 1 }}>PROJECTION</div>
+                        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: 100, display: "block" }}>
+                          <line x1="10" y1={goalY} x2={W-10} y2={goalY} stroke="#10b98122" strokeWidth="1" strokeDasharray="4 3" />
+                          {projPath && <path d={projPath} fill="none" stroke="#34d39966" strokeWidth="1.5" strokeDasharray="5 4" />}
+                          <path d={actPath} fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          {allPts.map((p,i) => <circle key={i} cx={px(p.d)} cy={py(p.w)} r="3" fill="#60a5fa" />)}
+                          {projPts.length > 0 && <circle cx={px(projPts[projPts.length-1].d)} cy={py(projPts[projPts.length-1].w)} r="3" fill="#34d399" />}
+                        </svg>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+                          <div>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>AVG LOSS</div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#34d399" }}>{weeklyRate} <span style={{ fontSize: 10, color: "#475569" }}>lb/wk</span></div>
+                          </div>
+                          {goalDateStr ? <div style={{ textAlign: "right" }}>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>PROJECTED GOAL</div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#34d399" }}>{goalDateStr}</div>
+                          </div> : <div style={{ textAlign: "right" }}>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>PROJECTED GOAL</div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 14, color: "#475569" }}>LOG MORE DATA</div>
+                          </div>}
+                        </div>
+                      </div>
+                    );
+                  })()}
                   {/* Vertical timeline */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                     {[...weighIns].reverse().map((w, i) => {
