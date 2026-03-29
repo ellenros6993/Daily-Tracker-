@@ -1894,7 +1894,7 @@ export default function App() {
           { id: "Weekly Report", Icon: BarChart2, label: "Summary" },
           { id: "Progress Photos", Icon: Camera, label: "Progress" },
         ].map(({ id, Icon, label }) => (
-          <button key={id} onClick={() => navigateTo(id)} style={{ background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 6px", color: tab === id ? (id === "Training" ? "#60a5fa" : id === "Weight Tracker" ? "#fbbf24" : id === "Progress Photos" ? "#a855f7" : "#10b981") : "#334155", transition: "color 0.15s" }}>
+          <button key={id} onClick={() => navigateTo(id)} style={{ background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 6px", color: tab === id ? (id === "Training" ? "#60a5fa" : id === "Weight Tracker" ? "#fbbf24" : id === "Progress Photos" ? "#10b981" : "#a855f7") : "#334155", transition: "color 0.15s" }}>
             <Icon size={18} />
             <span style={{ fontSize: 9, letterSpacing: 0.3, fontFamily: "'DM Mono',monospace" }}>{label}</span>
           </button>
@@ -2160,7 +2160,7 @@ export default function App() {
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       {!today.steps && <button onClick={() => setShowShortcutModal(true)} style={{ background: "none", border: "none", color: "#60a5fa", fontSize: 10, display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }}>⚡ Sync Steps</button>}
-                      <button onClick={() => navigateTo("Nutrition")} style={{ background: "none", border: "none", color: "#10b981", fontSize: 10, fontWeight: 500, display: "flex", alignItems: "center", gap: 2 }}>Update <ChevronRight size={11} /></button>
+                      <button onClick={() => navigateTo("Nutrition")} style={{ background: "none", border: "none", color: "#a855f7", fontSize: 10, fontWeight: 500, display: "flex", alignItems: "center", gap: 2 }}>Update <ChevronRight size={11} /></button>
                     </div>
                   </div>
                 </>
