@@ -2209,7 +2209,7 @@ export default function App() {
                   })}
                 </div>
               )}
-              <div className="section-title" style={{ marginBottom: 10, fontSize: 9 }}>Today's Log</div>
+              <div style={{ marginBottom: 10, fontSize: 9, fontWeight: 700, letterSpacing: 3, color: "#334155", fontFamily: "'DM Mono',monospace", textTransform: "uppercase" }}>Today's Log</div>
               {today ? (
                 <>
                   <div className="today-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
@@ -2217,7 +2217,7 @@ export default function App() {
                       { label: "Cal", val: today.calories, check: v => parseInt(v) >= CALORIES_MIN && parseInt(v) <= CALORIES_MAX, unit: "kcal" },
                       { label: "Protein", val: today.protein, check: v => parseInt(v) >= PROTEIN_MIN, unit: "g" },
                       { label: "Steps", val: today.steps, check: v => parseInt(v) >= STEPS_MIN, unit: "steps" },
-                      { label: "Training", val: today.training || (workouts.find(w => w.date === viewedDate) ? (workouts.find(w => w.date === viewedDate).name || workouts.find(w => w.date === viewedDate).activityType || "Trained") : null), check: v => v && v.trim() !== "", unit: "" },
+                      { label: "Training", val: (workouts.find(w => w.date === viewedDate) ? (workouts.find(w => w.date === viewedDate).name || workouts.find(w => w.date === viewedDate).activityType || "Trained ✓") : null) || today.training, check: v => v && v.trim() !== "", unit: "" },
                     ].map(({ label, val, check, unit }) => {
                       const hit = val ? check(val) : null;
                       const isSteps = label === "Steps";
@@ -2232,7 +2232,7 @@ export default function App() {
                           </div>
                           <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: val ? tileCol : "#1e2d40", lineHeight: 1 }}>{val || (isSteps ? <span style={{ fontSize: 11, color: "#334155" }}>tap</span> : "—")}</div>
                           {unit && val && <div style={{ color: "#334155", fontSize: 9, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>{unit}</div>}
-                          {val && label !== "Training" && (() => { const pct = label === "Cal" ? Math.min(100, Math.round(parseInt(val) / CALORIES_MAX * 100)) : label === "Protein" ? Math.min(100, Math.round(parseInt(val) / PROTEIN_MIN * 100)) : Math.min(100, Math.round(parseInt(val) / STEPS_MIN * 100)); return <div style={{ position: "absolute", top: 4, right: 5, fontSize: 8, color: hit === true ? "#10b981" : "#475569", fontFamily: "'DM Mono',monospace" }}>{pct}%</div>; })()}
+                          {val && label !== "Training" && (() => { const pct = label === "Cal" ? Math.min(100, Math.round(parseInt(val) / CALORIES_MAX * 100)) : label === "Protein" ? Math.min(100, Math.round(parseInt(val) / PROTEIN_MIN * 100)) : Math.min(100, Math.round(parseInt(val) / STEPS_MIN * 100)); return <div style={{ position: "absolute", top: 4, right: 5, fontSize: 8, color: label === "Cal" || label === "Protein" ? (hit ? "#a855f7" : "#475569") : (hit ? "#60a5fa" : "#475569"), fontFamily: "'DM Mono',monospace" }}>{pct}%</div>; })()}
                         </div>
                       );
                     })}
