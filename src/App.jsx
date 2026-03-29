@@ -2286,7 +2286,7 @@ export default function App() {
           const isWeighInDay = [2,4,6].includes(new Date().getDay());
           return (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div className="section-title">WEIGHT TRACKER</div>
+              <div className="section-title" style={{ color: "#fbbf24" }}>WEIGHT TRACKER</div>
 
               {isWeighInDay && (
                 <div style={{ background: "#1a1200", border: "1px solid #fbbf2433", borderRadius: 10, padding: "10px 16px", color: "#fbbf24", fontSize: 11 }}>
@@ -2315,7 +2315,7 @@ export default function App() {
                   </div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
-                  <button className={`save-btn${saved ? " saved-state" : ""}`} onClick={saveLog} style={{ fontSize: 12, padding: "7px 16px" }}>{saved ? "✓ Saved" : "Save Weigh-in"}</button>
+                  <button className={`save-btn${saved ? " saved-state" : ""}`} onClick={saveLog} style={{ fontSize: 12, padding: "7px 16px", background: "linear-gradient(135deg,#d97706,#fbbf24)", boxShadow: "0 2px 12px #fbbf2430" }}>{saved ? "✓ Saved" : "Save Weigh-in"}</button>
                 </div>
 
               </div>
@@ -2345,7 +2345,7 @@ export default function App() {
                 }).join(" ") : null;
                 return (
                   <div className="stat-card">
-                    <div className="section-title" style={{ fontSize: 14 }}>TREND CHART</div>
+                    <div className="section-title" style={{ fontSize: 14, color: "#fbbf24" }}>TREND CHART</div>
                     <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ overflow: "visible", display: "block" }}>
                       <defs>
                         <linearGradient id="wg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#d97706"/><stop offset="100%" stopColor="#fbbf24"/></linearGradient>
@@ -2371,7 +2371,7 @@ export default function App() {
               {/* Animated weight journey timeline */}
               {weighIns.length > 0 && (
                 <div className="stat-card">
-                  <div className="section-title" style={{ fontSize: 14 }}>WEIGHT JOURNEY</div>
+                  <div className="section-title" style={{ fontSize: 14, color: "#fbbf24" }}>WEIGHT JOURNEY</div>
                   {/* Weight loss progress arc */}
                   {weighIns.length > 0 && (() => {
                     const startW = parseFloat(START_WEIGHT);
