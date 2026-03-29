@@ -4046,6 +4046,41 @@ export default function App() {
                 </div>
               </div>
 
+
+              {/* Weight Summary */}
+              {periodWeights.length >= 2 && (() => {
+                const startW = parseFloat(periodWeights[0].weight);
+                const endW = parseFloat(periodWeights[periodWeights.length-1].weight);
+                const diff = (startW - endW).toFixed(1);
+                const isLoss = parseFloat(diff) > 0;
+                const isGain = parseFloat(diff) < 0;
+                const diffColor = isLoss ? "#34d399" : isGain ? "#f87171" : "#475569";
+                return (
+                  <div className="stat-card">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#fbbf24" }}>WEIGHT</div>
+                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{periodWeights.length} weigh-ins</div>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center" }}>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>START</div>
+                        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 28, color: "#94a3b8", lineHeight: 1 }}>{startW}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div>
+                        <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{periodWeights[0].date}</div>
+                      </div>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: diffColor, lineHeight: 1 }}>{isLoss ? "↓" : isGain ? "↑" : "="}{Math.abs(diff)}</div>
+                        <div style={{ fontSize: 9, color: diffColor, fontFamily: "'DM Mono',monospace" }}>{isLoss ? "lbs lost" : isGain ? "lbs gained" : "no change"}</div>
+                      </div>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>NOW</div>
+                        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 28, color: "#fbbf24", lineHeight: 1 }}>{endW}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div>
+                        <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{periodWeights[periodWeights.length-1].date}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* Training */}
               <div className="stat-card">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
