@@ -4074,7 +4074,7 @@ export default function App() {
               {/* Calories */}
               <div className="stat-card">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div className="section-title" style={{ fontSize: 14, margin: 0 }}>CALORIES</div>
+                  <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#a855f7" }}>CALORIES</div>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>target {CALORIES_MIN}–{CALORIES_MAX}</div>
                 </div>
                 <SummaryBar data={calData} color="#a855f7" unit="kcal" goal={CALORIES_MIN} />
@@ -4087,7 +4087,7 @@ export default function App() {
               {/* Protein */}
               <div className="stat-card">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div className="section-title" style={{ fontSize: 14, margin: 0 }}>PROTEIN</div>
+                  <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#a855f7" }}>PROTEIN</div>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal ≥{PROTEIN_MIN}g</div>
                 </div>
                 <SummaryBar data={proData} color="#a855f7" unit="g" goal={PROTEIN_MIN} />
