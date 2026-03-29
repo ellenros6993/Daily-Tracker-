@@ -1070,6 +1070,7 @@ export default function App() {
   const [circuitPhase, setCircuitPhase] = useState("build");
   const [circuitRunning, setCircuitRunning] = useState(false);
   const [circuitConfig, setCircuitConfig] = useState({ work: 40, rest: 20, rounds: 4, restBetween: 60 });
+  const audioCtxRef = useRef(null);
   const [circuitState, setCircuitState] = useState({ round: 1, isWork: true, isBetween: false, secondsLeft: 40, done: false });
   const [expandedExercise, setExpandedExercise] = useState(null);
   const [pageVisible, setPageVisible] = useState(true);
@@ -1213,9 +1214,7 @@ export default function App() {
       setCircuitState(s => {
         if (s.secondsLeft > 1) return { ...s, secondsLeft: s.secondsLeft - 1 };
         haptic("medium");
-        try { const AudioCtx = window.AudioContext || window.webkitAudioContext; if (AudioCtx) { const ctx = new AudioCtx(); ctx.resume().then(() => { const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = s.isWork ? 880 : 440; o.type = "sine"; g.gain.setValueAtTime(0.5, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5); o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.5); }); } } catch(e) {}
-        try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = s.isWork ? 440 : 880; g.gain.setValueAtTime(0.3, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.3); } catch(e) {}
-        try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = s.isWork ? 440 : 880; g.gain.setValueAtTime(0.3, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.3); } catch(e) {}
+        try { const ctx = audioCtxRef.current; if (ctx) { const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = s.isWork ? 880 : 440; o.type = "sine"; g.gain.setValueAtTime(0.5, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4); o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.4); } } catch(e) {}
         if (s.isBetween) return { ...s, isBetween: false, isWork: true, secondsLeft: circuitConfig.work };
         if (s.isWork) return { ...s, isWork: false, secondsLeft: circuitConfig.rest };
         if (s.round >= circuitConfig.rounds) return { ...s, done: true };
@@ -3287,6 +3286,7 @@ export default function App() {
                         </div>
                         <button onClick={() => {
                           setCircuitState({ round: 1, isWork: true, secondsLeft: circuitConfig.work });
+                          try { audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)(); audioCtxRef.current.resume(); } catch(e) {}
                           setCircuitPhase("run");
                           setCircuitRunning(true);
                         }} style={{ background: "linear-gradient(135deg,#1e3a5f,#60a5fa)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: 1 }}>
