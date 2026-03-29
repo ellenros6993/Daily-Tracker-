@@ -2126,11 +2126,11 @@ export default function App() {
                         <div key={label} onClick={() => isSteps && !val && setShowManualSteps(v => !v)}
                           style={{ background: "#0f1623", borderRadius: 8, padding: "10px 8px", textAlign: "center", border: `1px solid ${hit === true ? tileCol+"22" : hit === false ? "#f8717122" : "#131929"}`, cursor: isSteps && !val ? "pointer" : "default", position: "relative" }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, marginBottom: 5 }}>
-                            <span className={`status-indicator ${hit === true ? (label === "Cal" || label === "Protein" ? "si-purple" : "si-blue") : hit === false ? "si-red" : "si-gray"}`} style={{ width: 6, height: 6 }} />
+                            <span className={`status-indicator ${val ? (label === "Cal" || label === "Protein" ? "si-purple" : "si-blue") : "si-gray"}`} style={{ width: 6, height: 6 }} />
                             <span className="label" style={{ marginBottom: 0, fontSize: 8 }}>{label}</span>
                             {isSteps && val && <span onClick={e => { e.stopPropagation(); setShowManualSteps(v => !v); }} style={{ fontSize: 7, color: "#334155", cursor: "pointer", marginLeft: 2 }}>✏️</span>}
                           </div>
-                          <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: hit === true ? tileCol : hit === false ? "#f87171" : "#1e2d40", lineHeight: 1 }}>{val || (isSteps ? <span style={{ fontSize: 11, color: "#334155" }}>tap</span> : "—")}</div>
+                          <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: val ? tileCol : "#1e2d40", lineHeight: 1 }}>{val || (isSteps ? <span style={{ fontSize: 11, color: "#334155" }}>tap</span> : "—")}</div>
                           {unit && val && <div style={{ color: "#334155", fontSize: 9, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>{unit}</div>}
                         </div>
                       );
