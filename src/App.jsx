@@ -1850,7 +1850,7 @@ export default function App() {
       </div>
 
       {/* Main */}
-      <div className="main-content">
+      <div className="main-content" style={{ zoom: fontScale }}>
         <div className="topbar">
           <div className="topbar-title">Daily Accountability Tracker<span>{tab}</span></div>
           <div className="topbar-status" style={{ display: "flex", alignItems: "center", gap: 10 }}>
