@@ -2526,6 +2526,7 @@ export default function App() {
 
               {/* Daily goal ring */}
               <div className="stat-card" style={{ borderColor: "#a855f722" }}>
+                <div className="section-title" style={{ fontSize: 14, color: "#a855f7", marginBottom: 12 }}>DAILY TOTALS</div>
                 {/* Top row: calories | ring | protein (highlighted) */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 12, alignItems: "center" }}>
                   <div style={{ textAlign: "center" }}>
@@ -2743,7 +2744,7 @@ export default function App() {
                           <button onClick={() => { setSaveMealSlot(slot); setSaveMealName(""); }} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "4px 10px", borderRadius: 7, fontSize: 10, cursor: "pointer" }}>💾 Save</button>
                         )}
                         <button onClick={() => { setActiveMealSlot(isOpen ? null : slot); setFoodResults(null); setFoodSearch(""); setFoodError(null); setMacroTab("search"); }}
-                          style={{ background: isOpen ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${isOpen ? "transparent" : "#1e2d40"}`, color: isOpen ? "#fff" : "#10b981", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                          style={{ background: isOpen ? "linear-gradient(135deg,#6d28d9,#a855f7)" : "#0f1623", border: `1px solid ${isOpen ? "transparent" : "#1e2d40"}`, color: isOpen ? "#fff" : "#a855f7", padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                           {isOpen ? "✕ Close" : "+ Add Food"}
                         </button>
                         <button onClick={() => { if (!copyYesterdaySlot(slot)) haptic("error"); }}
@@ -3185,7 +3186,7 @@ export default function App() {
 
                 return (
                   <div className="stat-card">
-                    <div className="section-title" style={{ marginBottom: 12, fontSize: 14 }}>7-DAY HISTORY</div>
+                    <div className="section-title" style={{ marginBottom: 12, fontSize: 14, color: "#a855f7" }}>7-DAY HISTORY</div>
 
                     {/* Today's summary */}
                     {(today.cal > 0 || today.pro > 0) && (() => {
