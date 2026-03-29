@@ -4077,10 +4077,10 @@ export default function App() {
                   <div className="section-title" style={{ fontSize: 14, margin: 0 }}>CALORIES</div>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>target {CALORIES_MIN}–{CALORIES_MAX}</div>
                 </div>
-                <SummaryBar data={calData} color="#fbbf24" unit="kcal" goal={CALORIES_MIN} />
+                <SummaryBar data={calData} color="#a855f7" unit="kcal" goal={CALORIES_MIN} />
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {calData.filter(d=>d.val).length ? Math.round(calData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/calData.filter(d=>d.val).length) : "—"} kcal</div>
-                  <div style={{ fontSize: 10, color: "#fbbf24", fontFamily: "'DM Mono',monospace" }}>{calData.filter(d=>d.val>=CALORIES_MIN&&d.val<=CALORIES_MAX).length} days on target</div>
+                  <div style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>{calData.filter(d=>d.val>=CALORIES_MIN&&d.val<=CALORIES_MAX).length} days on target</div>
                 </div>
               </div>
 
@@ -4090,10 +4090,10 @@ export default function App() {
                   <div className="section-title" style={{ fontSize: 14, margin: 0 }}>PROTEIN</div>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal ≥{PROTEIN_MIN}g</div>
                 </div>
-                <SummaryBar data={proData} color="#10b981" unit="g" goal={PROTEIN_MIN} />
+                <SummaryBar data={proData} color="#a855f7" unit="g" goal={PROTEIN_MIN} />
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {proData.filter(d=>d.val).length ? Math.round(proData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/proData.filter(d=>d.val).length) : "—"}g</div>
-                  <div style={{ fontSize: 10, color: "#10b981", fontFamily: "'DM Mono',monospace" }}>{proData.filter(d=>d.val>=PROTEIN_MIN).length} days hit goal</div>
+                  <div style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>{proData.filter(d=>d.val>=PROTEIN_MIN).length} days hit goal</div>
                 </div>
               </div>
 
