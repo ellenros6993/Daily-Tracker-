@@ -2327,15 +2327,10 @@ export default function App() {
               );
             })()}
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Share</div>
-                <button onClick={shareStats} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>📤 Share</button>
-              </div>
-              <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
-                <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Reminders</div>
-                <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", transition: "all 0.2s" }}>{notifEnabled ? "On ✓" : "Enable"}</button>
-              </div>
+
+            <div className="stat-card fade-up-4" style={{ padding: "10px 12px" }}>
+              <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>Reminders</div>
+              <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#0f1623", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", transition: "all 0.2s" }}>{notifEnabled ? "On ✓" : "Enable"}</button>
             </div>
 
             {/* Settings & Targets */}
@@ -4212,6 +4207,14 @@ export default function App() {
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {proData.filter(d=>d.val).length ? Math.round(proData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/proData.filter(d=>d.val).length) : "—"}g</div>
                   <div style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>{proData.filter(d=>d.val>=PROTEIN_MIN).length} days hit goal</div>
                 </div>
+              </div>
+
+              <div className="stat-card" style={{ padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "#e2e8f0", marginBottom: 2 }}>Share your stats</div>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Generates a summary image card</div>
+                </div>
+                <button onClick={shareStats} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "8px 16px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>📤 Share</button>
               </div>
 
             </div>
