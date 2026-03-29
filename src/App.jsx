@@ -2232,7 +2232,7 @@ export default function App() {
                           </div>
                           <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: val ? tileCol : "#1e2d40", lineHeight: 1 }}>{val || (isSteps ? <span style={{ fontSize: 11, color: "#334155" }}>tap</span> : "—")}</div>
                           {unit && val && <div style={{ color: "#334155", fontSize: 9, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>{unit}</div>}
-                          {val && label !== "Training" && (() => { const pct = label === "Cal" ? Math.min(100, Math.round(parseInt(val) / CALORIES_MAX * 100)) : label === "Protein" ? Math.min(100, Math.round(parseInt(val) / PROTEIN_MIN * 100)) : Math.min(100, Math.round(parseInt(val) / STEPS_MIN * 100)); return <div style={{ position: "absolute", top: 4, right: 5, fontSize: 8, color: label === "Cal" || label === "Protein" ? (hit ? "#a855f7" : "#475569") : (hit ? "#60a5fa" : "#475569"), fontFamily: "'DM Mono',monospace" }}>{pct}%</div>; })()}
+                          {val && label !== "Training" && (() => { const pct = label === "Cal" ? Math.min(100, Math.round(parseInt(val) / CALORIES_MAX * 100)) : label === "Protein" ? Math.min(100, Math.round(parseInt(val) / PROTEIN_MIN * 100)) : Math.min(100, Math.round(parseInt(val) / STEPS_MIN * 100)); return <div style={{ position: "absolute", top: 4, right: 5, fontSize: 8, color: tileCol, fontFamily: "'DM Mono',monospace" }}>{pct}%</div>; })()}
                         </div>
                       );
                     })}
