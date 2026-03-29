@@ -2039,6 +2039,7 @@ export default function App() {
                   const R = 42, CIRC = 2 * Math.PI * R;
                   const dash = ringPct * CIRC;
                   const ringCol = weekHits >= 6 ? "#10b981" : weekHits >= 4 ? "#fbbf24" : weekHits >= 2 ? "#f97316" : "#f87171";
+                  const ringCol = weekHits >= 6 ? "#10b981" : weekHits >= 4 ? "#fbbf24" : weekHits >= 2 ? "#f97316" : "#f87171";
                   return <>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <div className="big-num" style={{ fontSize: 26, color: "#a855f7" }}>
@@ -2430,20 +2431,20 @@ export default function App() {
                       <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: "1px solid #131929" }}>
                         <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 8, letterSpacing: 1 }}>PROJECTION</div>
                         <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: 100, display: "block" }}>
-                          <line x1="10" y1={goalY} x2={W-10} y2={goalY} stroke="#10b98122" strokeWidth="1" strokeDasharray="4 3" />
-                          {projPath && <path d={projPath} fill="none" stroke="#34d39966" strokeWidth="1.5" strokeDasharray="5 4" />}
-                          <path d={actPath} fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          {allPts.map((p,i) => <circle key={i} cx={px(p.d)} cy={py(p.w)} r="3" fill="#60a5fa" />)}
+                          <line x1="10" y1={goalY} x2={W-10} y2={goalY} stroke="#94a3b822" strokeWidth="1" strokeDasharray="4 3" />
+                          {projPath && <path d={projPath} fill="none" stroke="#94a3b844" strokeWidth="1.5" strokeDasharray="5 4" />}
+                          <path d={actPath} fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          {allPts.map((p,i) => <circle key={i} cx={px(p.d)} cy={py(p.w)} r="3" fill="#94a3b8" />)}
                           {projPts.length > 0 && <circle cx={px(projPts[projPts.length-1].d)} cy={py(projPts[projPts.length-1].w)} r="3" fill="#34d399" />}
                         </svg>
                         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
                           <div>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>AVG LOSS</div>
-                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#34d399" }}>{weeklyRate} <span style={{ fontSize: 10, color: "#475569" }}>lb/wk</span></div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#fbbf24" }}>{weeklyRate} <span style={{ fontSize: 10, color: "#475569" }}>lb/wk</span></div>
                           </div>
                           {goalDateStr ? <div style={{ textAlign: "right" }}>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>PROJECTED GOAL</div>
-                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#34d399" }}>{goalDateStr}</div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#fbbf24" }}>{goalDateStr}</div>
                           </div> : <div style={{ textAlign: "right" }}>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>PROJECTED GOAL</div>
                             <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 14, color: "#475569" }}>LOG MORE DATA</div>
@@ -2458,14 +2459,14 @@ export default function App() {
                       const prev = i < weighIns.length - 1 ? [...weighIns].reverse()[i + 1] : null;
                       const delta = prev ? (parseFloat(w.weight) - parseFloat(prev.weight)).toFixed(1) : null;
                       const isFirst = i === 0;
-                      const deltaColor = delta === null ? "#10b981" : parseFloat(delta) < 0 ? "#34d399" : parseFloat(delta) > 0 ? "#f87171" : "#475569";
+                      const deltaColor = delta === null ? "#94a3b8" : parseFloat(delta) < 0 ? "#fbbf24" : parseFloat(delta) > 0 ? "#f87171" : "#475569";
                       return (
                         <div key={w.date} className="timeline-node" style={{ display: "flex", alignItems: "center", gap: 8, background: isFirst ? "#0f1623" : "transparent", borderRadius: 8, padding: isFirst ? "8px 12px" : "4px 8px", border: isFirst ? "1px solid #1e2d40" : "1px solid transparent", animation: `fadeUp 0.3s ${i * 0.04}s ease both` }}>
-                          <div style={{ width: 4, height: isFirst ? 36 : 24, borderRadius: 2, background: isFirst ? "linear-gradient(to bottom,#059669,#34d399)" : "#1e2d40", flexShrink: 0 }} />
+                          <div style={{ width: 4, height: isFirst ? 36 : 24, borderRadius: 2, background: isFirst ? "linear-gradient(to bottom,#64748b,#94a3b8)" : "#1e2d40", flexShrink: 0 }} />
                           <div style={{ flex: 1 }}>
                             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
                               <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                                <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: isFirst ? 24 : 16, color: isFirst ? "#10b981" : "#94a3b8", lineHeight: 1 }}>{w.weight}</span>
+                                <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: isFirst ? 24 : 16, color: isFirst ? "#fbbf24" : "#64748b", lineHeight: 1 }}>{w.weight}</span>
                                 <span style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>lb</span>
                                 {delta !== null && (
                                   <span style={{ fontSize: 10, fontFamily: "'Bebas Neue',sans-serif", color: deltaColor }}>
