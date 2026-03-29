@@ -1184,16 +1184,113 @@ export default function App() {
 
   function shareStats() {
     const lw = latestWeight ? latestWeight.weight : "?";
-    const lost = lostSoFar > 0 ? lostSoFar : 0;
+    const lost = lostSoFar > 0 ? parseFloat(lostSoFar) : 0;
     const streak = getLoggingStreak(logs);
     const todayScore = today ? calcScore(today, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) : 0;
-    const text = `📊 Daily Accountability Tracker\n⚖️ Weight: ${lw} lb (${lost} lb lost)\n🔥 Streak: ${streak} days\n✅ Today: ${todayScore}/4\n🎯 Goal: 160 lb by Aug 23`;
-    if (navigator.share) {
-      navigator.share({ text }).catch(() => {});
-    } else {
-      navigator.clipboard?.writeText(text);
-      haptic("success");
-    }
+    const todayCal = today?.calories || "—";
+    const todayPro = today?.protein || "—";
+    const todaySteps = today?.steps || "—";
+    const pct = latestWeight ? Math.round(((START_WEIGHT - parseFloat(latestWeight.weight)) / (START_WEIGHT - GOAL_WEIGHT)) * 100) : 0;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 640; canvas.height = 400;
+    const ctx = canvas.getContext("2d");
+
+    // Background
+    ctx.fillStyle = "#07080d";
+    ctx.fillRect(0, 0, 640, 400);
+
+    // Green accent bar
+    ctx.fillStyle = "#10b981";
+    ctx.fillRect(0, 0, 4, 400);
+
+    // Title
+    ctx.fillStyle = "#10b981";
+    ctx.font = "bold 13px monospace";
+    ctx.fillText("DAILY ACCOUNTABILITY TRACKER", 24, 36);
+
+    // Date
+    ctx.fillStyle = "#475569";
+    ctx.font = "11px monospace";
+    ctx.fillText(new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }), 24, 56);
+
+    // Divider
+    ctx.strokeStyle = "#131929";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(24, 68); ctx.lineTo(616, 68); ctx.stroke();
+
+    // Weight block
+    ctx.fillStyle = "#34d399";
+    ctx.font = "bold 48px monospace";
+    ctx.fillText(lw, 24, 128);
+    ctx.fillStyle = "#475569";
+    ctx.font = "11px monospace";
+    ctx.fillText("lbs", 24 + ctx.measureText(lw).width + 8, 120);
+    ctx.fillStyle = "#10b981";
+    ctx.font = "12px monospace";
+    ctx.fillText(`↓ ${lost} lbs lost · ${pct}% to goal`, 24, 148);
+
+    // Divider
+    ctx.strokeStyle = "#131929";
+    ctx.beginPath(); ctx.moveTo(24, 168); ctx.lineTo(616, 168); ctx.stroke();
+
+    // Today stats
+    const stats = [
+      { label: "CALORIES", val: todayCal, color: "#a855f7", x: 24 },
+      { label: "PROTEIN", val: todayPro ? todayPro + "g" : "—", color: "#a855f7", x: 200 },
+      { label: "STEPS", val: todaySteps ? parseInt(todaySteps).toLocaleString() : "—", color: "#60a5fa", x: 376 },
+    ];
+    stats.forEach(({ label, val, color, x }) => {
+      ctx.fillStyle = "#475569";
+      ctx.font = "9px monospace";
+      ctx.fillText(label, x, 192);
+      ctx.fillStyle = color;
+      ctx.font = "bold 28px monospace";
+      ctx.fillText(val, x, 226);
+    });
+
+    // Divider
+    ctx.strokeStyle = "#131929";
+    ctx.beginPath(); ctx.moveTo(24, 248); ctx.lineTo(616, 248); ctx.stroke();
+
+    // Streak + Score
+    ctx.fillStyle = "#475569";
+    ctx.font = "9px monospace";
+    ctx.fillText("STREAK", 24, 272);
+    ctx.fillStyle = "#f97316";
+    ctx.font = "bold 36px monospace";
+    ctx.fillText(`${streak} days`, 24, 310);
+
+    ctx.fillStyle = "#475569";
+    ctx.font = "9px monospace";
+    ctx.fillText("TODAY'S SCORE", 300, 272);
+    ctx.fillStyle = todayScore === 4 ? "#10b981" : todayScore >= 2 ? "#fbbf24" : "#f87171";
+    ctx.font = "bold 36px monospace";
+    ctx.fillText(`${todayScore}/4`, 300, 310);
+
+    // Footer
+    ctx.fillStyle = "#1e2d40";
+    ctx.fillRect(0, 360, 640, 40);
+    ctx.fillStyle = "#334155";
+    ctx.font = "10px monospace";
+    ctx.fillText("dailytrack-ten.vercel.app", 24, 385);
+    ctx.fillStyle = "#10b981";
+    ctx.fillText("LOCKED IN 💪", 480, 385);
+
+    canvas.toBlob(blob => {
+      if (!blob) return;
+      const file = new File([blob], "my-stats.png", { type: "image/png" });
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        navigator.share({ files: [file], title: "My Stats" }).catch(() => {});
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = "my-stats.png"; a.click();
+        URL.revokeObjectURL(url);
+      }
+    }, "image/png");
+    haptic("success");
+  }
   }
 
   useEffect(() => { localStorage.setItem("dat-bf-goal", bfGoal); }, [bfGoal]);
@@ -2128,7 +2225,7 @@ export default function App() {
                       const tileCol = label === "Cal" || label === "Protein" ? "#a855f7" : label === "Steps" || label === "Training" ? "#60a5fa" : "#10b981";
                       return (
                         <div key={label} onClick={() => isSteps && !val && setShowManualSteps(v => !v)}
-                          style={{ background: "#0f1623", borderRadius: 8, padding: "10px 8px", textAlign: "center", border: `1px solid ${hit === true ? tileCol+"22" : hit === false ? "#f8717122" : "#131929"}`, cursor: isSteps && !val ? "pointer" : "default", position: "relative" }}>
+                          style={{ background: "#0f1623", borderRadius: 8, padding: "10px 8px", textAlign: "center", border: `1px solid ${hit === true ? "#10b98144" : hit === false ? "#f8717122" : "#131929"}`, cursor: isSteps && !val ? "pointer" : "default", position: "relative" }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, marginBottom: 5 }}>
                             <span className={`status-indicator ${val ? (label === "Cal" || label === "Protein" ? "si-purple" : "si-blue") : "si-gray"}`} style={{ width: 6, height: 6 }} />
                             <span className="label" style={{ marginBottom: 0, fontSize: 8 }}>{label}</span>
@@ -2136,6 +2233,7 @@ export default function App() {
                           </div>
                           <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: val ? tileCol : "#1e2d40", lineHeight: 1 }}>{val || (isSteps ? <span style={{ fontSize: 11, color: "#334155" }}>tap</span> : "—")}</div>
                           {unit && val && <div style={{ color: "#334155", fontSize: 9, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>{unit}</div>}
+                          {val && label !== "Training" && (() => { const pct = label === "Cal" ? Math.min(100, Math.round(parseInt(val) / CALORIES_MAX * 100)) : label === "Protein" ? Math.min(100, Math.round(parseInt(val) / PROTEIN_MIN * 100)) : Math.min(100, Math.round(parseInt(val) / STEPS_MIN * 100)); return <div style={{ position: "absolute", top: 4, right: 5, fontSize: 8, color: hit === true ? "#10b981" : "#475569", fontFamily: "'DM Mono',monospace" }}>{pct}%</div>; })()}
                         </div>
                       );
                     })}
@@ -2164,7 +2262,7 @@ export default function App() {
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       {!today.steps && <button onClick={() => setShowShortcutModal(true)} style={{ background: "none", border: "none", color: "#60a5fa", fontSize: 10, display: "flex", alignItems: "center", gap: 3, cursor: "pointer" }}>⚡ Sync Steps</button>}
-                      <button onClick={() => navigateTo("Nutrition")} style={{ background: "none", border: "none", color: "#a855f7", fontSize: 10, fontWeight: 500, display: "flex", alignItems: "center", gap: 2 }}>Update <ChevronRight size={11} /></button>
+                      <button onClick={() => navigateTo("Nutrition")} style={{ background: "none", border: "none", color: "#10b981", fontSize: 10, fontWeight: 500, display: "flex", alignItems: "center", gap: 2 }}>Update <ChevronRight size={11} /></button>
                     </div>
                   </div>
                 </>
@@ -2177,27 +2275,6 @@ export default function App() {
               )}
             </div>
             );})()}
-            {/* 7-Day Averages */}
-            {(() => {
-              const last7 = logs.filter(l => { const d = getDaysBetween(l.date, getLocalDateStr()); return d >= 0 && d < 7; });
-              const withCal = last7.filter(l => l.calories && parseInt(l.calories) > 0);
-              const withPro = last7.filter(l => l.protein && parseInt(l.protein) > 0);
-              const withSteps = last7.filter(l => l.steps && parseInt(l.steps) > 0);
-              const avgCal = withCal.length ? Math.round(withCal.reduce((s,l) => s + parseInt(l.calories), 0) / withCal.length) : null;
-              const avgPro = withPro.length ? Math.round(withPro.reduce((s,l) => s + parseInt(l.protein), 0) / withPro.length) : null;
-              const avgSteps = withSteps.length ? Math.round(withSteps.reduce((s,l) => s + parseInt(l.steps), 0) / withSteps.length) : null;
-              if(!avgCal && !avgPro && !avgSteps) return null;
-              return (
-                <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
-                  <div className="label" style={{ fontSize: 9, marginBottom: 10 }}>7-DAY AVERAGES</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgCal ? "#a855f7" : "#334155", lineHeight: 1 }}>{avgCal || "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>kcal/day</div></div>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgPro ? "#a855f7" : "#334155", lineHeight: 1 }}>{avgPro ? avgPro + "g" : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>protein/day</div></div>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: "#60a5fa", lineHeight: 1 }}>{avgSteps ? avgSteps.toLocaleString() : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>steps/day</div></div>
-                  </div>
-                </div>
-              );
-            })()}
 
 
 
@@ -2271,6 +2348,7 @@ export default function App() {
                     <div className="label" style={{ fontSize: 9, marginBottom: 4 }}>Settings & Targets</div>
                     <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>
                       <div style={{display:"flex",gap:10,marginTop:4}}><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#a855f7",lineHeight:1}}>{S_CALORIES_MIN}–{S_CALORIES_MAX}</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>kcal</div></div><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#a855f7",lineHeight:1}}>≥{S_PROTEIN_MIN}g</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>protein</div></div><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#60a5fa",lineHeight:1}}>≥{S_STEPS_MIN.toLocaleString()}</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>steps</div></div></div>
+                    <div style={{display:"flex",alignItems:"center",gap:6,marginTop:8}}><span style={{fontSize:9,color:"#475569",fontFamily:"'DM Mono',monospace"}}>WEEKLY WORKOUT GOAL:</span><input type="number" min="1" max="7" value={WORKOUTS_PER_WEEK} onChange={e=>{const v=parseInt(e.target.value)||1;saveSettings({...settings,workoutsPerWeek:v});}} style={{width:36,padding:"2px 6px",fontSize:11,textAlign:"center",background:"#131929",border:"1px solid #1e2d40",borderRadius:6,color:"#10b981"}} /><span style={{fontSize:9,color:"#475569",fontFamily:"'DM Mono',monospace"}}>days/wk</span></div>
                     </div>
                   </div>
                 </div>
