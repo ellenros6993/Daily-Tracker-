@@ -1291,7 +1291,6 @@ export default function App() {
     }, "image/png");
     haptic("success");
   }
-  }
 
   useEffect(() => { localStorage.setItem("dat-bf-goal", bfGoal); }, [bfGoal]);
 
