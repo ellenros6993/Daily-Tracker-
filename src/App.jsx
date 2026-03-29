@@ -1683,6 +1683,8 @@ export default function App() {
         .si-green { background: #10b981; box-shadow: 0 0 6px #10b98166; }
         .si-red { background: #f87171; box-shadow: 0 0 6px #f8717166; }
         .si-yellow { background: #fbbf24; box-shadow: 0 0 6px #fbbf2466; }
+        .si-purple { background: #a855f7; box-shadow: 0 0 6px #a855f766; }
+        .si-blue { background: #60a5fa; box-shadow: 0 0 6px #60a5fa66; }
         .si-gray { background: #1e2d40; }
 
         /* Tables */
@@ -1892,7 +1894,7 @@ export default function App() {
           { id: "Weekly Report", Icon: BarChart2, label: "Summary" },
           { id: "Progress Photos", Icon: Camera, label: "Progress" },
         ].map(({ id, Icon, label }) => (
-          <button key={id} onClick={() => navigateTo(id)} style={{ background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 6px", color: tab === id ? (id === "Training" ? "#60a5fa" : id === "Weight Tracker" ? "#34d399" : id === "Progress Photos" ? "#a855f7" : "#10b981") : "#334155", transition: "color 0.15s" }}>
+          <button key={id} onClick={() => navigateTo(id)} style={{ background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 6px", color: tab === id ? (id === "Training" ? "#60a5fa" : id === "Weight Tracker" ? "#fbbf24" : id === "Progress Photos" ? "#a855f7" : "#10b981") : "#334155", transition: "color 0.15s" }}>
             <Icon size={18} />
             <span style={{ fontSize: 9, letterSpacing: 0.3, fontFamily: "'DM Mono',monospace" }}>{label}</span>
           </button>
@@ -2119,15 +2121,16 @@ export default function App() {
                     ].map(({ label, val, check, unit }) => {
                       const hit = val ? check(val) : null;
                       const isSteps = label === "Steps";
+                      const tileCol = label === "Cal" || label === "Protein" ? "#a855f7" : label === "Steps" || label === "Training" ? "#60a5fa" : "#10b981";
                       return (
                         <div key={label} onClick={() => isSteps && !val && setShowManualSteps(v => !v)}
-                          style={{ background: "#0f1623", borderRadius: 8, padding: "10px 8px", textAlign: "center", border: `1px solid ${hit === true ? "#10b98122" : hit === false ? "#f8717122" : "#131929"}`, cursor: isSteps && !val ? "pointer" : "default", position: "relative" }}>
+                          style={{ background: "#0f1623", borderRadius: 8, padding: "10px 8px", textAlign: "center", border: `1px solid ${hit === true ? tileCol+"22" : hit === false ? "#f8717122" : "#131929"}`, cursor: isSteps && !val ? "pointer" : "default", position: "relative" }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, marginBottom: 5 }}>
-                            <span className={`status-indicator ${hit === true ? "si-green" : hit === false ? "si-red" : "si-gray"}`} style={{ width: 6, height: 6 }} />
+                            <span className={`status-indicator ${hit === true ? (label === "Cal" || label === "Protein" ? "si-purple" : "si-blue") : hit === false ? "si-red" : "si-gray"}`} style={{ width: 6, height: 6 }} />
                             <span className="label" style={{ marginBottom: 0, fontSize: 8 }}>{label}</span>
                             {isSteps && val && <span onClick={e => { e.stopPropagation(); setShowManualSteps(v => !v); }} style={{ fontSize: 7, color: "#334155", cursor: "pointer", marginLeft: 2 }}>✏️</span>}
                           </div>
-                          <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: hit === true ? "#34d399" : hit === false ? "#f87171" : "#1e2d40", lineHeight: 1 }}>{val || (isSteps ? <span style={{ fontSize: 11, color: "#334155" }}>tap</span> : "—")}</div>
+                          <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: hit === true ? tileCol : hit === false ? "#f87171" : "#1e2d40", lineHeight: 1 }}>{val || (isSteps ? <span style={{ fontSize: 11, color: "#334155" }}>tap</span> : "—")}</div>
                           {unit && val && <div style={{ color: "#334155", fontSize: 9, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>{unit}</div>}
                         </div>
                       );
