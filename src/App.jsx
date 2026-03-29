@@ -4030,9 +4030,9 @@ export default function App() {
               {/* KPI row */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                 <div className="stat-card" style={{ padding: "12px 10px", textAlign: "center" }}>
-                  <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>GOAL HIT RATE</div>
-                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: goalHitRate >= 80 ? "#34d399" : goalHitRate >= 50 ? "#fbbf24" : "#f87171", lineHeight: 1 }}>{goalHitRate}%</div>
-                  <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{goalsHit}/{daysWithData} days</div>
+                  <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>AVG WATER</div>
+                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: "#60a5fa", lineHeight: 1 }}>{(() => { try { const w = JSON.parse(localStorage.getItem("dat-water") || "{}"); const unit = localStorage.getItem("dat-water-unit") || "L"; const unitMl = unit === "L" ? 250 : unit === "500ml" ? 500 : unit === "cups" ? 237 : 30; const entries = Object.entries(w).filter(([d]) => { const diff = (new Date(getLocalDateStr()) - new Date(d)) / 86400000; return diff >= 0 && diff < days; }); if (!entries.length) return "—"; const avg = entries.reduce((s,[,v]) => s + v * unitMl, 0) / entries.length / 1000; return avg.toFixed(1) + "L"; } catch { return "—"; } })()}</div>
+                  <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>avg per day</div>
                 </div>
                 <div className="stat-card" style={{ padding: "12px 10px", textAlign: "center" }}>
                   <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>AVG SLEEP</div>
