@@ -2135,7 +2135,7 @@ export default function App() {
                   {showManualSteps && (
                     <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
                       <input type="number" placeholder="Enter steps..." value={manualStepsInput} onChange={e => setManualStepsInput(e.target.value)}
-                        style={{ flex: 1, fontSize: 13, padding: "6px 10px" }} />
+                        style={{ flex: 1, fontSize: 16, padding: "6px 10px" }} />
                       <button onClick={() => {
                         if (!manualStepsInput) return;
                         const tod = viewedDate;
