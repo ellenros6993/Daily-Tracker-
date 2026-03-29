@@ -2375,6 +2375,7 @@ export default function App() {
                   {/* Weight loss progress arc */}
                   {weighIns.length > 0 && (() => {
                     const startW = parseFloat(START_WEIGHT);
+                    const goalW = parseFloat(GOAL_WEIGHT);
                     const currentW = parseFloat([...weighIns].sort((a,b) => b.date.localeCompare(a.date))[0]?.weight || startW);
                     const totalToLose = startW - goalW;
                     const lost = startW - currentW;
