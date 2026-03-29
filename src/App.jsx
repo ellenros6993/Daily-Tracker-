@@ -2039,7 +2039,6 @@ export default function App() {
                   const R = 42, CIRC = 2 * Math.PI * R;
                   const dash = ringPct * CIRC;
                   const ringCol = weekHits >= 6 ? "#10b981" : weekHits >= 4 ? "#fbbf24" : weekHits >= 2 ? "#f97316" : "#f87171";
-                  const ringCol = weekHits >= 6 ? "#10b981" : weekHits >= 4 ? "#fbbf24" : weekHits >= 2 ? "#f97316" : "#f87171";
                   return <>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <div className="big-num" style={{ fontSize: 26, color: "#a855f7" }}>
