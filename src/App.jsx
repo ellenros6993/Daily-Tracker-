@@ -1983,7 +1983,7 @@ export default function App() {
             {/* Weekly Compliance + Next Milestone + Share */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }} className="kpi-grid">
               {/* Weekly compliance ring */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px 40px 14px", borderLeft: "3px solid #fbbf24" }}>
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px 40px 14px", borderLeft: `3px solid ${(() => { const wh = getWeekLogs(logs, getCurrentWeekStart()).filter(l => calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) >= 1).length; return wh >= 6 ? "#10b981" : wh >= 4 ? "#fbbf24" : wh >= 2 ? "#f97316" : "#f87171"; })()}` }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>This Week</div>
                 {(() => {
                   const weekLogs = getWeekLogs(logs, getCurrentWeekStart());
