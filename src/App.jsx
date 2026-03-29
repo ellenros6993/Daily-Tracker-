@@ -2374,8 +2374,7 @@ export default function App() {
                   <div className="section-title" style={{ fontSize: 14, color: "#fbbf24" }}>WEIGHT JOURNEY</div>
                   {/* Weight loss progress arc */}
                   {weighIns.length > 0 && (() => {
-                    const startW = periodWeights.length ? parseFloat(periodWeights[0].weight) : parseFloat(START_WEIGHT);
-                    const goalW = parseFloat(GOAL_WEIGHT);
+                    const startW = parseFloat(START_WEIGHT);
                     const currentW = parseFloat([...weighIns].sort((a,b) => b.date.localeCompare(a.date))[0]?.weight || startW);
                     const totalToLose = startW - goalW;
                     const lost = startW - currentW;
