@@ -550,6 +550,7 @@ export default function App() {
   const S_PROTEIN_MIN = settings.proteinMin;
   const S_STEPS_MIN = settings.stepsMin;
   const S_WATER_GOAL = settings.waterGoal || 8;
+  const WORKOUTS_PER_WEEK = settings.workoutsPerWeek || 4;
   // Override module constants with live settings inside component
   const CALORIES_MIN = S_CALORIES_MIN; // eslint-disable-line no-shadow
   const CALORIES_MAX = S_CALORIES_MAX; // eslint-disable-line no-shadow
@@ -1996,7 +1997,7 @@ export default function App() {
                   let restDaysUsed = 0;
                   const { hitGoals, totalGoals } = weekLogs.reduce((acc, l) => {
                     const trained = l.training && l.training.trim() !== "";
-                    const isRest = !trained && restDaysUsed < 2;
+                    const maxRestDays = 7 - WORKOUTS_PER_WEEK; const isRest = !trained && restDaysUsed < maxRestDays;
                     if (!trained) restDaysUsed++;
                     const possible = isRest ? 3 : 4;
                     return { hitGoals: acc.hitGoals + calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}), totalGoals: acc.totalGoals + possible };
