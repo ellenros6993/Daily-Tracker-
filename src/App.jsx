@@ -2035,6 +2035,7 @@ export default function App() {
                   const ringPct = weekHits / WEEK_GOAL;
                   const R = 42, CIRC = 2 * Math.PI * R;
                   const dash = ringPct * CIRC;
+                  const ringCol = weekHits >= 6 ? "#10b981" : weekHits >= 4 ? "#fbbf24" : weekHits >= 2 ? "#f97316" : "#f87171";
                   return <>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <div className="big-num" style={{ fontSize: 26, color: "#a855f7" }}>
@@ -2044,7 +2045,7 @@ export default function App() {
                       <svg width={100} height={100} style={{ flexShrink: 0, overflow: "visible" }}>
                         <circle cx="50" cy="50" r={R} fill="none" stroke="#131929" strokeWidth="4" />
                         <circle cx="50" cy="50" r={R} fill="none"
-                          stroke="#a855f7"
+                          stroke={ringCol}
                           strokeWidth="4" strokeLinecap="round"
                           strokeDasharray={`${dash} ${CIRC}`}
                           transform="rotate(-90 50 50)"
