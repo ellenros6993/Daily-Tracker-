@@ -2209,6 +2209,41 @@ export default function App() {
                   })}
                 </div>
               )}
+            {/* Sleep on Home */}
+            {(() => {
+              const sleep = getSleepToday();
+              const qualityColors = ["","#f87171","#fb923c","#fbbf24","#34d399","#10b981"];
+              return (
+                <div className="stat-card fade-up-3" style={{ padding: "10px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 14 }}>😴</span>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Last Night's Sleep</div>
+                      {sleep.hours && <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "#fb7185" }}>{sleep.hours}h</span>}
+                      {sleep.quality > 0 && <span style={{ fontSize: 11, color: qualityColors[sleep.quality] }}>{["","😴","😕","😊","😌","🌟"][sleep.quality]}</span>}
+                    </div>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <select value={sleep.hours || ""} onChange={e => { saveSleep("hours", e.target.value ? parseFloat(e.target.value) : ""); haptic("light"); }}
+                        style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 6, color: sleep.hours ? "#fb7185" : "#475569", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "3px 6px", cursor: "pointer", outline: "none" }}>
+                        <option value="">hrs</option>
+                        {[4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10].map(h => (
+                          <option key={h} value={h}>{h}h</option>
+                        ))}
+                      </select>
+                      <select value={sleep.quality || ""} onChange={e => { saveSleep("quality", e.target.value ? parseInt(e.target.value) : 0); haptic("light"); }}
+                        style={{ background: "#0f1623", border: `1px solid ${sleep.quality ? qualityColors[sleep.quality] + "66" : "#1e2d40"}`, borderRadius: 6, color: sleep.quality ? qualityColors[sleep.quality] : "#475569", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "3px 6px", cursor: "pointer", outline: "none" }}>
+                        <option value="">quality</option>
+                        <option value="1">😴 Poor</option>
+                        <option value="2">😕 Fair</option>
+                        <option value="3">😊 Okay</option>
+                        <option value="4">😌 Good</option>
+                        <option value="5">🌟 Great</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
               <div style={{ marginBottom: 10, fontSize: 9, fontWeight: 700, letterSpacing: 3, color: "#334155", fontFamily: "'DM Mono',monospace", textTransform: "uppercase" }}>Today's Log</div>
               {today ? (
                 <>
@@ -2593,6 +2628,8 @@ export default function App() {
                 <button onClick={() => { if (!copyYesterdayMeals()) alert("No meals logged yesterday"); }} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "5px 12px", borderRadius: 8, fontSize: 10, fontFamily: "'DM Mono',monospace", cursor: "pointer" }}>↑ Copy Yesterday</button>
               </div>
 
+              {/* Daily totals + Water row */}
+            <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
               {/* Daily goal ring */}
               <div className="stat-card" style={{ borderColor: "#a855f722" }}>
                 <div className="section-title" style={{ fontSize: 14, color: "#a855f7", marginBottom: 12 }}>DAILY TOTALS</div>
@@ -2655,9 +2692,6 @@ export default function App() {
                 </div>
                 <div style={{ marginTop: 4, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "right" }}>✓ Auto-saved</div>
               </div>
-
-            {/* Water + Sleep side by side */}
-            <div style={{ display: "flex", gap: 8 }}>
               {/* Water Tracker */}
               <div className="stat-card fade-up-4" style={{ padding: "12px 12px", flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
@@ -2706,52 +2740,6 @@ export default function App() {
                 })()}
               </div>
 
-
-              {/* Sleep Tracker */}
-              {(() => {
-                const sleep = getSleepToday();
-                const qualityLabels = ["","😴 Poor","😕 Fair","😊 Okay","😌 Good","🌟 Great"];
-                const qualityColors = ["","#f87171","#fb923c","#fbbf24","#34d399","#10b981"];
-                return (
-                  <div className="stat-card fade-up-4" style={{ padding: "12px 12px", flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                      <span style={{ fontSize: 14 }}>😴</span>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Last Night's Sleep</div>
-                      {sleep.hours && <span style={{ marginLeft: "auto", fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "#60a5fa" }}>{sleep.hours}h</span>}
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <div>
-                        <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4, letterSpacing: 1 }}>HOURS SLEPT</div>
-                        <select value={sleep.hours || ""} onChange={e => { saveSleep("hours", e.target.value ? parseFloat(e.target.value) : ""); haptic("light"); }}
-                          style={{ width: "100%", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: sleep.hours ? "#60a5fa" : "#475569", fontSize: 12, fontFamily: "'DM Mono',monospace", padding: "5px 8px", cursor: "pointer", outline: "none" }}>
-                          <option value="">-- hrs</option>
-                          {[4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10].map(h => (
-                            <option key={h} value={h}>{h}h</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4, letterSpacing: 1 }}>QUALITY</div>
-                        <select value={sleep.quality || ""} onChange={e => { saveSleep("quality", e.target.value ? parseInt(e.target.value) : 0); haptic("light"); }}
-                          style={{ width: "100%", background: "#0f1623", border: `1px solid ${sleep.quality ? qualityColors[sleep.quality] : "#1e2d40"}`, borderRadius: 7, color: sleep.quality ? qualityColors[sleep.quality] : "#475569", fontSize: 12, fontFamily: "'DM Mono',monospace", padding: "5px 8px", cursor: "pointer", outline: "none" }}>
-                          <option value="">-- quality</option>
-                          <option value="1">😴 Poor</option>
-                          <option value="2">😕 Fair</option>
-                          <option value="3">😊 Okay</option>
-                          <option value="4">😌 Good</option>
-                          <option value="5">🌟 Great</option>
-                        </select>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4, letterSpacing: 1 }}>NOTES</div>
-                        <textarea value={sleep.note || ""} onChange={e => saveSleep("note", e.target.value)}
-                          placeholder="Any notes..."
-                          style={{ width: "100%", boxSizing: "border-box", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 10, fontFamily: "'DM Mono',monospace", padding: "6px 8px", resize: "none", minHeight: 48, outline: "none" }} />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
             </div>
               <div className="stat-card" style={{ padding: 0, overflow: "hidden" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer" }} onClick={() => setShowManualMacros(v => !v)}>
