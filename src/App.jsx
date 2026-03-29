@@ -1894,7 +1894,7 @@ export default function App() {
           { id: "Weekly Report", Icon: BarChart2, label: "Summary" },
           { id: "Progress Photos", Icon: Camera, label: "Progress" },
         ].map(({ id, Icon, label }) => (
-          <button key={id} onClick={() => navigateTo(id)} style={{ background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 6px", color: tab === id ? (id === "Training" ? "#60a5fa" : id === "Weight Tracker" ? "#fbbf24" : id === "Progress Photos" ? "#10b981" : "#a855f7") : "#334155", transition: "color 0.15s" }}>
+          <button key={id} onClick={() => navigateTo(id)} style={{ background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 6px", color: tab === id ? (id === "Training" ? "#60a5fa" : id === "Weight Tracker" ? "#fbbf24" : id === "Progress Photos" ? "#10b981" : id === "Nutrition" ? "#a855f7" : "#10b981") : "#334155", transition: "color 0.15s" }}>
             <Icon size={18} />
             <span style={{ fontSize: 9, letterSpacing: 0.3, fontFamily: "'DM Mono',monospace" }}>{label}</span>
           </button>
