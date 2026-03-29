@@ -3251,7 +3251,7 @@ export default function App() {
 
               {/* Circuit Timer */}
               {showCircuitTimer && (
-                <div style={{ position: "fixed", inset: 0, background: "#07080dee", zIndex: 1000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
+                <div style={{ position: "fixed", inset: 0, background: "#07080dee", zIndex: 1000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", padding: 24, paddingTop: 60, overflowY: "auto" }}>
                   <div style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 16, width: "100%", maxWidth: 400, padding: 24, position: "relative" }}>
                     <button onClick={() => { setShowCircuitTimer(false); setCircuitRunning(false); setCircuitPhase("build"); }} style={{ position: "absolute", top: 12, right: 12, background: "none", border: "none", color: "#475569", fontSize: 20, cursor: "pointer" }}>✕</button>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0", marginBottom: 16, letterSpacing: 2, fontFamily: "'DM Mono',monospace" }}>⏱ CIRCUIT TIMER</div>
