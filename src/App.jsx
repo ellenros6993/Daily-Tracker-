@@ -1841,7 +1841,7 @@ export default function App() {
         </nav>
         <div style={{ padding: "16px 20px", borderTop: "1px solid #131929" }}>
           <div style={{ fontSize: 9, color: "#1e2d40", letterSpacing: 1, fontFamily: "'DM Mono', monospace", marginBottom: 4 }}>TARGETS</div>
-          <div style={{ fontSize: 10, lineHeight: 1.8, fontFamily: "'DM Mono', monospace" }}><div style={{color:"#334155"}}>{S_CALORIES_MIN}–{S_CALORIES_MAX} kcal</div><div style={{color:"#10b981"}}>≥{S_PROTEIN_MIN}g protein</div><div style={{color:"#60a5fa"}}>≥{S_STEPS_MIN.toLocaleString()} steps</div></div>
+          <div style={{ fontSize: 10, lineHeight: 1.8, fontFamily: "'DM Mono', monospace" }}><div style={{color:"#334155"}}>{S_CALORIES_MIN}–{S_CALORIES_MAX} kcal</div><div style={{color:"#a855f7"}}>≥{S_PROTEIN_MIN}g protein</div><div style={{color:"#60a5fa"}}>≥{S_STEPS_MIN.toLocaleString()} steps</div></div>
         </div>
       </div>
 
@@ -2187,8 +2187,8 @@ export default function App() {
                 <div className="stat-card fade-up-3" style={{ padding: "12px 14px" }}>
                   <div className="label" style={{ fontSize: 9, marginBottom: 10 }}>7-DAY AVERAGES</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgCal && avgCal >= CALORIES_MIN && avgCal <= CALORIES_MAX ? "#34d399" : avgCal ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgCal || "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>kcal/day</div></div>
-                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgPro && avgPro >= PROTEIN_MIN ? "#34d399" : avgPro ? "#fbbf24" : "#334155", lineHeight: 1 }}>{avgPro ? avgPro + "g" : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>protein/day</div></div>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgCal ? "#a855f7" : "#334155", lineHeight: 1 }}>{avgCal || "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>kcal/day</div></div>
+                    <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: avgPro ? "#a855f7" : "#334155", lineHeight: 1 }}>{avgPro ? avgPro + "g" : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>protein/day</div></div>
                     <div><div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: "#60a5fa", lineHeight: 1 }}>{avgSteps ? avgSteps.toLocaleString() : "—"}</div><div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>steps/day</div></div>
                   </div>
                 </div>
@@ -2266,7 +2266,7 @@ export default function App() {
                   <div>
                     <div className="label" style={{ fontSize: 9, marginBottom: 4 }}>Settings & Targets</div>
                     <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>
-                      <div style={{display:"flex",gap:10,marginTop:4}}><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#34d399",lineHeight:1}}>{S_CALORIES_MIN}–{S_CALORIES_MAX}</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>kcal</div></div><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#60a5fa",lineHeight:1}}>≥{S_PROTEIN_MIN}g</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>protein</div></div><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#a855f7",lineHeight:1}}>≥{S_STEPS_MIN.toLocaleString()}</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>steps</div></div></div>
+                      <div style={{display:"flex",gap:10,marginTop:4}}><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#a855f7",lineHeight:1}}>{S_CALORIES_MIN}–{S_CALORIES_MAX}</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>kcal</div></div><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#a855f7",lineHeight:1}}>≥{S_PROTEIN_MIN}g</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>protein</div></div><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#60a5fa",lineHeight:1}}>≥{S_STEPS_MIN.toLocaleString()}</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>steps</div></div></div>
                     </div>
                   </div>
                 </div>
