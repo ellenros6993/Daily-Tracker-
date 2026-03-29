@@ -2500,8 +2500,8 @@ export default function App() {
           const calRemaining = CALORIES_MAX - totalCals;
           const calPct = Math.min(100, Math.round((totalCals / CALORIES_MAX) * 100));
           const proPct = Math.min(100, Math.round((totalPro / PROTEIN_MIN) * 100));
-          const calColor = totalCals >= CALORIES_MIN && totalCals <= CALORIES_MAX ? "#34d399" : totalCals > CALORIES_MAX ? "#f87171" : "#fbbf24";
-          const proColor = totalPro >= PROTEIN_MIN ? "#34d399" : "#fbbf24";
+          const calColor = totalCals >= CALORIES_MIN && totalCals <= CALORIES_MAX ? "#a855f7" : totalCals > CALORIES_MAX ? "#f87171" : "#c084fc";
+          const proColor = totalPro >= PROTEIN_MIN ? "#a855f7" : "#c084fc";
           const totalCarbs = Math.round(MEAL_SLOTS.reduce((s, slot) => s + (mealFoods[slot] || []).reduce((ms, f) => ms + (f.carbs || 0), 0), 0));
           const totalFat = Math.round(MEAL_SLOTS.reduce((s, slot) => s + (mealFoods[slot] || []).reduce((ms, f) => ms + (f.fat || 0), 0), 0));
           const recentFoods = getRecentFoods();
@@ -2521,7 +2521,7 @@ export default function App() {
               </div>
 
               {/* Daily goal ring */}
-              <div className="stat-card" style={{ borderColor: "#046c4e22" }}>
+              <div className="stat-card" style={{ borderColor: "#a855f722" }}>
                 {/* Top row: calories | ring | protein (highlighted) */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 12, alignItems: "center" }}>
                   <div style={{ textAlign: "center" }}>
@@ -2547,7 +2547,7 @@ export default function App() {
                     );
                   })()}
                   {/* Protein — highlighted */}
-                  <div style={{ textAlign: "center", background: "#0a2118", borderRadius: 10, padding: "10px 6px", border: `1px solid ${proColor}33` }}>
+                  <div style={{ textAlign: "center", background: "#1a0a2e", borderRadius: 10, padding: "10px 6px", border: `1px solid ${proColor}33` }}>
                     <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: proColor, lineHeight: 1 }}>{Math.round(totalPro)}g</div>
                     <div style={{ fontSize: 9, color: proColor, fontFamily: "'DM Mono',monospace", fontWeight: 600 }}>PROTEIN</div>
                     <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>goal {PROTEIN_MIN}g</div>
