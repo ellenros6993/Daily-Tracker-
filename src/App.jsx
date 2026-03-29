@@ -2289,7 +2289,7 @@ export default function App() {
               <div className="section-title">WEIGHT TRACKER</div>
 
               {isWeighInDay && (
-                <div style={{ background: "#071910", border: "1px solid #10b98133", borderRadius: 10, padding: "10px 16px", color: "#34d399", fontSize: 11 }}>
+                <div style={{ background: "#1a1200", border: "1px solid #fbbf2433", borderRadius: 10, padding: "10px 16px", color: "#fbbf24", fontSize: 11 }}>
                   ⚖️ Today is a weigh-in day — log your weight below
                 </div>
               )}
@@ -2348,20 +2348,20 @@ export default function App() {
                     <div className="section-title" style={{ fontSize: 14 }}>TREND CHART</div>
                     <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ overflow: "visible", display: "block" }}>
                       <defs>
-                        <linearGradient id="wg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#059669"/><stop offset="100%" stopColor="#34d399"/></linearGradient>
+                        <linearGradient id="wg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#d97706"/><stop offset="100%" stopColor="#fbbf24"/></linearGradient>
                       </defs>
                       {/* Goal line */}
                       {GOAL_WEIGHT >= wMin && GOAL_WEIGHT <= wMax && <line x1="0" y1={goalY} x2={W} y2={goalY} stroke="#fbbf2444" strokeWidth="1" strokeDasharray="4 3" />}
                       {/* Prediction dotted extension */}
-                      {rate > 0 && <line x1={x(pts.length-1)} y1={yW(parseFloat(pts[pts.length-1].weight))} x2={W + 20} y2={yW(Math.max(predWeight, wMin - 2))} stroke="#10b98166" strokeWidth="1.5" strokeDasharray="5 4" strokeLinecap="round" />}
+                      {rate > 0 && <line x1={x(pts.length-1)} y1={yW(parseFloat(pts[pts.length-1].weight))} x2={W + 20} y2={yW(Math.max(predWeight, wMin - 2))} stroke="#fbbf2466" strokeWidth="1.5" strokeDasharray="5 4" strokeLinecap="round" />}
                       {/* Body fat line */}
                       {bfPath && <path d={bfPath} fill="none" stroke="#a78bfa99" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />}
                       {/* Weight line */}
                       <path d={weightPath} fill="none" stroke="url(#wg)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                      {pts.map((p,i) => <circle key={i} cx={x(i)} cy={yW(parseFloat(p.weight))} r="2.5" fill="#10b981" />)}
+                      {pts.map((p,i) => <circle key={i} cx={x(i)} cy={yW(parseFloat(p.weight))} r="2.5" fill="#fbbf24" />)}
                     </svg>
                     <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 5 }}><div style={{ width: 16, height: 2, background: "linear-gradient(to right,#059669,#34d399)", borderRadius: 1 }} /><span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Weight</span></div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 5 }}><div style={{ width: 16, height: 2, background: "linear-gradient(to right,#d97706,#fbbf24)", borderRadius: 1 }} /><span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Weight</span></div>
                       {bfPath && <div style={{ display: "flex", alignItems: "center", gap: 5 }}><div style={{ width: 16, height: 2, background: "#a78bfa", borderRadius: 1 }} /><span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Body Fat %</span></div>}
                     </div>
                   </div>
