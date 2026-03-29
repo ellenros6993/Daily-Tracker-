@@ -2382,7 +2382,7 @@ export default function App() {
                     const pct = Math.max(0, Math.min(1, lost / totalToLose));
                     const R = 30, CIRC = 2 * Math.PI * R;
                     const dash = pct * CIRC;
-                    const col = pct >= 1 ? "#34d399" : pct >= 0.5 ? "#fbbf24" : "#60a5fa";
+                    const col = "#2dd4bf";
                     return (
                       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16, paddingBottom: 16, borderBottom: "1px solid #131929" }}>
                         <svg width={74} height={74}>
@@ -2458,7 +2458,7 @@ export default function App() {
                       const prev = i < weighIns.length - 1 ? [...weighIns].reverse()[i + 1] : null;
                       const delta = prev ? (parseFloat(w.weight) - parseFloat(prev.weight)).toFixed(1) : null;
                       const isFirst = i === 0;
-                      const deltaColor = delta === null ? "#94a3b8" : parseFloat(delta) < 0 ? "#fbbf24" : parseFloat(delta) > 0 ? "#f87171" : "#475569";
+                      const deltaColor = delta === null ? "#fbbf24" : parseFloat(delta) < 0 ? "#34d399" : parseFloat(delta) > 0 ? "#f87171" : "#475569";
                       return (
                         <div key={w.date} className="timeline-node" style={{ display: "flex", alignItems: "center", gap: 8, background: isFirst ? "#0f1623" : "transparent", borderRadius: 8, padding: isFirst ? "8px 12px" : "4px 8px", border: isFirst ? "1px solid #1e2d40" : "1px solid transparent", animation: `fadeUp 0.3s ${i * 0.04}s ease both` }}>
                           <div style={{ width: 4, height: isFirst ? 36 : 24, borderRadius: 2, background: isFirst ? "linear-gradient(to bottom,#64748b,#94a3b8)" : "#1e2d40", flexShrink: 0 }} />
@@ -2477,8 +2477,8 @@ export default function App() {
                             </div>
                             {(w.bodyFat || w.muscleMass) && (
                               <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
-                                {w.bodyFat && <span style={{ fontSize: 8, color: "#a78bfa", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>}
-                                {w.muscleMass && <span style={{ fontSize: 8, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>Muscle {w.muscleMass}lb</span>}
+                                {w.bodyFat && <span style={{ fontSize: 8, color: "#94a3b8", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>}
+                                {w.muscleMass && <span style={{ fontSize: 8, color: "#94a3b8", fontFamily: "'DM Mono',monospace" }}>Muscle {w.muscleMass}lb</span>}
                               </div>
                             )}
                           </div>
