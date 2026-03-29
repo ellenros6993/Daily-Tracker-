@@ -379,7 +379,7 @@ function generateReportHTML(weekStart, weekLogs, allLogs) {
         <td style="color:${calHit ? '#34d399' : row.calories ? '#f87171' : '#334155'}">${row.calories || '—'}</td>
         <td style="color:${proHit ? '#34d399' : row.protein ? '#f87171' : '#334155'}">${row.protein ? row.protein + 'g' : '—'}</td>
         <td style="color:#60a5fa">${row.steps ? parseInt(row.steps).toLocaleString() : '—'}</td>
-        <td style="color:${row.training ? '#34d399' : '#334155'}">${row.training || '—'}</td>
+        <td style="color:${row.training ? '#60a5fa' : '#334155'}">${row.training || '—'}</td>
         <td style="color:${row.score === 4 ? '#34d399' : row.score >= 3 ? '#fbbf24' : '#f87171'};font-family:'Bebas Neue',sans-serif;font-size:18px">${row.score ?? '—'}/4</td>
       </tr>`;
     }).join('')}
@@ -3364,7 +3364,7 @@ export default function App() {
                             <div style={{ fontSize: 11, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 2 }}>
                               {circuitState.isBetween ? "REST BETWEEN ROUNDS" : circuitState.isWork ? "WORK" : "REST"} · ROUND {circuitState.round}/{circuitConfig.rounds}
                             </div>
-                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 96, lineHeight: 1, color: circuitState.isBetween ? "#fbbf24" : circuitState.isWork ? "#34d399" : "#f87171" }}>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 96, lineHeight: 1, color: circuitState.isBetween ? "#fbbf24" : circuitState.isWork ? "#60a5fa" : "#f87171" }}>
                               {circuitState.secondsLeft}
                             </div>
                             <div style={{ display: "flex", gap: 10, width: "100%" }}>
