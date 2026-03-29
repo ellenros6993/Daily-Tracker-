@@ -1229,6 +1229,7 @@ export default function App() {
   }, [circuitRunning, circuitState, circuitConfig]);
   // Persist dark mode
   useEffect(() => { localStorage.setItem("dat-dark", darkMode ? "dark" : "light"); }, [darkMode]);
+  useEffect(() => { const size = fontSize === "xl" ? "18px" : fontSize === "large" ? "15px" : "13px"; document.documentElement.style.fontSize = size; }, [fontSize]);
 
   // Swipe navigation
   const swipeHandlers = useSwipe(
@@ -1602,7 +1603,7 @@ export default function App() {
   const arcDash = (_pct / 100) * ARC_CIRC;
 
   return (
-    <div style={{ minHeight: "100vh", background: darkMode ? "#07080d" : "#f1f5f9", color: darkMode ? "#e2e8f0" : "#0f172a", fontFamily: "'Inter', system-ui, sans-serif", fontSize: fontScale * 13, display: "flex" }}
+    <div style={{ minHeight: "100vh", background: darkMode ? "#07080d" : "#f1f5f9", color: darkMode ? "#e2e8f0" : "#0f172a", fontFamily: "'Inter', system-ui, sans-serif", fontSize: fontScale * 13, display: "flex", maxWidth: "100vw", overflowX: "hidden" }}
       {...swipeHandlers}
       onTouchStart={handleTouchStartPull}
       onTouchMove={handleTouchMovePull}
