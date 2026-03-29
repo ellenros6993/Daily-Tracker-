@@ -535,8 +535,8 @@ export default function App() {
   const [waterUnit, setWaterUnit] = useState(() => localStorage.getItem("dat-water-unit") || "L");
   const [localSettings, setLocalSettings] = useState(() => getSettings());
   useEffect(() => { setLocalSettings(settings); }, [JSON.stringify(settings)]);
-  const fontSize = settings.fontSize || "normal";
-  const fontScale = fontSize === "xl" ? 1.2 : fontSize === "large" ? 1.1 : 1;
+  const fontSize = settings.fontSize || "large";
+  const fontScale = fontSize === "large" ? 1.2 : fontSize === "medium" ? 1.1 : 1;
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("dat-onboarded"));
   const [onboardStep, setOnboardStep] = useState(0);
   const [onboardData, setOnboardData] = useState({ userName: "", goalWeight: "", startWeight: "", deadline: "", caloriesMin: "", caloriesMax: "", proteinMin: "", stepsMin: "", workoutsPerWeek: "" });
@@ -1229,7 +1229,7 @@ export default function App() {
   }, [circuitRunning, circuitState, circuitConfig]);
   // Persist dark mode
   useEffect(() => { localStorage.setItem("dat-dark", darkMode ? "dark" : "light"); }, [darkMode]);
-  useEffect(() => { const size = fontSize === "xl" ? "18px" : fontSize === "large" ? "15px" : "13px"; document.documentElement.style.fontSize = size; }, [fontSize]);
+  useEffect(() => { const size = fontSize === "large" ? "18px" : fontSize === "medium" ? "15px" : "13px"; document.documentElement.style.fontSize = size; }, [fontSize]);
 
   // Swipe navigation
   const swipeHandlers = useSwipe(
@@ -4158,7 +4158,7 @@ export default function App() {
               { key: "stepsMin", label: "Steps Goal", type: "number", placeholder: "8000" },
               { key: "waterGoal", label: "Water Goal (cups)", type: "number", placeholder: "8" },
               { key: "workoutsPerWeek", label: "Workouts Per Week Goal", type: "number", placeholder: "4" },
-              { key: "fontSize", label: "Font Size", type: "select", options: ["normal","large","xl"], placeholder: "normal" },
+              { key: "fontSize", label: "Font Size", type: "select", options: ["small","medium","large"], placeholder: "normal" },
             ]},
           ];
           return (
@@ -4172,7 +4172,7 @@ export default function App() {
                     {items.map(({ key, label, type, placeholder, options }) => (
                       <div key={key}>
                         <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 5 }}>{label}</div>
-                        {type === "select" ? (<select value={localSettings[key] ?? ""} onChange={e => setLocalSettings(s => ({ ...s, [key]: e.target.value }))} style={{ width: "100%", boxSizing: "border-box", background: "#131929", border: "1px solid #1e2d40", borderRadius: 8, color: "#e2e8f0", padding: "8px 12px", fontSize: 13 }}>{(options||[]).map(o => <option key={o} value={o}>{o === "normal" ? "Normal" : o === "large" ? "Large" : "Extra Large"}</option>)}</select>) : (<input type={type} placeholder={placeholder} value={localSettings[key] ?? ""}
+                        {type === "select" ? (<select value={localSettings[key] ?? ""} onChange={e => setLocalSettings(s => ({ ...s, [key]: e.target.value }))} style={{ width: "100%", boxSizing: "border-box", background: "#131929", border: "1px solid #1e2d40", borderRadius: 8, color: "#e2e8f0", padding: "8px 12px", fontSize: 13 }}>{(options||[]).map(o => <option key={o} value={o}>{o === "small" ? "Small" : o === "medium" ? "Medium" : "Large"}</option>)}</select>) : (<input type={type} placeholder={placeholder} value={localSettings[key] ?? ""}
                           onChange={e => setLocalSettings(s => ({ ...s, [key]: e.target.value }))}
                           style={{ width: "100%", boxSizing: "border-box" }} />)}
                       </div>
