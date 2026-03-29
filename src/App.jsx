@@ -535,9 +535,11 @@ export default function App() {
   const [waterUnit, setWaterUnit] = useState(() => localStorage.getItem("dat-water-unit") || "L");
   const [localSettings, setLocalSettings] = useState(() => getSettings());
   useEffect(() => { setLocalSettings(settings); }, [JSON.stringify(settings)]);
+  const fontSize = settings.fontSize || "normal";
+  const fontScale = fontSize === "xl" ? 1.2 : fontSize === "large" ? 1.1 : 1;
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("dat-onboarded"));
   const [onboardStep, setOnboardStep] = useState(0);
-  const [onboardData, setOnboardData] = useState({ userName: "", goalWeight: "", startWeight: "", deadline: "", caloriesMin: "", caloriesMax: "", proteinMin: "", stepsMin: "" });
+  const [onboardData, setOnboardData] = useState({ userName: "", goalWeight: "", startWeight: "", deadline: "", caloriesMin: "", caloriesMax: "", proteinMin: "", stepsMin: "", workoutsPerWeek: "" });
 
   // Derived settings values — these shadow the module-level constants throughout the component
   const S_GOAL_WEIGHT = settings.goalWeight;
@@ -1599,7 +1601,7 @@ export default function App() {
   const arcDash = (_pct / 100) * ARC_CIRC;
 
   return (
-    <div style={{ minHeight: "100vh", background: darkMode ? "#07080d" : "#f1f5f9", color: darkMode ? "#e2e8f0" : "#0f172a", fontFamily: "'Inter', system-ui, sans-serif", fontSize: 13, display: "flex" }}
+    <div style={{ minHeight: "100vh", background: darkMode ? "#07080d" : "#f1f5f9", color: darkMode ? "#e2e8f0" : "#0f172a", fontFamily: "'Inter', system-ui, sans-serif", fontSize: fontScale * 13, display: "flex" }}
       {...swipeHandlers}
       onTouchStart={handleTouchStartPull}
       onTouchMove={handleTouchMovePull}
@@ -4153,6 +4155,8 @@ export default function App() {
               { key: "proteinMin", label: "Protein Goal (g)", type: "number", placeholder: "120" },
               { key: "stepsMin", label: "Steps Goal", type: "number", placeholder: "8000" },
               { key: "waterGoal", label: "Water Goal (cups)", type: "number", placeholder: "8" },
+              { key: "workoutsPerWeek", label: "Workouts Per Week Goal", type: "number", placeholder: "4" },
+              { key: "fontSize", label: "Font Size", type: "select", options: ["normal","large","xl"], placeholder: "normal" },
             ]},
           ];
           return (
@@ -4163,12 +4167,12 @@ export default function App() {
                 <div key={section} className="stat-card">
                   <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 16 }}>{section}</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {items.map(({ key, label, type, placeholder }) => (
+                    {items.map(({ key, label, type, placeholder, options }) => (
                       <div key={key}>
                         <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 5 }}>{label}</div>
-                        <input type={type} placeholder={placeholder} value={localSettings[key] ?? ""}
+                        {type === "select" ? (<select value={localSettings[key] ?? ""} onChange={e => setLocalSettings(s => ({ ...s, [key]: e.target.value }))} style={{ width: "100%", boxSizing: "border-box", background: "#131929", border: "1px solid #1e2d40", borderRadius: 8, color: "#e2e8f0", padding: "8px 12px", fontSize: 13 }}>{(options||[]).map(o => <option key={o} value={o}>{o === "normal" ? "Normal" : o === "large" ? "Large" : "Extra Large"}</option>)}</select>) : (<input type={type} placeholder={placeholder} value={localSettings[key] ?? ""}
                           onChange={e => setLocalSettings(s => ({ ...s, [key]: e.target.value }))}
-                          style={{ width: "100%", boxSizing: "border-box" }} />
+                          style={{ width: "100%", boxSizing: "border-box" }} />)}
                       </div>
                     ))}
                   </div>
@@ -4243,7 +4247,7 @@ export default function App() {
         const steps = [
           { title: "Welcome! 👋", sub: "Let's set up your tracker in 2 minutes", fields: [{ key: "userName", label: "Your name", placeholder: "Ellen", type: "text" }] },
           { title: "Your Goal ⚖️", sub: "Where are you starting and where do you want to be?", fields: [{ key: "startWeight", label: "Current weight (lbs)", placeholder: "210", type: "number" }, { key: "goalWeight", label: "Goal weight (lbs)", placeholder: "160", type: "number" }, { key: "deadline", label: "Target date", placeholder: "2025-08-23", type: "date" }] },
-          { title: "Daily Targets 🎯", sub: "These guide your score each day — you can change them anytime", fields: [{ key: "caloriesMin", label: "Min calories", placeholder: "1400", type: "number" }, { key: "caloriesMax", label: "Max calories", placeholder: "1800", type: "number" }, { key: "proteinMin", label: "Protein goal (g)", placeholder: "120", type: "number" }, { key: "stepsMin", label: "Steps goal", placeholder: "8000", type: "number" }] },
+          { title: "Daily Targets 🎯", sub: "These guide your score each day — you can change them anytime", fields: [{ key: "caloriesMin", label: "Min calories", placeholder: "1400", type: "number" }, { key: "caloriesMax", label: "Max calories", placeholder: "1800", type: "number" }, { key: "proteinMin", label: "Protein goal (g)", placeholder: "120", type: "number" }, { key: "stepsMin", label: "Steps goal", placeholder: "8000", type: "number" }, { key: "workoutsPerWeek", label: "Workouts per week goal", placeholder: "4", type: "number" }] },
         ];
         const step = steps[onboardStep];
         const isLast = onboardStep === steps.length - 1;
