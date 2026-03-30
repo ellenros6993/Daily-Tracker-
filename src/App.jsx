@@ -1316,10 +1316,7 @@ export default function App() {
     const weekStart = getPreviousWeekStart();
     const weekLogs = getWeekLogs(logs, weekStart);
     const streak = getLoggingStreak(logs);
-    const daysTrained = workouts.filter(w => {
-      const d = getDaysBetween(w.date, getLocalDateStr());
-      return d >= 0 && d < 7;
-    }).length;
+    const daysTrained = workouts.filter(w => { const d = getDaysBetween(w.date, getLocalDateStr()); return d >= 0 && d < 7; }).length;
     const withCal = weekLogs.filter(l => l.calories && parseInt(l.calories) > 0);
     const withPro = weekLogs.filter(l => l.protein && parseInt(l.protein) > 0);
     const withSteps = weekLogs.filter(l => l.steps && parseInt(l.steps) > 0);
@@ -1328,81 +1325,142 @@ export default function App() {
     const avgSteps = withSteps.length ? Math.round(withSteps.reduce((s,l) => s + parseInt(l.steps), 0) / withSteps.length) : null;
     const lw = latestWeight ? latestWeight.weight : "?";
     const lost = lostSoFar > 0 ? parseFloat(lostSoFar) : 0;
+    const pct = latestWeight ? Math.round(((START_WEIGHT - parseFloat(latestWeight.weight)) / (START_WEIGHT - GOAL_WEIGHT)) * 100) : 0;
+    const W = 640, H = 1385;
 
     const canvas = document.createElement("canvas");
-    canvas.width = 640; canvas.height = 480;
+    canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d");
 
-    // Background
     ctx.fillStyle = "#07080d";
-    ctx.fillRect(0, 0, 640, 480);
+    ctx.fillRect(0, 0, W, H);
 
-    // Top accent bar
-    const grad = ctx.createLinearGradient(0, 0, 640, 0);
-    grad.addColorStop(0, "#10b981");
-    grad.addColorStop(0.5, "#a855f7");
-    grad.addColorStop(1, "#60a5fa");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 640, 4);
+    // Top gradient bar
+    const topGrad = ctx.createLinearGradient(0, 0, W, 0);
+    topGrad.addColorStop(0, "#10b981"); topGrad.addColorStop(0.5, "#a855f7"); topGrad.addColorStop(1, "#60a5fa");
+    ctx.fillStyle = topGrad; ctx.fillRect(0, 0, W, 6);
 
-    // Title
-    ctx.fillStyle = "#10b981";
-    ctx.font = "bold 13px monospace";
-    ctx.fillText("WEEKLY SUMMARY", 24, 36);
-    ctx.fillStyle = "#475569";
-    ctx.font = "11px monospace";
+    // Left accent
+    ctx.fillStyle = "#10b981"; ctx.fillRect(0, 6, 3, H - 6);
+
+    // App label
+    ctx.fillStyle = "#10b981"; ctx.font = "bold 14px monospace";
+    ctx.fillText("DAILY ACCOUNTABILITY TRACKER", 28, 46);
+    ctx.fillStyle = "#334155"; ctx.font = "12px monospace";
+    ctx.fillText("WEEKLY SUMMARY", 28, 68);
+
+    // Week range
     const weekEnd = new Date(weekStart); weekEnd.setDate(weekEnd.getDate() + 6);
-    ctx.fillText(`${weekStart} – ${weekEnd.toISOString().slice(0,10)}`, 24, 54);
+    ctx.fillStyle = "#475569"; ctx.font = "11px monospace";
+    ctx.fillText(`${weekStart}  →  ${weekEnd.toISOString().slice(0,10)}`, 28, 90);
 
     // Divider
     ctx.strokeStyle = "#1e2d40"; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(24, 66); ctx.lineTo(616, 66); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(28, 108); ctx.lineTo(612, 108); ctx.stroke();
 
-    // Weight row
-    ctx.fillStyle = "#fbbf24"; ctx.font = "bold 42px monospace";
-    ctx.fillText(lw, 24, 118);
-    ctx.fillStyle = "#475569"; ctx.font = "11px monospace";
-    ctx.fillText("lbs current", 24, 138);
-    ctx.fillStyle = "#34d399"; ctx.font = "bold 14px monospace";
-    ctx.fillText(`↓ ${lost} lbs lost total`, 24, 162);
+    // Weight hero
+    ctx.fillStyle = "#fbbf24"; ctx.font = "bold 96px monospace";
+    ctx.fillText(lw, 28, 226);
+    ctx.fillStyle = "#64748b"; ctx.font = "16px monospace";
+    ctx.fillText("lbs", 28, 254);
+    ctx.fillStyle = "#34d399"; ctx.font = "bold 16px monospace";
+    ctx.fillText(`↓ ${lost} lbs lost  ·  ${pct}% to goal`, 28, 284);
+
+    // Progress bar
+    ctx.fillStyle = "#131929"; ctx.beginPath(); ctx.roundRect(28, 300, 584, 10, 5); ctx.fill();
+    const barG = ctx.createLinearGradient(28, 0, 28 + 584 * pct/100, 0);
+    barG.addColorStop(0, "#059669"); barG.addColorStop(1, "#34d399");
+    ctx.fillStyle = barG; ctx.beginPath(); ctx.roundRect(28, 300, Math.max(10, 584 * pct/100), 10, 5); ctx.fill();
 
     // Divider
     ctx.strokeStyle = "#1e2d40";
-    ctx.beginPath(); ctx.moveTo(24, 178); ctx.lineTo(616, 178); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(28, 332); ctx.lineTo(612, 332); ctx.stroke();
 
-    // Stats grid
-    const stats = [
-      { label: "AVG CALORIES", val: avgCal ? avgCal.toLocaleString() : "—", color: "#a855f7" },
-      { label: "AVG PROTEIN", val: avgPro ? avgPro + "g" : "—", color: "#a855f7" },
-      { label: "AVG STEPS", val: avgSteps ? avgSteps.toLocaleString() : "—", color: "#60a5fa" },
+    // Section label
+    ctx.fillStyle = "#334155"; ctx.font = "bold 10px monospace";
+    ctx.fillText("THIS WEEK", 28, 358);
+
+    // 3 big stat boxes top row
+    const topStats = [
+      { label: "AVG CALORIES", val: avgCal ? avgCal.toLocaleString() : "—", color: "#a855f7", sub: `goal ${CALORIES_MAX}` },
+      { label: "AVG PROTEIN", val: avgPro ? avgPro + "g" : "—", color: "#a855f7", sub: `goal ${PROTEIN_MIN}g` },
+      { label: "AVG STEPS", val: avgSteps ? avgSteps.toLocaleString() : "—", color: "#60a5fa", sub: `goal ${STEPS_MIN.toLocaleString()}` },
+    ];
+    topStats.forEach(({ label, val, color, sub }, i) => {
+      const x = 28 + i * 198; const y = 372;
+      ctx.fillStyle = "#0f1623"; ctx.beginPath(); ctx.roundRect(x, y, 186, 160, 10); ctx.fill();
+      ctx.strokeStyle = color + "55"; ctx.lineWidth = 1; ctx.beginPath(); ctx.roundRect(x, y, 186, 160, 10); ctx.stroke();
+      ctx.fillStyle = "#475569"; ctx.font = "10px monospace"; ctx.fillText(label, x + 14, y + 26);
+      ctx.fillStyle = color; ctx.font = "bold 38px monospace"; ctx.fillText(val, x + 14, y + 90);
+      ctx.fillStyle = "#334155"; ctx.font = "10px monospace"; ctx.fillText(sub, x + 14, y + 118);
+      // mini bar
+      ctx.fillStyle = "#131929"; ctx.beginPath(); ctx.roundRect(x + 14, y + 132, 158, 6, 3); ctx.fill();
+      const pctVal = label === "AVG CALORIES" && avgCal ? Math.min(1, avgCal/CALORIES_MAX) : label === "AVG PROTEIN" && avgPro ? Math.min(1, avgPro/PROTEIN_MIN) : avgSteps ? Math.min(1, avgSteps/STEPS_MIN) : 0;
+      ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(x + 14, y + 132, Math.max(6, 158 * pctVal), 6, 3); ctx.fill();
+    });
+
+    // 3 bottom stat boxes
+    const botStats = [
       { label: "DAYS TRAINED", val: `${daysTrained}/7`, color: "#60a5fa" },
       { label: "STREAK", val: `${streak} days`, color: "#f97316" },
       { label: "DAYS LOGGED", val: `${weekLogs.length}/7`, color: "#10b981" },
     ];
-    stats.forEach(({ label, val, color }, i) => {
-      const col = i % 3;
-      const row = Math.floor(i / 3);
-      const x = 24 + col * 205;
-      const y = 210 + row * 100;
-      ctx.fillStyle = "#0f1623";
-      ctx.beginPath(); ctx.roundRect(x, y, 190, 80, 8); ctx.fill();
-      ctx.strokeStyle = color + "44"; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.roundRect(x, y, 190, 80, 8); ctx.stroke();
-      ctx.fillStyle = "#475569"; ctx.font = "9px monospace";
-      ctx.fillText(label, x + 10, y + 20);
-      ctx.fillStyle = color; ctx.font = "bold 26px monospace";
-      ctx.fillText(val, x + 10, y + 56);
+    botStats.forEach(({ label, val, color }, i) => {
+      const x = 28 + i * 198; const y = 552;
+      ctx.fillStyle = "#0f1623"; ctx.beginPath(); ctx.roundRect(x, y, 186, 120, 10); ctx.fill();
+      ctx.strokeStyle = color + "55"; ctx.lineWidth = 1; ctx.beginPath(); ctx.roundRect(x, y, 186, 120, 10); ctx.stroke();
+      ctx.fillStyle = "#475569"; ctx.font = "10px monospace"; ctx.fillText(label, x + 14, y + 26);
+      ctx.fillStyle = color; ctx.font = "bold 36px monospace"; ctx.fillText(val, x + 14, y + 80);
     });
 
-    // Footer
+    // Divider
+    ctx.strokeStyle = "#1e2d40";
+    ctx.beginPath(); ctx.moveTo(28, 696); ctx.lineTo(612, 696); ctx.stroke();
+
+    // Daily log section label
+    ctx.fillStyle = "#334155"; ctx.font = "bold 10px monospace";
+    ctx.fillText("TODAY", 28, 722);
+
+    // Today's log boxes
+    const dayTotals = getAllDayTotals();
+    const todayCal = dayTotals.calories > 0 ? dayTotals.calories : (today?.calories ? parseInt(today.calories) : 0);
+    const todayPro = dayTotals.protein > 0 ? dayTotals.protein : (today?.protein ? parseInt(today.protein) : 0);
+    const todaySteps = today?.steps ? parseInt(today.steps) : 0;
+    const todayScore = today ? calcScore(today, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) : 0;
+    const todayStats2 = [
+      { label: "CALORIES", val: todayCal > 0 ? todayCal.toLocaleString() : "—", color: "#a855f7" },
+      { label: "PROTEIN", val: todayPro > 0 ? Math.round(todayPro) + "g" : "—", color: "#a855f7" },
+      { label: "STEPS", val: todaySteps > 0 ? todaySteps.toLocaleString() : "—", color: "#60a5fa" },
+      { label: "SCORE", val: `${todayScore}/4`, color: todayScore === 4 ? "#10b981" : "#fbbf24" },
+    ];
+    todayStats2.forEach(({ label, val, color }, i) => {
+      const x = 28 + i * 148; const y = 736;
+      ctx.fillStyle = "#0f1623"; ctx.beginPath(); ctx.roundRect(x, y, 136, 110, 10); ctx.fill();
+      ctx.strokeStyle = color + "44"; ctx.lineWidth = 1; ctx.beginPath(); ctx.roundRect(x, y, 136, 110, 10); ctx.stroke();
+      ctx.fillStyle = "#475569"; ctx.font = "9px monospace"; ctx.fillText(label, x + 10, y + 22);
+      ctx.fillStyle = color; ctx.font = "bold 30px monospace"; ctx.fillText(val, x + 10, y + 72);
+    });
+
+    // Big motivational text
     ctx.fillStyle = "#0f1623";
-    ctx.fillRect(0, 432, 640, 48);
+    ctx.fillRect(28, 870, 584, 120);
+    ctx.strokeStyle = "#10b98133"; ctx.lineWidth = 1;
+    ctx.strokeRect(28, 870, 584, 120);
+    ctx.fillStyle = "#10b981"; ctx.font = "bold 28px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("LOCKED IN 💪", W/2, 928);
+    ctx.fillStyle = "#475569"; ctx.font = "12px monospace";
+    ctx.fillText(`${streak} day streak  ·  ${lost} lbs lost  ·  ${pct}% to goal`, W/2, 964);
+    ctx.textAlign = "left";
+
+    // Footer
+    ctx.fillStyle = "#0c0e18"; ctx.fillRect(0, H - 60, W, 60);
     ctx.strokeStyle = "#1e2d40"; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(0, 432); ctx.lineTo(640, 432); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, H - 60); ctx.lineTo(W, H - 60); ctx.stroke();
     ctx.fillStyle = "#334155"; ctx.font = "10px monospace";
-    ctx.fillText("dailytrack-ten.vercel.app", 24, 462);
-    ctx.fillStyle = "#10b981";
-    ctx.fillText("LOCKED IN 💪", 460, 462);
+    ctx.fillText("dailytrack-ten.vercel.app", 28, H - 22);
+    ctx.fillStyle = "#10b981"; ctx.font = "bold 10px monospace";
+    ctx.fillText("Daily Accountability Tracker", 380, H - 22);
 
     canvas.toBlob(blob => {
       if (!blob) return;
@@ -1411,8 +1469,7 @@ export default function App() {
         navigator.share({ files: [file], title: "My Weekly Summary" }).catch(() => {});
       } else {
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url; a.download = "weekly-summary.png"; a.click();
+        const a = document.createElement("a"); a.href = url; a.download = "weekly-summary.png"; a.click();
         URL.revokeObjectURL(url);
       }
     }, "image/png");
