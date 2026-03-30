@@ -1298,7 +1298,7 @@ export default function App() {
     ctx.fillStyle = "#10b981"; ctx.font = "bold 9px monospace";
     ctx.fillText("LOCKED IN 💪", 490, 411);
 
-    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); setShareImageUrl(url); },"image/png");
+    canvas.toBlob(blob=>{ if(!blob){ alert("Failed to generate image"); return; } const url=URL.createObjectURL(blob); setShareImageUrl(url); },"image/png");
     haptic("success");
   }
 
@@ -1320,6 +1320,8 @@ export default function App() {
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d");
+    if(!ctx){ alert("Canvas not supported"); return; }
+    try {
 
     const rr = (x,y,w,h,r) => { ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r); ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r); ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r); ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r); ctx.closePath(); };
 
@@ -1446,7 +1448,8 @@ export default function App() {
     ctx.fillStyle="#10b981"; ctx.font="bold 9px monospace";
     ctx.fillText("Daily Accountability Tracker", 380, H-18);
 
-    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); setShareImageUrl(url); },"image/png");
+    } catch(e) { alert("Error: " + e.message); return; }
+    canvas.toBlob(blob=>{ if(!blob){ alert("Failed to generate image"); return; } const url=URL.createObjectURL(blob); setShareImageUrl(url); },"image/png");
     haptic("success");
   }
 
