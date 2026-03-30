@@ -2211,7 +2211,7 @@ export default function App() {
               <div className="report-sunday-banner fade-up" style={{ padding: "10px 16px", marginBottom: 0 }}>
                 <span style={{ color: "#34d399", fontSize: 11, fontWeight: 500 }}>📊 Weekly report ready</span>
                 <button className="save-btn" style={{ fontSize: 11, padding: "4px 12px" }} onClick={() => setTab("Weekly Report")}>View</button>
-                <button onClick={shareSummary} style={{ background: "none", border: "1px solid #10b98155", color: "#10b981", padding: "4px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>📤 Share</button>
+                <button onClick={() => { alert("clicked"); shareSummary(); }} style={{ background: "none", border: "1px solid #10b98155", color: "#10b981", padding: "4px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>📤 Share</button>
               </div>
             )}
 
