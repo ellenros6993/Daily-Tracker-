@@ -1238,12 +1238,12 @@ export default function App() {
 
     // Progress bar
     ctx.fillStyle = "#131929";
-    ctx.beginPath(); ctx.roundRect(24, 172, 592, 6, 3); ctx.fill();
+    ctx.beginPath(); ctx.rect(24, 172, 592, 6); ctx.fill();
     const barGrad = ctx.createLinearGradient(24, 0, 24 + (592 * pct/100), 0);
     barGrad.addColorStop(0, "#059669");
     barGrad.addColorStop(1, "#34d399");
     ctx.fillStyle = barGrad;
-    ctx.beginPath(); ctx.roundRect(24, 172, Math.max(8, 592 * pct/100), 6, 3); ctx.fill();
+    ctx.beginPath(); ctx.rect(24, 172, Math.max(8, 592 * pct/100), 6); ctx.fill();
 
     // Divider
     ctx.strokeStyle = "#131929";
@@ -1258,9 +1258,9 @@ export default function App() {
     todayStats.forEach(({ label, val, color, sub }, i) => {
       const x = 24 + i * 200;
       ctx.fillStyle = "#0f1623";
-      ctx.beginPath(); ctx.roundRect(x, 206, 188, 90, 8); ctx.fill();
+      ctx.beginPath(); ctx.rect(x, 206, 188, 90); ctx.fill();
       ctx.strokeStyle = color + "33"; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.roundRect(x, 206, 188, 90, 8); ctx.stroke();
+      ctx.beginPath(); ctx.rect(x, 206, 188, 90); ctx.stroke();
       ctx.fillStyle = "#475569"; ctx.font = "9px monospace";
       ctx.fillText(label, x + 12, 224);
       ctx.fillStyle = color; ctx.font = "bold 28px monospace";
@@ -1331,7 +1331,7 @@ export default function App() {
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d");
 
-    const rr = (x,y,w,h,r) => { ctx.beginPath(); ctx.roundRect(x,y,w,h,r); };
+    const rr = (x,y,w,h,r) => { ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r); ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r); ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r); ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r); ctx.closePath(); };
 
     ctx.fillStyle = "#07080d"; ctx.fillRect(0, 0, W, H);
 
