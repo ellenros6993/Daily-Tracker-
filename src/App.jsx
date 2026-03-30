@@ -1313,11 +1313,11 @@ export default function App() {
   }
 
   function shareSummary() {
-    const weekStart = getPreviousWeekStart();
+    const weekStart = getCurrentWeekStart();
     const weekLogs = getWeekLogs(logs, weekStart);
     const streak = getLoggingStreak(logs);
     const daysTrained = workouts.filter(w => { const d = getDaysBetween(w.date, getLocalDateStr()); return d >= 0 && d < 7; }).length;
-    const withCal = weekLogs.filter(l => l.calories && parseInt(l.calories) > 0);
+    const withCal = days7.map(ds=>logs.find(l=>l.date===ds)).filter(l=>l&&l.calories&&parseInt(l.calories)>0); const _unused = weekLogs.filter(l => l.calories && parseInt(l.calories) > 0);
     const withPro = weekLogs.filter(l => l.protein && parseInt(l.protein) > 0);
     const withSteps = weekLogs.filter(l => l.steps && parseInt(l.steps) > 0);
     const avgCal = withCal.length ? Math.round(withCal.reduce((s,l) => s + parseInt(l.calories), 0) / withCal.length) : 0;
@@ -1392,19 +1392,23 @@ export default function App() {
     };
 
     const days7 = Array.from({length:7},(_,i)=>{ const d=new Date(weekStart+"T12:00:00"); d.setDate(d.getDate()+i); return getLocalDateStr(d); });
-    const calVals = days7.map(ds=>{ const l=weekLogs.find(x=>x.date===ds); return l?.calories?parseInt(l.calories):0; });
-    const proVals = days7.map(ds=>{ const l=weekLogs.find(x=>x.date===ds); return l?.protein?parseInt(l.protein):0; });
-    const stepVals = days7.map(ds=>{ const l=weekLogs.find(x=>x.date===ds); return l?.steps?parseInt(l.steps):0; });
+    const allLogs7 = days7.map(ds=>logs.find(l=>l.date===ds));
+    const calVals = days7.map(ds=>{ const mf=(() => { try { const s=localStorage.getItem(`dat-meal-foods-${ds}`); if(s){ const foods=Object.values(JSON.parse(s)).flat(); const c=foods.reduce((t,f)=>t+(f.calories||0),0); return c>0?c:null; } } catch {} return null; })(); const l=logs.find(x=>x.date===ds); return mf||( l?.calories?parseInt(l.calories):0); });
+    const proVals = days7.map(ds=>{ const mf=(() => { try { const s=localStorage.getItem(`dat-meal-foods-${ds}`); if(s){ const foods=Object.values(JSON.parse(s)).flat(); const p=Math.round(foods.reduce((t,f)=>t+(f.protein||0),0)); return p>0?p:null; } } catch {} return null; })(); const l=logs.find(x=>x.date===ds); return mf||(l?.protein?parseInt(l.protein):0); });
+    const stepVals = days7.map(ds=>{ const l=logs.find(x=>x.date===ds); return l?.steps?parseInt(l.steps):0; });
+    const avgCalV = calVals.filter(v=>v>0).length ? Math.round(calVals.filter(v=>v>0).reduce((s,v)=>s+v,0)/calVals.filter(v=>v>0).length) : 0;
+    const avgProV = proVals.filter(v=>v>0).length ? Math.round(proVals.filter(v=>v>0).reduce((s,v)=>s+v,0)/proVals.filter(v=>v>0).length) : 0;
+    const avgStepsV = stepVals.filter(v=>v>0).length ? Math.round(stepVals.filter(v=>v>0).reduce((s,v)=>s+v,0)/stepVals.filter(v=>v>0).length) : 0;
 
-    drawBars(calVals, CALORIES_MAX, "#a855f7", 28, 308, 280, 120, `Avg ${avgCal>0?avgCal.toLocaleString():"—"} kcal/day  ·  goal ${CALORIES_MAX}`);
-    drawBars(proVals, PROTEIN_MIN, "#a855f7", 332, 308, 280, 120, `Avg ${avgPro>0?avgPro+"g":"—"} protein/day  ·  goal ${PROTEIN_MIN}g`);
+    drawBars(calVals, CALORIES_MAX, "#a855f7", 28, 308, 280, 120, `Avg ${avgCalV>0?avgCalV.toLocaleString():"—"} kcal/day  ·  goal ${CALORIES_MAX}`);
+    drawBars(proVals, PROTEIN_MIN, "#a855f7", 332, 308, 280, 120, `Avg ${avgProV>0?avgProV+"g":"—"} protein/day  ·  goal ${PROTEIN_MIN}g`);
 
     // Section: STEPS + TRAINING
     ctx.strokeStyle="#1e2d40"; ctx.lineWidth=1;
     ctx.beginPath(); ctx.moveTo(28,458); ctx.lineTo(612,458); ctx.stroke();
     ctx.fillStyle="#334155"; ctx.font="bold 10px monospace"; ctx.fillText("STEPS & TRAINING", 28, 480);
 
-    drawBars(stepVals, STEPS_MIN, "#60a5fa", 28, 494, 280, 120, `Avg ${avgSteps>0?avgSteps.toLocaleString():"—"} steps/day  ·  goal ${STEPS_MIN.toLocaleString()}`);
+    drawBars(stepVals, STEPS_MIN, "#60a5fa", 28, 494, 280, 120, `Avg ${avgStepsV>0?avgStepsV.toLocaleString():"—"} steps/day  ·  goal ${STEPS_MIN.toLocaleString()}`);
 
     // Training days grid
     const trainX=332, trainY=494;
