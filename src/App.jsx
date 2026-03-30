@@ -1297,7 +1297,7 @@ export default function App() {
     ctx.fillStyle = "#10b981"; ctx.font = "bold 9px monospace";
     ctx.fillText("LOCKED IN 💪", 490, 411);
 
-    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="my-stats.png"; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(url),1000); },"image/png");
+    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); window.open(url,"_blank"); },"image/png");
     haptic("success");
   }
 
@@ -1445,7 +1445,7 @@ export default function App() {
     ctx.fillStyle="#10b981"; ctx.font="bold 9px monospace";
     ctx.fillText("Daily Accountability Tracker", 380, H-18);
 
-    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="weekly-summary.png"; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(url),1000); },"image/png");
+    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); window.open(url,"_blank"); },"image/png");
     haptic("success");
   }
 
