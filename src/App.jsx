@@ -1081,6 +1081,17 @@ export default function App() {
   const [templates, setTemplates] = useState(() => { try { return JSON.parse(localStorage.getItem(TEMPLATES_KEY)) || []; } catch { return []; } });
   const [showConfetti, setShowConfetti] = useState(false);
   const [shareImageUrl, setShareImageUrl] = useState(null);
+  const [showSleepPopup, setShowSleepPopup] = useState(() => {
+    const hour = new Date().getHours();
+    const todayKey = getLocalDateStr();
+    const dismissed = localStorage.getItem("dat-sleep-dismissed-" + todayKey);
+    const hasSleep = (() => { try { const s = JSON.parse(localStorage.getItem("dat-sleep") || "{}"); return !!(s[todayKey]?.hours); } catch { return false; } })();
+    return hour >= 5 && !dismissed && !hasSleep;
+  });
+  const [sleepBedTime, setSleepBedTime] = useState("");
+  const [sleepWakeTime, setSleepWakeTime] = useState("");
+  const [sleepQualityInput, setSleepQualityInput] = useState("");
+  const [sleepNoteInput, setSleepNoteInput] = useState("");
   const [notifEnabled, setNotifEnabled] = useState(() => localStorage.getItem("dat-notif") === "true");
   const confettiRef = useRef(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("dat-dark") !== "light");
@@ -1868,6 +1879,60 @@ export default function App() {
       {shareImageUrl && (
         <div style={{ position: "fixed", inset: 0, zIndex: 10000, background: "rgba(0,0,0,0.92)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShareImageUrl(null)}>
           <div style={{ fontSize: 11, color: "#94a3b8", fontFamily: "'DM Mono',monospace", marginBottom: 12, textAlign: "center" }}>Long-press the image to save or share 👇</div>
+      {showSleepPopup && (() => {
+        const qColors = ["#f87171","#fb923c","#fbbf24","#34d399","#10b981"];
+        const calcHours = (bed, wake) => {
+          if(!bed||!wake) return null;
+          const [bh,bm]=bed.split(":").map(Number); const [wh,wm]=wake.split(":").map(Number);
+          let mins = (wh*60+wm)-(bh*60+bm); if(mins<=0) mins+=1440;
+          return Math.round(mins/60*10)/10;
+        };
+        const hrs = calcHours(sleepBedTime, sleepWakeTime);
+        const dismiss = () => { localStorage.setItem("dat-sleep-dismissed-"+getLocalDateStr(), "1"); setShowSleepPopup(false); };
+        const submit = () => {
+          if(hrs) saveSleep("hours", hrs);
+          if(sleepQualityInput) saveSleep("quality", parseInt(sleepQualityInput));
+          if(sleepNoteInput) saveSleep("note", sleepNoteInput);
+          localStorage.setItem("dat-sleep-dismissed-"+getLocalDateStr(), "1");
+          setShowSleepPopup(false); haptic("success");
+        };
+        return (
+          <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "flex-end", justifyContent: "center", padding: 16 }}>
+            <div style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 16, padding: 24, width: "100%", maxWidth: 420 }}>
+              <div style={{ fontSize: 22, marginBottom: 4 }}>😴</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#e2e8f0", marginBottom: 2 }}>How did you sleep?</div>
+              <div style={{ fontSize: 11, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 16 }}>Log last night's sleep</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
+                <div>
+                  <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>BEDTIME</div>
+                  <input type="time" value={sleepBedTime} onChange={e=>setSleepBedTime(e.target.value)} style={{ width: "100%", boxSizing: "border-box", background: "#131929", border: "1px solid #1e2d40", borderRadius: 8, color: "#fb7185", fontSize: 16, padding: "8px 10px", outline: "none" }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>WAKE TIME</div>
+                  <input type="time" value={sleepWakeTime} onChange={e=>setSleepWakeTime(e.target.value)} style={{ width: "100%", boxSizing: "border-box", background: "#131929", border: "1px solid #1e2d40", borderRadius: 8, color: "#fb7185", fontSize: 16, padding: "8px 10px", outline: "none" }} />
+                </div>
+              </div>
+              {hrs && <div style={{ textAlign: "center", fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: "#fb7185", marginBottom: 12 }}>{hrs} hours slept</div>}
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 6 }}>SLEEP QUALITY</div>
+                <div style={{ display: "flex", gap: 6 }}>
+                  {[["1","😴 Poor"],["2","😕 Fair"],["3","😊 Okay"],["4","😌 Good"],["5","🌟 Great"]].map(([v,e])=>(
+                    <button key={v} onClick={()=>setSleepQualityInput(v)} style={{ flex:1, padding: "6px 2px", borderRadius: 8, border: `1px solid ${sleepQualityInput===v ? qColors[parseInt(v)-1]+"99" : "#1e2d40"}`, background: sleepQualityInput===v ? "#131929" : "#0f1623", fontSize: 10, color: sleepQualityInput===v ? qColors[parseInt(v)-1] : "#475569", cursor: "pointer", fontFamily: "'DM Mono',monospace" }}>{e}</button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>NOTES (optional)</div>
+                <textarea value={sleepNoteInput} onChange={e=>setSleepNoteInput(e.target.value)} placeholder="Any notes about your sleep..." style={{ width: "100%", boxSizing: "border-box", background: "#131929", border: "1px solid #1e2d40", borderRadius: 8, color: "#e2e8f0", fontSize: 13, padding: "8px 10px", resize: "none", minHeight: 56, outline: "none", fontFamily: "'DM Mono',monospace" }} />
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={dismiss} style={{ flex:1, padding: "10px", borderRadius: 10, border: "1px solid #1e2d40", background: "#0f1623", color: "#475569", fontSize: 13, cursor: "pointer" }}>Ignore</button>
+                <button onClick={submit} style={{ flex:2, padding: "10px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#be185d,#fb7185)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Save Sleep 😴</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
           <img src={shareImageUrl} alt="Share card" style={{ maxWidth: "100%", maxHeight: "80vh", borderRadius: 12, objectFit: "contain" }} onClick={e => e.stopPropagation()} />
           <button onClick={() => setShareImageUrl(null)} style={{ marginTop: 16, background: "none", border: "1px solid #334155", color: "#94a3b8", padding: "8px 24px", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>✕ Close</button>
         </div>
@@ -2377,41 +2442,6 @@ export default function App() {
                   })}
                 </div>
               )}
-            {/* Sleep on Home */}
-            {(() => {
-              const sleep = getSleepToday();
-              const qualityColors = ["","#f87171","#fb923c","#fbbf24","#34d399","#10b981"];
-              return (
-                <div className="stat-card fade-up-3" style={{ padding: "10px 14px" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: 14 }}>😴</span>
-                      <div style={{ fontSize: 11, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Last Night's Sleep</div>
-                      {sleep.hours && <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "#fb7185" }}>{sleep.hours}h</span>}
-                      {sleep.quality > 0 && <span style={{ fontSize: 11, color: qualityColors[sleep.quality] }}>{["","😴","😕","😊","😌","🌟"][sleep.quality]}</span>}
-                    </div>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <select value={sleep.hours || ""} onChange={e => { saveSleep("hours", e.target.value ? parseFloat(e.target.value) : ""); haptic("light"); }}
-                        style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 6, color: sleep.hours ? "#fb7185" : "#475569", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "3px 6px", cursor: "pointer", outline: "none" }}>
-                        <option value="">hrs</option>
-                        {[4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10].map(h => (
-                          <option key={h} value={h}>{h}h</option>
-                        ))}
-                      </select>
-                      <select value={sleep.quality || ""} onChange={e => { saveSleep("quality", e.target.value ? parseInt(e.target.value) : 0); haptic("light"); }}
-                        style={{ background: "#0f1623", border: `1px solid ${sleep.quality ? qualityColors[sleep.quality] + "66" : "#1e2d40"}`, borderRadius: 6, color: sleep.quality ? qualityColors[sleep.quality] : "#475569", fontSize: 11, fontFamily: "'DM Mono',monospace", padding: "3px 6px", cursor: "pointer", outline: "none" }}>
-                        <option value="">quality</option>
-                        <option value="1">😴 Poor</option>
-                        <option value="2">😕 Fair</option>
-                        <option value="3">😊 Okay</option>
-                        <option value="4">😌 Good</option>
-                        <option value="5">🌟 Great</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
               <div style={{ marginBottom: 10, fontSize: 9, fontWeight: 700, letterSpacing: 3, color: "#334155", fontFamily: "'DM Mono',monospace", textTransform: "uppercase" }}>Today's Log</div>
               {today ? (
                 <>
@@ -2531,27 +2561,44 @@ export default function App() {
             })()}
 
 
-
             {/* Settings & Targets */}
-            <div className="stat-card fade-up-4" style={{ padding: "10px 14px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+            <div className="stat-card fade-up-4" style={{ padding: "14px 16px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <Settings2 size={14} style={{ color: "#475569" }} />
-                  <div>
-                    <div className="label" style={{ fontSize: 9, marginBottom: 4 }}>Settings & Targets</div>
-                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>
-                      <div style={{display:"flex",gap:10,marginTop:4}}><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#a855f7",lineHeight:1}}>{S_CALORIES_MIN}–{S_CALORIES_MAX}</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>kcal</div></div><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#a855f7",lineHeight:1}}>≥{S_PROTEIN_MIN}g</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>protein</div></div><div style={{textAlign:"center"}}><div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#60a5fa",lineHeight:1}}>≥{S_STEPS_MIN.toLocaleString()}</div><div style={{fontSize:8,color:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>steps</div></div></div>
-                    <div style={{display:"flex",alignItems:"center",gap:6,marginTop:8}}><span style={{fontSize:9,color:"#475569",fontFamily:"'DM Mono',monospace"}}>WEEKLY WORKOUT GOAL:</span><input type="number" min="1" max="7" value={WORKOUTS_PER_WEEK} onChange={e=>{const v=parseInt(e.target.value)||1;saveSettings({...settings,workoutsPerWeek:v});}} style={{width:36,padding:"2px 6px",fontSize:11,textAlign:"center",background:"#131929",border:"1px solid #1e2d40",borderRadius:6,color:"#10b981"}} /><span style={{fontSize:9,color:"#475569",fontFamily:"'DM Mono',monospace"}}>days/wk</span></div>
-                    <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8}}><span style={{fontSize:9,color:"#475569",fontFamily:"'DM Mono',monospace"}}>REMINDERS:</span><button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{background:notifEnabled?"linear-gradient(135deg,#059669,#10b981)":"#0f1623",border:`1px solid ${notifEnabled?"#10b98155":"#1e2d40"}`,color:notifEnabled?"#fff":"#475569",padding:"3px 12px",borderRadius:6,fontSize:10,fontWeight:600,cursor:"pointer"}}>{notifEnabled?"On ✓":"Off"}</button></div>
-                    </div>
+                  <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2, color: "#475569", fontFamily: "'DM Mono',monospace" }}>SETTINGS & TARGETS</span>
+                </div>
+                <button onClick={() => navigateTo("Settings")} style={{ background: "#131929", border: "1px solid #1e2d40", color: "#94a3b8", padding: "4px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>Edit <ChevronRight size={11} /></button>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
+                <div style={{ background: "#0f1623", borderRadius: 8, padding: "8px 10px", border: "1px solid #a855f722" }}>
+                  <div style={{ fontSize: 8, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 2 }}>CALORIES</div>
+                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#a855f7", lineHeight: 1 }}>{S_CALORIES_MIN}–{S_CALORIES_MAX}</div>
+                </div>
+                <div style={{ background: "#0f1623", borderRadius: 8, padding: "8px 10px", border: "1px solid #a855f722" }}>
+                  <div style={{ fontSize: 8, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 2 }}>PROTEIN</div>
+                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#a855f7", lineHeight: 1 }}>≥{S_PROTEIN_MIN}g</div>
+                </div>
+                <div style={{ background: "#0f1623", borderRadius: 8, padding: "8px 10px", border: "1px solid #60a5fa22" }}>
+                  <div style={{ fontSize: 8, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 2 }}>STEPS</div>
+                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#60a5fa", lineHeight: 1 }}>≥{S_STEPS_MIN.toLocaleString()}</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>WEEKLY WORKOUTS</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <input type="number" min="1" max="7" value={WORKOUTS_PER_WEEK} onChange={e=>{const v=parseInt(e.target.value)||1;saveSettings({...settings,workoutsPerWeek:v});}} style={{ width: 36, padding: "3px 6px", fontSize: 12, textAlign: "center", background: "#131929", border: "1px solid #1e2d40", borderRadius: 6, color: "#10b981" }} />
+                    <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>days / wk</span>
                   </div>
                 </div>
-                <button onClick={() => navigateTo("Settings")}
-                  style={{ background: "linear-gradient(135deg,#0f1623,#1e2d40)", border: "1px solid #1e2d4066", color: "#94a3b8", padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
-                  Edit <ChevronRight size={11} />
-                </button>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>REMINDERS</span>
+                  <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#131929", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "4px 14px", borderRadius: 6, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>{notifEnabled ? "On ✓" : "Off"}</button>
+                </div>
               </div>
             </div>
+
 
           </div>
         )}
