@@ -1292,6 +1292,113 @@ export default function App() {
     haptic("success");
   }
 
+  function shareSummary() {
+    const weekStart = getPreviousWeekStart();
+    const weekLogs = getWeekLogs(logs, weekStart);
+    const streak = getLoggingStreak(logs);
+    const daysTrained = workouts.filter(w => {
+      const d = getDaysBetween(w.date, getLocalDateStr());
+      return d >= 0 && d < 7;
+    }).length;
+    const withCal = weekLogs.filter(l => l.calories && parseInt(l.calories) > 0);
+    const withPro = weekLogs.filter(l => l.protein && parseInt(l.protein) > 0);
+    const withSteps = weekLogs.filter(l => l.steps && parseInt(l.steps) > 0);
+    const avgCal = withCal.length ? Math.round(withCal.reduce((s,l) => s + parseInt(l.calories), 0) / withCal.length) : null;
+    const avgPro = withPro.length ? Math.round(withPro.reduce((s,l) => s + parseInt(l.protein), 0) / withPro.length) : null;
+    const avgSteps = withSteps.length ? Math.round(withSteps.reduce((s,l) => s + parseInt(l.steps), 0) / withSteps.length) : null;
+    const lw = latestWeight ? latestWeight.weight : "?";
+    const lost = lostSoFar > 0 ? parseFloat(lostSoFar) : 0;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 640; canvas.height = 480;
+    const ctx = canvas.getContext("2d");
+
+    // Background
+    ctx.fillStyle = "#07080d";
+    ctx.fillRect(0, 0, 640, 480);
+
+    // Top accent bar
+    const grad = ctx.createLinearGradient(0, 0, 640, 0);
+    grad.addColorStop(0, "#10b981");
+    grad.addColorStop(0.5, "#a855f7");
+    grad.addColorStop(1, "#60a5fa");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 640, 4);
+
+    // Title
+    ctx.fillStyle = "#10b981";
+    ctx.font = "bold 13px monospace";
+    ctx.fillText("WEEKLY SUMMARY", 24, 36);
+    ctx.fillStyle = "#475569";
+    ctx.font = "11px monospace";
+    const weekEnd = new Date(weekStart); weekEnd.setDate(weekEnd.getDate() + 6);
+    ctx.fillText(`${weekStart} – ${weekEnd.toISOString().slice(0,10)}`, 24, 54);
+
+    // Divider
+    ctx.strokeStyle = "#1e2d40"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(24, 66); ctx.lineTo(616, 66); ctx.stroke();
+
+    // Weight row
+    ctx.fillStyle = "#fbbf24"; ctx.font = "bold 42px monospace";
+    ctx.fillText(lw, 24, 118);
+    ctx.fillStyle = "#475569"; ctx.font = "11px monospace";
+    ctx.fillText("lbs current", 24, 138);
+    ctx.fillStyle = "#34d399"; ctx.font = "bold 14px monospace";
+    ctx.fillText(`↓ ${lost} lbs lost total`, 24, 162);
+
+    // Divider
+    ctx.strokeStyle = "#1e2d40";
+    ctx.beginPath(); ctx.moveTo(24, 178); ctx.lineTo(616, 178); ctx.stroke();
+
+    // Stats grid
+    const stats = [
+      { label: "AVG CALORIES", val: avgCal ? avgCal.toLocaleString() : "—", color: "#a855f7" },
+      { label: "AVG PROTEIN", val: avgPro ? avgPro + "g" : "—", color: "#a855f7" },
+      { label: "AVG STEPS", val: avgSteps ? avgSteps.toLocaleString() : "—", color: "#60a5fa" },
+      { label: "DAYS TRAINED", val: `${daysTrained}/7`, color: "#60a5fa" },
+      { label: "STREAK", val: `${streak} days`, color: "#f97316" },
+      { label: "DAYS LOGGED", val: `${weekLogs.length}/7`, color: "#10b981" },
+    ];
+    stats.forEach(({ label, val, color }, i) => {
+      const col = i % 3;
+      const row = Math.floor(i / 3);
+      const x = 24 + col * 205;
+      const y = 210 + row * 100;
+      ctx.fillStyle = "#0f1623";
+      ctx.beginPath(); ctx.roundRect(x, y, 190, 80, 8); ctx.fill();
+      ctx.strokeStyle = color + "44"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(x, y, 190, 80, 8); ctx.stroke();
+      ctx.fillStyle = "#475569"; ctx.font = "9px monospace";
+      ctx.fillText(label, x + 10, y + 20);
+      ctx.fillStyle = color; ctx.font = "bold 26px monospace";
+      ctx.fillText(val, x + 10, y + 56);
+    });
+
+    // Footer
+    ctx.fillStyle = "#0f1623";
+    ctx.fillRect(0, 432, 640, 48);
+    ctx.strokeStyle = "#1e2d40"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, 432); ctx.lineTo(640, 432); ctx.stroke();
+    ctx.fillStyle = "#334155"; ctx.font = "10px monospace";
+    ctx.fillText("dailytrack-ten.vercel.app", 24, 462);
+    ctx.fillStyle = "#10b981";
+    ctx.fillText("LOCKED IN 💪", 460, 462);
+
+    canvas.toBlob(blob => {
+      if (!blob) return;
+      const file = new File([blob], "weekly-summary.png", { type: "image/png" });
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        navigator.share({ files: [file], title: "My Weekly Summary" }).catch(() => {});
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = "weekly-summary.png"; a.click();
+        URL.revokeObjectURL(url);
+      }
+    }, "image/png");
+    haptic("success");
+  }
+
   useEffect(() => { localStorage.setItem("dat-bf-goal", bfGoal); }, [bfGoal]);
 
   // Trigger sparks when streak increases
@@ -2044,6 +2151,7 @@ export default function App() {
               <div className="report-sunday-banner fade-up" style={{ padding: "10px 16px", marginBottom: 0 }}>
                 <span style={{ color: "#34d399", fontSize: 11, fontWeight: 500 }}>📊 Weekly report ready</span>
                 <button className="save-btn" style={{ fontSize: 11, padding: "4px 12px" }} onClick={() => setTab("Weekly Report")}>View</button>
+                <button onClick={shareSummary} style={{ background: "none", border: "1px solid #10b98155", color: "#10b981", padding: "4px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>📤 Share</button>
               </div>
             )}
 
@@ -2086,7 +2194,7 @@ export default function App() {
             {/* Weekly Compliance + Next Milestone + Share */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }} className="kpi-grid">
               {/* Weekly compliance ring */}
-              <div className="stat-card fade-up-3" style={{ padding: "12px 14px 40px 14px", borderLeft: `3px solid ${(() => { const wh = getWeekLogs(logs, getCurrentWeekStart()).filter(l => calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) >= 1).length; const p = getWeekLogs(logs, getCurrentWeekStart()).reduce((a,l) => a + calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}), 0); const tot = getWeekLogs(logs, getCurrentWeekStart()).length * 4 || 1; const pct2 = Math.round(p/tot*100); const wl = getWeekLogs(logs, getCurrentWeekStart()); let rd=0; const {h,t} = wl.reduce((a,l) => { const tr=l.training&&l.training.trim()!==""; const ir=!tr&&rd<2; if(!tr)rd++; return {h:a.h+calcScore(l,workouts,{cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}),t:a.t+(ir?3:4)}; },{h:0,t:0}); const bp=t>0?Math.round(h/t*100):0; return bp >= 80 ? "#34d399" : bp >= 50 ? "#fbbf24" : "#f87171"; })()}` }}>
+              <div className="stat-card fade-up-3" style={{ padding: "12px 14px 40px 14px", borderLeft: `3px solid ${(() => { const wh = getWeekLogs(logs, getCurrentWeekStart()).filter(l => calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) >= 1).length; const p = getWeekLogs(logs, getCurrentWeekStart()).reduce((a,l) => a + calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}), 0); const tot = getWeekLogs(logs, getCurrentWeekStart()).length * 4 || 1; const pct2 = Math.round(p/tot*100); const wl = getWeekLogs(logs, getCurrentWeekStart()); let rd=0; const {h,t} = wl.reduce((a,l) => { const tr=l.training&&l.training.trim()!==""; const maxRd=7-WORKOUTS_PER_WEEK; const ir=!tr&&rd<maxRd; if(!tr)rd++; return {h:a.h+calcScore(l,workouts,{cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}),t:a.t+(ir?3:4)}; },{h:0,t:0}); const bp=t>0?Math.round(h/t*100):0; return bp >= 80 ? "#34d399" : bp >= 50 ? "#fbbf24" : "#f87171"; })()}` }}>
                 <div className="label" style={{ fontSize: 9, marginBottom: 6 }}>This Week</div>
                 {(() => {
                   const weekLogs = getWeekLogs(logs, getCurrentWeekStart());
