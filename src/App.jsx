@@ -1182,7 +1182,7 @@ export default function App() {
 
   useEffect(() => () => clearInterval(restTimerRef.current), []);
 
-  function shareStats() {
+  async function shareStats() {
     const lw = latestWeight ? latestWeight.weight : "?";
     const lost = lostSoFar > 0 ? parseFloat(lostSoFar) : 0;
     const streak = getLoggingStreak(logs);
@@ -1297,22 +1297,19 @@ export default function App() {
     ctx.fillStyle = "#10b981"; ctx.font = "bold 9px monospace";
     ctx.fillText("LOCKED IN 💪", 490, 411);
 
-    canvas.toBlob(blob => {
+    canvas.toBlob(async blob => {
       if (!blob) return;
       const file = new File([blob], "my-stats.png", { type: "image/png" });
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        navigator.share({ files: [file], title: "My Stats" }).catch(() => {});
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url; a.download = "my-stats.png"; a.click();
-        URL.revokeObjectURL(url);
-      }
+      try {
+        if (navigator.share) { await navigator.share({ files: [file], title: "My Stats" }); }
+        else { const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="my-stats.png"; a.click(); URL.revokeObjectURL(url); }
+      } catch(e) { const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="my-stats.png"; a.click(); URL.revokeObjectURL(url); }
     }, "image/png");
+    haptic("success");
     haptic("success");
   }
 
-  function shareSummary() {
+  async function shareSummary() {
     const weekStart = getCurrentWeekStart();
     const weekLogs = getWeekLogs(logs, weekStart);
     const streak = getLoggingStreak(logs);
@@ -1456,11 +1453,10 @@ export default function App() {
     ctx.fillStyle="#10b981"; ctx.font="bold 9px monospace";
     ctx.fillText("Daily Accountability Tracker", 380, H-18);
 
-    canvas.toBlob(blob=>{
+    canvas.toBlob(async blob=>{
       if(!blob) return;
       const file=new File([blob],"weekly-summary.png",{type:"image/png"});
-      if(navigator.share&&navigator.canShare?.({files:[file]})){navigator.share({files:[file],title:"My Weekly Summary"}).catch(()=>{});}
-      else{const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="weekly-summary.png";a.click();URL.revokeObjectURL(url);}
+      try { if(navigator.share) { await navigator.share({files:[file],title:"My Weekly Summary"}); } else { const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="weekly-summary.png"; a.click(); URL.revokeObjectURL(url); } } catch(e) { const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="weekly-summary.png"; a.click(); URL.revokeObjectURL(url); }
     },"image/png");
     haptic("success");
   }
