@@ -1879,6 +1879,10 @@ export default function App() {
       {shareImageUrl && (
         <div style={{ position: "fixed", inset: 0, zIndex: 10000, background: "rgba(0,0,0,0.92)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShareImageUrl(null)}>
           <div style={{ fontSize: 11, color: "#94a3b8", fontFamily: "'DM Mono',monospace", marginBottom: 12, textAlign: "center" }}>Long-press the image to save or share 👇</div>
+          <img src={shareImageUrl} alt="Share card" style={{ maxWidth: "100%", maxHeight: "80vh", borderRadius: 12, objectFit: "contain" }} />
+          <button onClick={() => setShareImageUrl(null)} style={{ marginTop: 16, background: "none", border: "1px solid #334155", color: "#94a3b8", padding: "8px 24px", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>✕ Close</button>
+        </div>
+      )}
       {showSleepPopup && (() => {
         const qColors = ["#f87171","#fb923c","#fbbf24","#34d399","#10b981"];
         const calcHours = (bed, wake) => {
@@ -1933,10 +1937,6 @@ export default function App() {
           </div>
         );
       })()}
-          <img src={shareImageUrl} alt="Share card" style={{ maxWidth: "100%", maxHeight: "80vh", borderRadius: 12, objectFit: "contain" }} onClick={e => e.stopPropagation()} />
-          <button onClick={() => setShareImageUrl(null)} style={{ marginTop: 16, background: "none", border: "1px solid #334155", color: "#94a3b8", padding: "8px 24px", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>✕ Close</button>
-        </div>
-      )}
 
       {/* Milestone overlay */}
       {milestone && (
