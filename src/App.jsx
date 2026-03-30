@@ -2585,14 +2585,14 @@ export default function App() {
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>WEEKLY WORKOUTS</span>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <input type="number" min="1" max="7" value={WORKOUTS_PER_WEEK} onChange={e=>{const v=parseInt(e.target.value)||1;saveSettings({...settings,workoutsPerWeek:v});}} style={{ width: 36, padding: "3px 6px", fontSize: 12, textAlign: "center", background: "#131929", border: "1px solid #1e2d40", borderRadius: 6, color: "#10b981" }} />
                     <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>days / wk</span>
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>REMINDERS</span>
                   <button onClick={async () => { if (!notifEnabled) { const p = await Notification.requestPermission(); if (p === "granted") { setNotifEnabled(true); haptic("success"); } } else { setNotifEnabled(false); } }} style={{ background: notifEnabled ? "linear-gradient(135deg,#059669,#10b981)" : "#131929", border: `1px solid ${notifEnabled ? "#10b98155" : "#1e2d40"}`, color: notifEnabled ? "#fff" : "#475569", padding: "4px 14px", borderRadius: 6, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>{notifEnabled ? "On ✓" : "Off"}</button>
                 </div>
