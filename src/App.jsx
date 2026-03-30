@@ -2204,6 +2204,7 @@ export default function App() {
               {darkMode ? <Sun size={13} /> : <Moon size={13} />}
             </button>
             {isSunday() && <div className="status-pill" style={{ borderColor: "#065f3a55", color: "#34d399" }}><span>📊</span>Report Day</div>}
+            <button onClick={() => setShowSleepPopup(true)} style={{ background: "none", border: "1px solid #fb718544", color: "#fb7185", padding: "3px 10px", borderRadius: 20, fontSize: 10, cursor: "pointer" }}>😴 Test Sleep</button>
             <div style={{ position: "relative" }}>
               <div style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 20, padding: "3px 10px", display: "flex", alignItems: "center", gap: 5, cursor: "pointer" }} onClick={() => document.getElementById('hdr-date').focus()}>
                 <span className="status-dot" style={{ background: viewedDate === getLocalDateStr() ? "#10b981" : "#fbbf24", flexShrink: 0 }} />
