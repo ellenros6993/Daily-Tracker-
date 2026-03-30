@@ -1086,7 +1086,7 @@ export default function App() {
     const todayKey = getLocalDateStr();
     const dismissed = localStorage.getItem("dat-sleep-dismissed-" + todayKey);
     const hasSleep = (() => { try { const s = JSON.parse(localStorage.getItem("dat-sleep") || "{}"); return !!(s[todayKey]?.hours); } catch { return false; } })();
-    return hour >= 5 && !dismissed && !hasSleep;
+    return !dismissed && !hasSleep;
   });
   const [sleepBedTime, setSleepBedTime] = useState("");
   const [sleepWakeTime, setSleepWakeTime] = useState("");
