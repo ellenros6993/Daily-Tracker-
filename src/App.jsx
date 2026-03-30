@@ -1187,95 +1187,115 @@ export default function App() {
     const lost = lostSoFar > 0 ? parseFloat(lostSoFar) : 0;
     const streak = getLoggingStreak(logs);
     const todayScore = today ? calcScore(today, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) : 0;
-    const todayCal = today?.calories || "—";
-    const todayPro = today?.protein || "—";
-    const todaySteps = today?.steps || "—";
+    const dayTotals = getAllDayTotals();
+    const todayCal = dayTotals.calories > 0 ? dayTotals.calories : (today?.calories || 0);
+    const todayPro = dayTotals.protein > 0 ? dayTotals.protein : (today?.protein || 0);
+    const todaySteps = today?.steps ? parseInt(today.steps) : 0;
     const pct = latestWeight ? Math.round(((START_WEIGHT - parseFloat(latestWeight.weight)) / (START_WEIGHT - GOAL_WEIGHT)) * 100) : 0;
 
     const canvas = document.createElement("canvas");
-    canvas.width = 640; canvas.height = 400;
+    canvas.width = 640; canvas.height = 420;
     const ctx = canvas.getContext("2d");
 
-    // Background
+    // Dark background
     ctx.fillStyle = "#07080d";
-    ctx.fillRect(0, 0, 640, 400);
+    ctx.fillRect(0, 0, 640, 420);
 
-    // Green accent bar
+    // Gradient top bar
+    const topGrad = ctx.createLinearGradient(0, 0, 640, 0);
+    topGrad.addColorStop(0, "#10b981");
+    topGrad.addColorStop(1, "#059669");
+    ctx.fillStyle = topGrad;
+    ctx.fillRect(0, 0, 640, 5);
+
+    // Left accent line
     ctx.fillStyle = "#10b981";
-    ctx.fillRect(0, 0, 4, 400);
+    ctx.fillRect(0, 5, 3, 415);
 
-    // Title
+    // App name
     ctx.fillStyle = "#10b981";
-    ctx.font = "bold 13px monospace";
-    ctx.fillText("DAILY ACCOUNTABILITY TRACKER", 24, 36);
+    ctx.font = "bold 11px monospace";
+    ctx.letterSpacing = "3px";
+    ctx.fillText("DAILY ACCOUNTABILITY TRACKER", 24, 34);
+    ctx.fillStyle = "#334155";
+    ctx.font = "10px monospace";
+    ctx.fillText(new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }), 24, 52);
 
-    // Date
-    ctx.fillStyle = "#475569";
-    ctx.font = "11px monospace";
-    ctx.fillText(new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }), 24, 56);
+    // Thin divider
+    ctx.strokeStyle = "#131929"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(24, 64); ctx.lineTo(616, 64); ctx.stroke();
 
-    // Divider
-    ctx.strokeStyle = "#131929";
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(24, 68); ctx.lineTo(616, 68); ctx.stroke();
-
-    // Weight block
-    ctx.fillStyle = "#34d399";
-    ctx.font = "bold 48px monospace";
-    ctx.fillText(lw, 24, 128);
-    ctx.fillStyle = "#475569";
-    ctx.font = "11px monospace";
-    ctx.fillText("lbs", 24 + ctx.measureText(lw).width + 8, 120);
-    ctx.fillStyle = "#10b981";
+    // Weight big number
+    ctx.fillStyle = "#fbbf24";
+    ctx.font = "bold 64px monospace";
+    ctx.fillText(lw, 24, 140);
+    ctx.fillStyle = "#64748b";
     ctx.font = "12px monospace";
-    ctx.fillText(`↓ ${lost} lbs lost · ${pct}% to goal`, 24, 148);
+    ctx.fillText("lbs", 24 + ctx.measureText(lw).width + 8, 128);
+    ctx.fillStyle = "#34d399";
+    ctx.font = "11px monospace";
+    ctx.fillText(`↓ ${lost} lbs lost  ·  ${pct}% to goal`, 24, 162);
+
+    // Progress bar
+    ctx.fillStyle = "#131929";
+    ctx.beginPath(); ctx.roundRect(24, 172, 592, 6, 3); ctx.fill();
+    const barGrad = ctx.createLinearGradient(24, 0, 24 + (592 * pct/100), 0);
+    barGrad.addColorStop(0, "#059669");
+    barGrad.addColorStop(1, "#34d399");
+    ctx.fillStyle = barGrad;
+    ctx.beginPath(); ctx.roundRect(24, 172, Math.max(8, 592 * pct/100), 6, 3); ctx.fill();
 
     // Divider
     ctx.strokeStyle = "#131929";
-    ctx.beginPath(); ctx.moveTo(24, 168); ctx.lineTo(616, 168); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(24, 194); ctx.lineTo(616, 194); ctx.stroke();
 
-    // Today stats
-    const stats = [
-      { label: "CALORIES", val: todayCal, color: "#a855f7", x: 24 },
-      { label: "PROTEIN", val: todayPro ? todayPro + "g" : "—", color: "#a855f7", x: 200 },
-      { label: "STEPS", val: todaySteps ? parseInt(todaySteps).toLocaleString() : "—", color: "#60a5fa", x: 376 },
+    // Today's stats — 3 boxes
+    const todayStats = [
+      { label: "CALORIES", val: todayCal > 0 ? todayCal.toLocaleString() : "—", color: "#a855f7", sub: `goal ${CALORIES_MAX}` },
+      { label: "PROTEIN", val: todayPro > 0 ? Math.round(todayPro) + "g" : "—", color: "#a855f7", sub: `goal ${PROTEIN_MIN}g` },
+      { label: "STEPS", val: todaySteps > 0 ? todaySteps.toLocaleString() : "—", color: "#60a5fa", sub: `goal ${STEPS_MIN.toLocaleString()}` },
     ];
-    stats.forEach(({ label, val, color, x }) => {
-      ctx.fillStyle = "#475569";
-      ctx.font = "9px monospace";
-      ctx.fillText(label, x, 192);
-      ctx.fillStyle = color;
-      ctx.font = "bold 28px monospace";
-      ctx.fillText(val, x, 226);
+    todayStats.forEach(({ label, val, color, sub }, i) => {
+      const x = 24 + i * 200;
+      ctx.fillStyle = "#0f1623";
+      ctx.beginPath(); ctx.roundRect(x, 206, 188, 90, 8); ctx.fill();
+      ctx.strokeStyle = color + "33"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(x, 206, 188, 90, 8); ctx.stroke();
+      ctx.fillStyle = "#475569"; ctx.font = "9px monospace";
+      ctx.fillText(label, x + 12, 224);
+      ctx.fillStyle = color; ctx.font = "bold 28px monospace";
+      ctx.fillText(val, x + 12, 262);
+      ctx.fillStyle = "#334155"; ctx.font = "9px monospace";
+      ctx.fillText(sub, x + 12, 282);
     });
 
     // Divider
     ctx.strokeStyle = "#131929";
-    ctx.beginPath(); ctx.moveTo(24, 248); ctx.lineTo(616, 248); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(24, 312); ctx.lineTo(616, 312); ctx.stroke();
 
-    // Streak + Score
-    ctx.fillStyle = "#475569";
-    ctx.font = "9px monospace";
-    ctx.fillText("STREAK", 24, 272);
-    ctx.fillStyle = "#f97316";
-    ctx.font = "bold 36px monospace";
-    ctx.fillText(`${streak} days`, 24, 310);
-
-    ctx.fillStyle = "#475569";
-    ctx.font = "9px monospace";
-    ctx.fillText("TODAY'S SCORE", 300, 272);
-    ctx.fillStyle = todayScore === 4 ? "#10b981" : todayScore >= 2 ? "#fbbf24" : "#f87171";
-    ctx.font = "bold 36px monospace";
-    ctx.fillText(`${todayScore}/4`, 300, 310);
+    // Streak + Score row
+    const bottomStats = [
+      { label: "STREAK", val: `${streak} days`, color: "#f97316" },
+      { label: "TODAY'S SCORE", val: `${todayScore}/4`, color: todayScore === 4 ? "#10b981" : todayScore >= 2 ? "#fbbf24" : "#f87171" },
+      { label: "PROGRESS", val: `${pct}%`, color: "#2dd4bf" },
+    ];
+    bottomStats.forEach(({ label, val, color }, i) => {
+      const x = 24 + i * 205;
+      ctx.fillStyle = "#475569"; ctx.font = "9px monospace";
+      ctx.fillText(label, x, 336);
+      ctx.fillStyle = color; ctx.font = "bold 32px monospace";
+      ctx.fillText(val, x, 374);
+    });
 
     // Footer
-    ctx.fillStyle = "#1e2d40";
-    ctx.fillRect(0, 360, 640, 40);
-    ctx.fillStyle = "#334155";
-    ctx.font = "10px monospace";
-    ctx.fillText("dailytrack-ten.vercel.app", 24, 385);
-    ctx.fillStyle = "#10b981";
-    ctx.fillText("LOCKED IN 💪", 480, 385);
+    ctx.fillStyle = "#0c0e18";
+    ctx.fillRect(0, 392, 640, 28);
+    ctx.strokeStyle = "#131929"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, 392); ctx.lineTo(640, 392); ctx.stroke();
+    ctx.fillStyle = "#334155"; ctx.font = "9px monospace";
+    ctx.fillText("dailytrack-ten.vercel.app", 24, 411);
+    ctx.fillStyle = "#10b981"; ctx.font = "bold 9px monospace";
+    ctx.fillText("LOCKED IN 💪", 490, 411);
 
     canvas.toBlob(blob => {
       if (!blob) return;
