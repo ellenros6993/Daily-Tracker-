@@ -797,14 +797,14 @@ export default function App() {
         if (Object.values(mealFoods).some(foods => foods.length > 0)) {
           setMealFoods({ ...mealFoods });
           haptic("success");
-          return true;
+
         }
       } else {
         const yMeals = JSON.parse(localStorage.getItem(`dat-meal-foods-${prevDate}`) || "{}");
         if (Object.keys(yMeals).length > 0) {
           setMealFoods(yMeals);
           haptic("success");
-          return true;
+
         }
       }
     } catch {}
@@ -825,7 +825,7 @@ export default function App() {
         const newItems = prevSlotFoods.map(f => ({ ...f, id: Date.now() + Math.random() }));
         setMealFoods(m => ({ ...m, [slot]: [...(m[slot] || []), ...newItems] }));
         haptic("success");
-        return true;
+
       }
     } catch {}
     return false;
@@ -1086,7 +1086,7 @@ export default function App() {
     const todayKey = getLocalDateStr();
     const dismissed = localStorage.getItem("dat-sleep-dismissed-" + todayKey);
     const hasSleep = (() => { try { const s = JSON.parse(localStorage.getItem("dat-sleep") || "{}"); return !!(s[todayKey]?.hours); } catch { return false; } })();
-    return true;
+    return hour >= 5 && !dismissed && !hasSleep;
   });
   const [sleepBedTime, setSleepBedTime] = useState("");
   const [sleepWakeTime, setSleepWakeTime] = useState("");
@@ -2204,7 +2204,6 @@ export default function App() {
               {darkMode ? <Sun size={13} /> : <Moon size={13} />}
             </button>
             {isSunday() && <div className="status-pill" style={{ borderColor: "#065f3a55", color: "#34d399" }}><span>📊</span>Report Day</div>}
-            <button onClick={() => setShowSleepPopup(true)} style={{ background: "none", border: "1px solid #fb718544", color: "#fb7185", padding: "3px 10px", borderRadius: 20, fontSize: 10, cursor: "pointer" }}>😴 Test Sleep</button>
             <div style={{ position: "relative" }}>
               <div style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 20, padding: "3px 10px", display: "flex", alignItems: "center", gap: 5, cursor: "pointer" }} onClick={() => document.getElementById('hdr-date').focus()}>
                 <span className="status-dot" style={{ background: viewedDate === getLocalDateStr() ? "#10b981" : "#fbbf24", flexShrink: 0 }} />
