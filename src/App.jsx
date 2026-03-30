@@ -1297,15 +1297,7 @@ export default function App() {
     ctx.fillStyle = "#10b981"; ctx.font = "bold 9px monospace";
     ctx.fillText("LOCKED IN 💪", 490, 411);
 
-    canvas.toBlob(async blob => {
-      if (!blob) return;
-      const file = new File([blob], "my-stats.png", { type: "image/png" });
-      try {
-        if (navigator.share) { await navigator.share({ files: [file], title: "My Stats" }); }
-        else { const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="my-stats.png"; a.click(); URL.revokeObjectURL(url); }
-      } catch(e) { const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="my-stats.png"; a.click(); URL.revokeObjectURL(url); }
-    }, "image/png");
-    haptic("success");
+    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="my-stats.png"; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(url),1000); },"image/png");
     haptic("success");
   }
 
@@ -1453,15 +1445,10 @@ export default function App() {
     ctx.fillStyle="#10b981"; ctx.font="bold 9px monospace";
     ctx.fillText("Daily Accountability Tracker", 380, H-18);
 
-    canvas.toBlob(async blob=>{
-      if(!blob) return;
-      const file=new File([blob],"weekly-summary.png",{type:"image/png"});
-      try { if(navigator.share) { await navigator.share({files:[file],title:"My Weekly Summary"}); } else { const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="weekly-summary.png"; a.click(); URL.revokeObjectURL(url); } } catch(e) { const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="weekly-summary.png"; a.click(); URL.revokeObjectURL(url); }
-    },"image/png");
+    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="weekly-summary.png"; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(url),1000); },"image/png");
     haptic("success");
   }
 
-  useEffect(() => { localStorage.setItem("dat-bf-goal", bfGoal); }, [bfGoal]);
 
   // Trigger sparks when streak increases
   useEffect(() => {
