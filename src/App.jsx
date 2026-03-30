@@ -1080,6 +1080,7 @@ export default function App() {
   const prevTabRef = useRef(tab);
   const [templates, setTemplates] = useState(() => { try { return JSON.parse(localStorage.getItem(TEMPLATES_KEY)) || []; } catch { return []; } });
   const [showConfetti, setShowConfetti] = useState(false);
+  const [shareImageUrl, setShareImageUrl] = useState(null);
   const [notifEnabled, setNotifEnabled] = useState(() => localStorage.getItem("dat-notif") === "true");
   const confettiRef = useRef(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("dat-dark") !== "light");
@@ -1297,7 +1298,7 @@ export default function App() {
     ctx.fillStyle = "#10b981"; ctx.font = "bold 9px monospace";
     ctx.fillText("LOCKED IN 💪", 490, 411);
 
-    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); window.open(url,"_blank"); },"image/png");
+    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); setShareImageUrl(url); },"image/png");
     haptic("success");
   }
 
@@ -1445,7 +1446,7 @@ export default function App() {
     ctx.fillStyle="#10b981"; ctx.font="bold 9px monospace";
     ctx.fillText("Daily Accountability Tracker", 380, H-18);
 
-    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); window.open(url,"_blank"); },"image/png");
+    canvas.toBlob(blob=>{ if(!blob)return; const url=URL.createObjectURL(blob); setShareImageUrl(url); },"image/png");
     haptic("success");
   }
 
@@ -1861,6 +1862,13 @@ export default function App() {
       onTouchMove={handleTouchMovePull}
       onTouchEnd={handleTouchEndPull}>
       {showConfetti && <canvas ref={confettiRef} style={{ position: "fixed", inset: 0, zIndex: 9999, pointerEvents: "none" }} />}
+      {shareImageUrl && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 10000, background: "rgba(0,0,0,0.92)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShareImageUrl(null)}>
+          <div style={{ fontSize: 11, color: "#94a3b8", fontFamily: "'DM Mono',monospace", marginBottom: 12, textAlign: "center" }}>Long-press the image to save or share 👇</div>
+          <img src={shareImageUrl} alt="Share card" style={{ maxWidth: "100%", maxHeight: "80vh", borderRadius: 12, objectFit: "contain" }} onClick={e => e.stopPropagation()} />
+          <button onClick={() => setShareImageUrl(null)} style={{ marginTop: 16, background: "none", border: "1px solid #334155", color: "#94a3b8", padding: "8px 24px", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>✕ Close</button>
+        </div>
+      )}
 
       {/* Milestone overlay */}
       {milestone && (
