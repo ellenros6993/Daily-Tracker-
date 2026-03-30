@@ -2147,7 +2147,7 @@ export default function App() {
                 <button className="save-btn" style={{ fontSize: 11, padding: "4px 12px", background: "linear-gradient(135deg,#92400e,#ca8a04)" }} onClick={() => setTab("Progress Photos")}>Log Now</button>
               </div>
             ) : null; })()}
-            {isSunday() && getWeekLogs(logs, getPreviousWeekStart()).length > 0 && (
+            {isSunday() && logs.length > 0 && (
               <div className="report-sunday-banner fade-up" style={{ padding: "10px 16px", marginBottom: 0 }}>
                 <span style={{ color: "#34d399", fontSize: 11, fontWeight: 500 }}>📊 Weekly report ready</span>
                 <button className="save-btn" style={{ fontSize: 11, padding: "4px 12px" }} onClick={() => setTab("Weekly Report")}>View</button>
