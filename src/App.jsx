@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+<div style={{ display: "flex", gap: 8, alignItems: "center" }}><button onClick={e => { e.stopPropagation(); setWorkoutForm({ ...w, exercises: w.exercises.map(ex => ({ ...ex, id: ex.id || Date.now() + Math.random() })) }); setEditingWorkoutId(w.id || i); window.scrollTo(0,0); haptic("light"); }} style={{ background: "none", border: "1px solid #1e3a5f", color: "#60a5fa", padding: "3px 10px", borderRadius: 6, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Edit</button></div>import { useState, useEffect, useRef } from "react";
 
 // Inline SVG icons — no external dependency
 const Icon = ({ d, size = 16, ...p }) => (
@@ -3572,12 +3572,6 @@ export default function App() {
                 </div>
               )}
 
-              {/* Circuit Timer button */}
-
-              <div style={{ display: "flex" }}>
-                <button onClick={() => setShowCircuitTimer(true)} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", padding: "10px 24px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, display: "flex", alignItems: "center", gap: 8 }}>⏱ CIRCUIT TIMER</button>
-              </div>
-
               {/* Circuit Timer */}
               {showCircuitTimer && (
                 <div style={{ position: "fixed", inset: 0, background: "#07080dee", zIndex: 1000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", padding: 24, paddingTop: 60, overflowY: "auto" }}>
@@ -3664,7 +3658,7 @@ export default function App() {
               {/* New workout form */}
               <div className="stat-card">
                 <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>LOG WORKOUT</div>
-                <div style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "flex-end" }}>
+                <div style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "flex-end", flexWrap: "nowrap" }}>
                   <div style={{ flex: "0 0 auto" }}>
                     <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DATE</div>
                     <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} style={{ width: "auto", fontSize: 12, padding: "5px 8px" }} />
@@ -3788,7 +3782,7 @@ export default function App() {
                           return (
                             <div key={sIdx} style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr auto", gap: 6, alignItems: "center", marginBottom: 4 }}>
                               <div style={{ color: "#475569", fontSize: 11, width: 24, textAlign: "center" }}>{sIdx + 1}</div>
-                              <input type="number" placeholder="12" value={set.reps} onChange={e => updateSet(ex.id, sIdx, "reps", e.target.value)} style={{ textAlign: "center" }} />
+                              <div style={{ display: "flex", alignItems: "center", gap: 3 }}><input type={set.timed ? "text" : "number"} placeholder={set.timed ? "30s" : "12"} value={set.reps} onChange={e => updateSet(ex.id, sIdx, "reps", e.target.value)} style={{ textAlign: "center", flex: 1 }} /><button onClick={() => toggleSetTimed(ex.id, sIdx)} style={{ background: set.timed ? "#1e3a5f" : "none", border: "1px solid " + (set.timed ? "#60a5fa" : "#131929"), color: set.timed ? "#60a5fa" : "#334155", borderRadius: 4, fontSize: 9, padding: "2px 4px", cursor: "pointer" }}>⏱</button></div>
                               <div style={{ position: "relative" }}>
                                 <input type="number" placeholder="135" value={set.weight} onChange={e => updateSet(ex.id, sIdx, "weight", e.target.value)} style={{ textAlign: "center", borderColor: isPR ? "#fbbf24" : undefined, paddingRight: 20 }} />
                                 <button onClick={() => { setPlateWeight(set.weight || ""); setShowPlateCalc(true); }} style={{ position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#334155", fontSize: 10, cursor: "pointer", padding: 0, lineHeight: 1 }}>🏋️</button>
@@ -3886,6 +3880,11 @@ export default function App() {
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Circuit Timer */}
+              <div style={{ display: "flex" }}>
+                <button onClick={() => setShowCircuitTimer(true)} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", padding: "10px 24px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1, display: "flex", alignItems: "center", gap: 8 }}>⏱ CIRCUIT TIMER</button>
               </div>
 
               {/* Workout Templates */}
@@ -4020,14 +4019,15 @@ export default function App() {
                   <div className="stat-card">
                     <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>🏆 PR BOARD</div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-                      {allExerciseNames.map(name => {
+                      {allExerciseNames.filter(name => pbBoardFilter === "all" || name === pbBoardFilter).map(name => {
                         const pr = getPRForExercise(name);
                         const allSessions = workouts.filter(w => w.exercises.some(e => e.name.toLowerCase() === name));
                         return pr > 0 ? (
                           <div key={name} style={{ background: "#0f1623", border: "1px solid #131929", borderRadius: 6, padding: 8 }}>
                             <div style={{ color: "#64748b", fontSize: 8, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4, height: 24, overflow: "hidden", lineHeight: 1.3 }}>{name}</div>
                             <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: "#fbbf24", lineHeight: 1 }}>{pr}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div>
-                            <div style={{ color: "#334155", fontSize: 10, marginTop: 3 }}>{allSessions.length} session{allSessions.length !== 1 ? "s" : ""}</div>
+                            <button onClick={() => { const t = name.toUpperCase() + " PR: " + pr + " lb"; navigator.share ? navigator.share({title:"PR",text:t}) : navigator.clipboard?.writeText(t); haptic("pr"); }} style={{ background: "none", border: "none", color: "#475569", fontSize: 9, cursor: "pointer", display: "block" }}>📤 share</button>
+                            <div style={{ color: "#334155", fontSize: 10, marginTop: 1 }}>{allSessions.length} session{allSessions.length !== 1 ? "s" : ""}</div>
                           </div>
                         ) : null;
                       })}
