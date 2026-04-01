@@ -2908,7 +2908,7 @@ export default function App() {
               </div>
 
               {/* Daily totals + Water row */}
-            <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+            <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
               {/* Daily goal ring */}
               <div className="stat-card" style={{ borderColor: "#a855f722", flex: 1, minWidth: 0 }}>
                 <div className="section-title" style={{ fontSize: 14, color: "#a855f7", marginBottom: 12 }}>DAILY TOTALS</div>
