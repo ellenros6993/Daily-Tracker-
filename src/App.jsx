@@ -640,6 +640,8 @@ export default function App() {
   });
   const [activeMealSlot, setActiveMealSlot] = useState(null);
   const [showManualMacros, setShowManualMacros] = useState(false);
+  const [macroCalcOpen, setMacroCalcOpen] = useState(false);
+  const [macroCalcForm, setMacroCalcForm] = useState({ sex: "male", age: "", weight: "", heightFt: "", heightIn: "", activity: "moderate", goal: "maintain" });
   const [manualMacros, setManualMacros] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-manual-macros") || "{}"); } catch { return {}; } });
   function getManualToday(date) { return manualMacros[date || getLocalDateStr()] || {}; }
   function saveManualMacro(field, val) {
@@ -3499,12 +3501,10 @@ export default function App() {
 
               {/* Macro Calculator */}
               {(() => {
-                const [mcOpen, setMcOpen] = React.useState(false);
-                const [mc, setMc] = React.useState({ sex: "male", age: "", weight: "", heightFt: "", heightIn: "", activity: "moderate", goal: "maintain" });
-                const mcResult = React.useMemo(() => {
-                  const w = parseFloat(mc.weight); const age = parseInt(mc.age);
-                  const ft = parseInt(mc.heightFt) || 0; const inch = parseInt(mc.heightIn) || 0;
-                  if (!w || !age || (!ft && !inch)) return null;
+                const mc = macroCalcForm;
+                const w = parseFloat(mc.weight); const age = parseInt(mc.age);
+                const ft = parseInt(mc.heightFt) || 0; const inch = parseInt(mc.heightIn) || 0;
+                const mcResult = (w && age && (ft || inch)) ? (() => {
                   const kg = w * 0.453592; const cm = ft * 30.48 + inch * 2.54;
                   const bmr = mc.sex === "male" ? 10*kg + 6.25*cm - 5*age + 5 : 10*kg + 6.25*cm - 5*age - 161;
                   const actM = { sedentary:1.2, light:1.375, moderate:1.55, active:1.725, veryActive:1.9 }[mc.activity] || 1.55;
@@ -3514,43 +3514,43 @@ export default function App() {
                   const fat = Math.round(goalCals * 0.28 / 9);
                   const carbs = Math.round((goalCals - protein * 4 - fat * 9) / 4);
                   return { calories: goalCals, protein, fat, carbs };
-                }, [mc]);
+                })() : null;
                 return (
                   <div className="stat-card" style={{ padding: 0, overflow: "hidden" }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer" }} onClick={() => setMcOpen(v => !v)}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer" }} onClick={() => setMacroCalcOpen(v => !v)}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <span style={{ fontSize: 14 }}>🧮</span>
                         <div style={{ fontSize: 13, fontWeight: 600 }}>Macro Calculator</div>
                       </div>
-                      <span style={{ color: "#475569", fontSize: 14, transition: "transform 0.2s", display: "inline-block", transform: mcOpen ? "rotate(90deg)" : "rotate(0deg)" }}>›</span>
+                      <span style={{ color: "#475569", fontSize: 14, transition: "transform 0.2s", display: "inline-block", transform: macroCalcOpen ? "rotate(90deg)" : "rotate(0deg)" }}>›</span>
                     </div>
-                    {mcOpen && (
+                    {macroCalcOpen && (
                       <div style={{ padding: "0 16px 16px", borderTop: "1px solid #131929" }}>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
                           <div>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>SEX</div>
-                            <select value={mc.sex} onChange={e => setMc(m => ({ ...m, sex: e.target.value }))} style={{ width: "100%", fontSize: 12, padding: "5px 8px", background: "#0f1623", border: "1px solid #1e2d40", color: "#e2e8f0", borderRadius: 6 }}>
+                            <select value={mc.sex} onChange={e => setMacroCalcForm(m => ({ ...m, sex: e.target.value }))} style={{ width: "100%", fontSize: 12, padding: "5px 8px", background: "#0f1623", border: "1px solid #1e2d40", color: "#e2e8f0", borderRadius: 6 }}>
                               <option value="male">Male</option><option value="female">Female</option>
                             </select>
                           </div>
                           <div>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>AGE</div>
-                            <input type="number" placeholder="25" value={mc.age} onChange={e => setMc(m => ({ ...m, age: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
+                            <input type="number" placeholder="25" value={mc.age} onChange={e => setMacroCalcForm(m => ({ ...m, age: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
                           </div>
                           <div>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>WEIGHT (lbs)</div>
-                            <input type="number" placeholder="150" value={mc.weight} onChange={e => setMc(m => ({ ...m, weight: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
+                            <input type="number" placeholder="150" value={mc.weight} onChange={e => setMacroCalcForm(m => ({ ...m, weight: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
                           </div>
                           <div>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>HEIGHT</div>
                             <div style={{ display: "flex", gap: 4 }}>
-                              <input type="number" placeholder="5ft" value={mc.heightFt} onChange={e => setMc(m => ({ ...m, heightFt: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
-                              <input type="number" placeholder="8in" value={mc.heightIn} onChange={e => setMc(m => ({ ...m, heightIn: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
+                              <input type="number" placeholder="5ft" value={mc.heightFt} onChange={e => setMacroCalcForm(m => ({ ...m, heightFt: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
+                              <input type="number" placeholder="8in" value={mc.heightIn} onChange={e => setMacroCalcForm(m => ({ ...m, heightIn: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
                             </div>
                           </div>
                           <div>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>ACTIVITY</div>
-                            <select value={mc.activity} onChange={e => setMc(m => ({ ...m, activity: e.target.value }))} style={{ width: "100%", fontSize: 11, padding: "5px 8px", background: "#0f1623", border: "1px solid #1e2d40", color: "#e2e8f0", borderRadius: 6 }}>
+                            <select value={mc.activity} onChange={e => setMacroCalcForm(m => ({ ...m, activity: e.target.value }))} style={{ width: "100%", fontSize: 11, padding: "5px 8px", background: "#0f1623", border: "1px solid #1e2d40", color: "#e2e8f0", borderRadius: 6 }}>
                               <option value="sedentary">Sedentary (desk job)</option>
                               <option value="light">Light (1-3×/wk)</option>
                               <option value="moderate">Moderate (3-5×/wk)</option>
@@ -3560,14 +3560,14 @@ export default function App() {
                           </div>
                           <div>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>GOAL</div>
-                            <select value={mc.goal} onChange={e => setMc(m => ({ ...m, goal: e.target.value }))} style={{ width: "100%", fontSize: 12, padding: "5px 8px", background: "#0f1623", border: "1px solid #1e2d40", color: "#e2e8f0", borderRadius: 6 }}>
+                            <select value={mc.goal} onChange={e => setMacroCalcForm(m => ({ ...m, goal: e.target.value }))} style={{ width: "100%", fontSize: 12, padding: "5px 8px", background: "#0f1623", border: "1px solid #1e2d40", color: "#e2e8f0", borderRadius: 6 }}>
                               <option value="cut">Cut (−20% deficit)</option>
                               <option value="maintain">Maintain</option>
                               <option value="bulk">Bulk (+10% surplus)</option>
                             </select>
                           </div>
                         </div>
-                        {mcResult && (
+                        {mcResult ? (
                           <div style={{ marginTop: 14, background: "#0a0d15", borderRadius: 10, padding: "12px 14px", border: "1px solid #a855f733" }}>
                             <div style={{ fontSize: 9, color: "#a855f7", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 10 }}>RECOMMENDED MACROS</div>
                             <div style={{ display: "flex", justifyContent: "space-around" }}>
@@ -3584,8 +3584,9 @@ export default function App() {
                               ))}
                             </div>
                           </div>
+                        ) : (
+                          <div style={{ marginTop: 10, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Fill in all fields to see recommendations</div>
                         )}
-                        {!mcResult && <div style={{ marginTop: 10, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Fill in all fields to see recommendations</div>}
                       </div>
                     )}
                   </div>
