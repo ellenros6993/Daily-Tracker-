@@ -1230,7 +1230,6 @@ export default function App() {
     // App name
     ctx.fillStyle = "#10b981";
     ctx.font = "bold 11px monospace";
-    ctx.letterSpacing = "3px";
     ctx.fillText("DAILY ACCOUNTABILITY TRACKER", 24, 34);
     ctx.fillStyle = "#334155";
     ctx.font = "10px monospace";
@@ -4289,7 +4288,7 @@ export default function App() {
           const daysWithData = periodLogs.length;
           const goalsHit = periodLogs.filter(l => calcScore(l, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) === 4).length;
           const goalHitRate = daysWithData > 0 ? Math.round(goalsHit / daysWithData * 100) : 0;
-          const sleepEntries = periodSleep.filter(([,s]) => s.hours);
+          const sleepEntries = periodSleep.filter(([,s]) => s.hours && parseFloat(s.hours) > 0);
           const avgSleep = sleepEntries.length > 0 ? (sleepEntries.reduce((sum,[,s]) => sum + parseFloat(s.hours), 0) / sleepEntries.length).toFixed(1) : null;
           const avgSleepQuality = sleepEntries.length > 0 ? Math.round(sleepEntries.reduce((sum,[,s]) => sum + (s.quality||0), 0) / sleepEntries.length) : 0;
           const qualityLabels = ["","😴","😕","😊","😌","🌟"];
@@ -4320,7 +4319,7 @@ export default function App() {
                 {data.map((d, i) => (
                   <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}
                     onTouchStart={() => setActiveIdx(i)} onTouchEnd={() => setTimeout(() => setActiveIdx(null), 1500)}
-                    onMouseEnter={() => setActiveIdx(i)} onMouseLeave={() => setActiveIdx(null)}>
+                    onMouseEnter={() => setActiveIdx(i)} onMouseLeave={(e) => { if (!e.buttons) setActiveIdx(null); }}>
                     <div style={{ width: "100%", background: d.val ? (activeIdx === i ? "#fff" : color) : "#131929", borderRadius: "3px 3px 0 0", height: d.val ? `${Math.max(4, Math.round((d.val/max)*72))}px` : "4px", transition: "all 0.15s" }} />
                     {data.length <= 14 && <div style={{ fontSize: 7, color: activeIdx === i ? "#e2e8f0" : "#334155", fontFamily: "'DM Mono',monospace" }}>{d.label}</div>}
                   </div>
@@ -4367,12 +4366,12 @@ export default function App() {
                 <div className="stat-card" style={{ padding: "12px 10px", textAlign: "center" }}>
                   <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>AVG SLEEP</div>
                   <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: "#fb7185", lineHeight: 1 }}>{avgSleep || "—"}<span style={{ fontSize: 14 }}>{avgSleep ? "h" : ""}</span></div>
-                  <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{avgSleepQuality > 0 ? qualityLabels[avgSleepQuality] : "no data"}</div>
+                  <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{sleepEntries.length > 0 ? `${sleepEntries.length} nights logged` : "no data"}</div>
                 </div>
                 <div className="stat-card" style={{ padding: "12px 10px", textAlign: "center" }}>
-                  <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>WEIGHT TREND</div>
-                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: weightTrend?.color || "#334155", lineHeight: 1, marginTop: 6 }}>{weightTrend?.label || "—"}</div>
-                  <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{periodWeights.length} weigh-ins</div>
+                  <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>SLEEP QUALITY</div>
+                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 32, color: "#fb7185", lineHeight: 1 }}>{avgSleepQuality > 0 ? avgSleepQuality : "—"}<span style={{ fontSize: 14 }}>{avgSleepQuality > 0 ? "/5" : ""}</span></div>
+                  <div style={{ fontSize: 14, marginTop: 4 }}>{avgSleepQuality > 0 ? qualityLabels[avgSleepQuality] : "no data"}</div>
                 </div>
               </div>
 
@@ -4411,20 +4410,19 @@ export default function App() {
                 );
               })()}
 
-              {/* Training */}
+              {/* Training Adherence + Steps combined */}
               <div className="stat-card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                  <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#60a5fa" }}>TRAINING</div>
-                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#60a5fa" }}>{daysTrained}<span style={{ fontSize: 12, color: "#475569" }}>/{days} days</span></div>
-                </div>
-                <div className="bar-bg">
-                  <div className="bar-fill" style={{ width: `${Math.round(daysTrained/days*100)}%`, background: "#60a5fa" }} />
-                </div>
-                <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 4 }}>{Math.round(daysTrained/days*100)}% training frequency</div>
-              </div>
-
-              {/* Steps */}
-              <div className="stat-card">
+                {(() => { const expected = Math.max(1, Math.round(days / 7 * WORKOUTS_PER_WEEK)); const adherePct = Math.min(100, Math.round(daysTrained / expected * 100)); return (<>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#60a5fa" }}>TRAINING ADHERENCE</div>
+                    <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#60a5fa" }}>{daysTrained}<span style={{ fontSize: 12, color: "#475569" }}>/{expected}</span></div>
+                  </div>
+                  <div className="bar-bg">
+                    <div className="bar-fill" style={{ width: `${adherePct}%`, background: "#60a5fa" }} />
+                  </div>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 4 }}>{adherePct}% training adherence</div>
+                </>); })()}
+                <div style={{ borderTop: "1px solid #131929", margin: "12px 0" }} />
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#60a5fa" }}>STEPS</div>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal {STEPS_MIN.toLocaleString()}</div>
@@ -4436,29 +4434,32 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Calories */}
+              {/* Nutrition — Calories + Protein combined */}
               <div className="stat-card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#a855f7" }}>CALORIES</div>
-                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>target {CALORIES_MIN}–{CALORIES_MAX}</div>
-                </div>
-                <SummaryBar data={calData} color="#a855f7" unit="kcal" goal={CALORIES_MIN} />
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {calData.filter(d=>d.val).length ? Math.round(calData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/calData.filter(d=>d.val).length) : "—"} kcal</div>
-                  <div style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>{calData.filter(d=>d.val>=CALORIES_MIN&&d.val<=CALORIES_MAX).length} days on target</div>
-                </div>
-              </div>
-
-              {/* Protein */}
-              <div className="stat-card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#a855f7" }}>PROTEIN</div>
-                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal ≥{PROTEIN_MIN}g</div>
-                </div>
-                <SummaryBar data={proData} color="#a855f7" unit="g" goal={PROTEIN_MIN} />
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {proData.filter(d=>d.val).length ? Math.round(proData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/proData.filter(d=>d.val).length) : "—"}g</div>
-                  <div style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>{proData.filter(d=>d.val>=PROTEIN_MIN).length} days hit goal</div>
+                <div className="section-title" style={{ fontSize: 14, margin: "0 0 10px 0", color: "#a855f7" }}>NUTRITION</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+                      <div style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace", letterSpacing: 1, fontWeight: 700 }}>CALORIES</div>
+                      <div style={{ fontSize: 8, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{CALORIES_MIN}–{CALORIES_MAX}</div>
+                    </div>
+                    <SummaryBar data={calData} color="#a855f7" unit="kcal" goal={CALORIES_MIN} />
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+                      <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {calData.filter(d=>d.val).length ? Math.round(calData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/calData.filter(d=>d.val).length) : "—"}</div>
+                      <div style={{ fontSize: 9, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>{calData.filter(d=>d.val>=CALORIES_MIN&&d.val<=CALORIES_MAX).length}d ✓</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+                      <div style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace", letterSpacing: 1, fontWeight: 700 }}>PROTEIN</div>
+                      <div style={{ fontSize: 8, color: "#475569", fontFamily: "'DM Mono',monospace" }}>≥{PROTEIN_MIN}g</div>
+                    </div>
+                    <SummaryBar data={proData} color="#a855f7" unit="g" goal={PROTEIN_MIN} />
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+                      <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {proData.filter(d=>d.val).length ? Math.round(proData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/proData.filter(d=>d.val).length) : "—"}g</div>
+                      <div style={{ fontSize: 9, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>{proData.filter(d=>d.val>=PROTEIN_MIN).length}d ✓</div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
