@@ -279,7 +279,7 @@ function generateReportHTML(weekStart, weekLogs, allLogs) {
 </head>
 <body>
 <h1>WEEKLY REPORT</h1>
-<div class="sub">${weekLabel} · Daily Accountability Tracker</div>
+<div class="sub">${weekLabel} · BUILT</div>
 
 <h2>WEIGHT</h2>
 <div class="grid">
@@ -1465,7 +1465,7 @@ export default function App() {
     ctx.fillStyle="#334155"; ctx.font="9px monospace";
     ctx.fillText("dailytrack-ten.vercel.app", 28, H-18);
     ctx.fillStyle="#10b981"; ctx.font="bold 9px monospace";
-    ctx.fillText("Daily Accountability Tracker", 380, H-18);
+    ctx.fillText("BUILT", 380, H-18);
 
     } catch(e) { alert("Error: " + e.message); return; }
     canvas.toBlob(blob=>{ if(!blob){ alert("Failed to generate image"); return; } const url=URL.createObjectURL(blob); setShareImageUrl(url); },"image/png");
@@ -1554,7 +1554,7 @@ export default function App() {
         const todayStr = getLocalDateStr();
         const todayLog = logs.find(l => l.date === todayStr);
         if (!todayLog || calcScore(todayLog, workouts, {cMin:CALORIES_MIN,cMax:CALORIES_MAX,pMin:PROTEIN_MIN,sMin:STEPS_MIN}) < 4) {
-          new Notification("Daily Accountability Tracker", { body: "Don't forget to log today! 💪", icon: "/favicon.ico" });
+          new Notification("BUILT", { body: "Don't forget to log today! 💪", icon: "/favicon.ico" });
         }
       }
     };
@@ -2173,7 +2173,7 @@ export default function App() {
       {/* Sidebar — desktop only */}
       <div className="sidebar">
         <div className="sidebar-logo">
-          <span>DAT</span>
+          <span>BUILT</span>
           <div>ACCOUNTABILITY</div>
         </div>
         <nav className="sidebar-nav">
@@ -2218,7 +2218,7 @@ export default function App() {
       {/* Main */}
       <div className="main-content" style={{ zoom: fontScale }}>
         <div className="topbar">
-          <div className="topbar-title">Daily Accountability Tracker<span>{tab}</span></div>
+          <div className="topbar-title">BUILT<span>{tab}</span></div>
           <div className="topbar-status" style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {/* Score ring — always visible */}
             {(() => {
@@ -4744,7 +4744,7 @@ export default function App() {
               </div>
 
               <div style={{ fontSize: 10, color: "#1e2d40", textAlign: "center", fontFamily: "'DM Mono',monospace", paddingBottom: 8 }}>
-                Daily Accountability Tracker · Built for Ellen
+                BUILT · Built for Ellen
               </div>
             </div>
           );
