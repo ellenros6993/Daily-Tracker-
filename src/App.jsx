@@ -3762,11 +3762,14 @@ export default function App() {
                         {ex.name && pr > 0 && (
                           <div style={{ color: "#fbbf24", fontSize: 10, letterSpacing: 1, marginBottom: 8 }}>
                             🏆 PR: {pr} lb
-                            {lastSession && <span style={{ color: "#475569", marginLeft: 12 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</span>}
+                            {lastSession && <><span style={{ color: "#475569", marginLeft: 12 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</span><button onClick={() => { setWorkoutForm(f => ({ ...f, exercises: f.exercises.map(e => e.id === ex.id ? { ...e, sets: lastSession.sets.map(s => ({ reps: s.reps, weight: s.weight, notes: s.notes || "" })) } : e) })); haptic("light"); }} style={{ marginLeft: 8, background: "none", border: "1px solid #1e3a5f", color: "#60a5fa", fontSize: 9, padding: "1px 7px", borderRadius: 4, cursor: "pointer", fontWeight: 600 }}>↙ Copy</button></>}
                           </div>
                         )}
                         {ex.name && !pr && lastSession && (
-                          <div style={{ color: "#475569", fontSize: 10, marginBottom: 8 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</div>
+                          <div style={{ color: "#475569", fontSize: 10, marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                            <span>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</span>
+                            <button onClick={() => { setWorkoutForm(f => ({ ...f, exercises: f.exercises.map(e => e.id === ex.id ? { ...e, sets: lastSession.sets.map(s => ({ reps: s.reps, weight: s.weight, notes: s.notes || "" })) } : e) })); haptic("light"); }} style={{ background: "none", border: "1px solid #1e3a5f", color: "#60a5fa", fontSize: 9, padding: "1px 7px", borderRadius: 4, cursor: "pointer", fontWeight: 600 }}>↙ Copy</button>
+                          </div>
                         )}
 
                         <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr auto", gap: 6, alignItems: "center", marginBottom: 6 }}>
