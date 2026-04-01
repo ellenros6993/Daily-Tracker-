@@ -1,4 +1,4 @@
-<div style={{ display: "flex", gap: 8, alignItems: "center" }}><button onClick={e => { e.stopPropagation(); setWorkoutForm({ ...w, exercises: w.exercises.map(ex => ({ ...ex, id: ex.id || Date.now() + Math.random() })) }); setEditingWorkoutId(w.id || i); window.scrollTo(0,0); haptic("light"); }} style={{ background: "none", border: "1px solid #1e3a5f", color: "#60a5fa", padding: "3px 10px", borderRadius: 6, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Edit</button></div>import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // Inline SVG icons — no external dependency
 const Icon = ({ d, size = 16, ...p }) => (
