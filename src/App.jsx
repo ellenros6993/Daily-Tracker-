@@ -4189,13 +4189,13 @@ export default function App() {
                           {compareImg && (
                             <div>
                               <div style={{ color: "#475569", fontSize: 9, letterSpacing: 1, marginBottom: 4 }}>BEFORE · {compareEntry.date}</div>
-                              <img src={compareImg} alt={`before ${angle}`} style={{ width: "100%", height: 300, borderRadius: 6, objectFit: "cover", objectPosition: "top center" }} />
+                              <img src={compareImg} alt={`before ${angle}`} style={{ width: "100%", borderRadius: 6, objectFit: "cover", maxHeight: 280 }} />
                             </div>
                           )}
                           {latestImg && (
                             <div>
                               <div style={{ color: "#10b981", fontSize: 9, letterSpacing: 1, marginBottom: 4 }}>LATEST · {lastEntry.date}</div>
-                              <img src={latestImg} alt={`latest ${angle}`} style={{ width: "100%", height: 300, borderRadius: 6, objectFit: "cover", objectPosition: "top center" }} />
+                              <img src={latestImg} alt={`latest ${angle}`} style={{ width: "100%", borderRadius: 6, objectFit: "cover", maxHeight: 280 }} />
                             </div>
                           )}
                         </div>
