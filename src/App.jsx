@@ -4713,9 +4713,8 @@ export default function App() {
                     const backup = {};
                     for (let i = 0; i < localStorage.length; i++) {
                       const k = localStorage.key(i);
-                      if (k.startsWith("dat-") || k.startsWith("fat-")) backup[k] = localStorage.getItem(k);
+                      backup[k] = localStorage.getItem(k);
                     }
-                    // also grab all dat-meal-foods-{date} keys
                     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement("a");
@@ -4738,7 +4737,7 @@ export default function App() {
                           const data = JSON.parse(ev.target.result);
                           let count = 0;
                           Object.entries(data).forEach(([k, v]) => {
-                            if (k.startsWith("dat-") || k.startsWith("fat-")) { localStorage.setItem(k, v); count++; }
+                            localStorage.setItem(k, v); count++;
                           });
                           haptic("success");
                           alert(`✓ Restored ${count} data entries. Reloading app…`);
