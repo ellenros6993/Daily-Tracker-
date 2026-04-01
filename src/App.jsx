@@ -2666,7 +2666,8 @@ export default function App() {
 
         {/* WEIGHT TRACKER */}
         {tab === "Weight Tracker" && (() => {
-          const isWeighInDay = [2,4,6].includes(new Date().getDay());
+          const weighInDays = settings.weighInDays || [2, 4, 6];
+          const isWeighInDay = weighInDays.includes(new Date().getDay());
           return (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div className="section-title" style={{ color: "#fbbf24" }}>WEIGHT TRACKER</div>
@@ -4397,7 +4398,7 @@ export default function App() {
 
         {/* WEEKLY REPORT */}
         {tab === "Weekly Report" && (() => {
-          const days = summaryPeriod === "all" ? 3650 : parseInt(summaryPeriod);
+          const days = 7;
           const periodLogs = logs.filter(l => {
             const d = getDaysBetween(l.date, getLocalDateStr());
             return d >= 0 && d < days;
@@ -4477,15 +4478,8 @@ export default function App() {
 
           return (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {/* Period selector */}
-              <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-                {[["7","7D"],["14","14D"],["30","30D"],["all","All"]].map(([val, label]) => (
-                  <button key={val} onClick={() => setSummaryPeriod(val)}
-                    style={{ padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Mono',monospace", letterSpacing: 1, border: `1px solid ${summaryPeriod === val ? "#60a5fa" : "#1e2d40"}`, background: summaryPeriod === val ? "#1e3a5f" : "#0f1623", color: summaryPeriod === val ? "#60a5fa" : "#475569" }}>
-                    {label}
-                  </button>
-                ))}
-              </div>
+              {/* Weekly Report header */}
+              <div style={{ fontFamily: "'DM Mono',monospace", fontSize: 10, color: "#475569", textAlign: "center", letterSpacing: 1 }}>LAST 7 DAYS</div>
 
               {/* KPI row */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
@@ -4650,6 +4644,51 @@ export default function App() {
                   </div>
                 </div>
               ))}
+
+              {/* Weigh-in Schedule */}
+              <div className="stat-card">
+                <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 16 }}>WEIGH-IN SCHEDULE</div>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 8 }}>Frequency</div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {[["1", "1× / week"], ["3", "3× / week"]].map(([val, label]) => {
+                      const curDays = localSettings.weighInDays || [2, 4, 6];
+                      const active = val === "1" ? curDays.length === 1 : curDays.length !== 1;
+                      return (
+                        <button key={val} onClick={() => {
+                          if (val === "1") {
+                            const d = (localSettings.weighInDays || [2,4,6]);
+                            setLocalSettings(s => ({ ...s, weighInDays: [d[0] ?? 2] }));
+                          } else {
+                            setLocalSettings(s => ({ ...s, weighInDays: s.weighInDays?.length === 3 ? s.weighInDays : [2,4,6] }));
+                          }
+                        }} style={{ flex: 1, padding: "7px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${active ? "#fbbf24" : "#1e2d40"}`, background: active ? "#1a1200" : "none", color: active ? "#fbbf24" : "#475569" }}>
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 8 }}>Days</div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {["Su","Mo","Tu","We","Th","Fr","Sa"].map((d, i) => {
+                      const curDays = localSettings.weighInDays || [2,4,6];
+                      const active = curDays.includes(i);
+                      return (
+                        <button key={i} onClick={() => {
+                          const cur = localSettings.weighInDays || [2,4,6];
+                          const next = active ? cur.filter(x => x !== i) : [...cur, i].sort();
+                          if (next.length === 0) return;
+                          setLocalSettings(s => ({ ...s, weighInDays: next }));
+                        }} style={{ flex: 1, padding: "6px 2px", borderRadius: 7, fontSize: 11, fontWeight: 600, cursor: "pointer", border: `1px solid ${active ? "#fbbf24" : "#1e2d40"}`, background: active ? "#1a1200" : "none", color: active ? "#fbbf24" : "#475569" }}>
+                          {d}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
 
               <button onClick={() => {
                 const cleaned = {};
