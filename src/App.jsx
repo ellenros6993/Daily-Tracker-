@@ -4702,6 +4702,55 @@ export default function App() {
                 ✓ Save Settings
               </button>
 
+              {/* Data Backup & Restore */}
+              <div className="stat-card">
+                <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 12 }}>DATA BACKUP & RESTORE</div>
+                <div style={{ fontSize: 11, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 14, lineHeight: 1.5 }}>
+                  Export saves all your data as a file. Import restores it — useful when switching devices or reinstalling.
+                </div>
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button onClick={() => {
+                    const backup = {};
+                    for (let i = 0; i < localStorage.length; i++) {
+                      const k = localStorage.key(i);
+                      if (k.startsWith("dat-") || k.startsWith("fat-")) backup[k] = localStorage.getItem(k);
+                    }
+                    // also grab all dat-meal-foods-{date} keys
+                    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `built-backup-${new Date().toISOString().slice(0,10)}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    haptic("success");
+                  }} style={{ flex: 1, background: "linear-gradient(135deg,#6d28d9,#a855f7)", border: "none", color: "#fff", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                    ↓ Export Backup
+                  </button>
+                  <label style={{ flex: 1, background: "#131929", border: "1px solid #1e2d40", color: "#a855f7", padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    ↑ Import Backup
+                    <input type="file" accept=".json" style={{ display: "none" }} onChange={e => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = ev => {
+                        try {
+                          const data = JSON.parse(ev.target.result);
+                          let count = 0;
+                          Object.entries(data).forEach(([k, v]) => {
+                            if (k.startsWith("dat-") || k.startsWith("fat-")) { localStorage.setItem(k, v); count++; }
+                          });
+                          haptic("success");
+                          alert(`✓ Restored ${count} data entries. Reloading app…`);
+                          window.location.reload();
+                        } catch { alert("Could not read backup file. Make sure it's a valid BUILT backup."); }
+                      };
+                      reader.readAsText(file);
+                    }} />
+                  </label>
+                </div>
+              </div>
+
               {/* App Features */}
               <div className="stat-card">
                 <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 16 }}>APP FEATURES</div>
