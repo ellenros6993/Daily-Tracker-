@@ -1062,6 +1062,8 @@ export default function App() {
   });
   const [workoutSaved, setWorkoutSaved] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
+  const [editingWorkoutId, setEditingWorkoutId] = useState(null);
+  const [pbBoardFilter, setPbBoardFilter] = useState("all");
   const [showShortcutModal, setShowShortcutModal] = useState(false);
   const [viewedDate, setViewedDate] = useState(getLocalDateStr());
   const [showManualSteps, setShowManualSteps] = useState(false);
@@ -1736,6 +1738,10 @@ export default function App() {
 
   function removeSet(exId, setIdx) {
     setWorkoutForm(f => ({ ...f, exercises: f.exercises.map(e => e.id === exId ? { ...e, sets: e.sets.filter((_,i) => i !== setIdx) } : e) }));
+  }
+
+  function toggleSetTimed(exId, setIdx) {
+    setWorkoutForm(f => ({ ...f, exercises: f.exercises.map(e => e.id === exId ? { ...e, sets: e.sets.map((s,i) => i === setIdx ? { ...s, timed: !s.timed } : s) } : e) }));
   }
 
   function updateSet(exId, setIdx, field, val) {
