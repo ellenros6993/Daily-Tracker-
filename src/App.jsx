@@ -3599,6 +3599,7 @@ export default function App() {
                   const d = new Date(); d.setDate(d.getDate() - (6 - i));
                   const ds = getLocalDateStr(d);
                   let cal = 0, pro = 0, carbs = 0, fat = 0, fiber = 0;
+                  let fromFoods = false;
                   try {
                     const mf = JSON.parse(localStorage.getItem(`dat-meal-foods-${ds}`) || "{}");
                     const foods = Object.values(mf).flat();
@@ -3608,14 +3609,20 @@ export default function App() {
                       carbs = Math.round(foods.reduce((s, f) => s + (f.carbs || 0), 0));
                       fat   = Math.round(foods.reduce((s, f) => s + (f.fat   || 0), 0));
                       fiber = Math.round(foods.reduce((s, f) => s + (f.fiber || f.fibre || 0), 0));
+                      fromFoods = true;
                     }
                   } catch {}
-                  if (cal === 0 && pro === 0) {
+                  if (fromFoods) {
+                    // Add manual on top of tracked foods (no double-count)
+                    const man = getManualToday(ds);
+                    cal += parseInt(man.calories)||0; pro += parseInt(man.protein)||0;
+                    carbs += parseInt(man.carbs)||0; fat += parseInt(man.fat)||0; fiber += parseInt(man.fiber)||0;
+                  } else {
+                    // Logs already include manual macros via auto-save — use as-is
                     const log = logs.find(l => l.date === ds);
                     if (log) { cal = parseInt(log.calories) || 0; pro = parseInt(log.protein) || 0; }
                   }
-                  const man = getManualToday(ds);
-                  return { date: ds, cal: cal + (parseInt(man.calories)||0), pro: pro + (parseInt(man.protein)||0), carbs: carbs + (parseInt(man.carbs)||0), fat: fat + (parseInt(man.fat)||0), fiber: fiber + (parseInt(man.fiber)||0) };
+                  return { date: ds, cal, pro, carbs, fat, fiber };
                 }).reverse(); // most recent first
 
                 const today7 = last7[0];
