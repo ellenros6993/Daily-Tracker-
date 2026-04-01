@@ -3554,7 +3554,7 @@ export default function App() {
 
               {/* Floating Rest Timer */}
               {(restTimerActive || restTimerRemaining !== null) && (
-                <div style={{ position: "fixed", bottom: 100, right: 16, zIndex: 200, background: "rgba(11,13,21,0.95)", backdropFilter: "blur(16px)", border: `1px solid ${restTimerRemaining === 0 ? "#34d399" : "#10b98155"}`, borderRadius: 16, padding: "14px 20px", minWidth: 160, boxShadow: "0 8px 32px #00000066", animation: "fadeUp 0.2s ease" }}>
+                <div style={{ position: "fixed", bottom: 170, right: 16, zIndex: 200, background: "rgba(11,13,21,0.95)", backdropFilter: "blur(16px)", border: `1px solid ${restTimerRemaining === 0 ? "#34d399" : "#10b98155"}`, borderRadius: 16, padding: "14px 20px", minWidth: 160, boxShadow: "0 8px 32px #00000066", animation: "fadeUp 0.2s ease" }}>
                   <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>REST TIMER</div>
                   <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 48, color: restTimerRemaining === 0 ? "#34d399" : restTimerRemaining <= 10 ? "#f87171" : "#60a5fa", lineHeight: 1, textAlign: "center" }}>
                     {restTimerRemaining === 0 ? "GO!" : `${Math.floor(restTimerRemaining / 60)}:${String(restTimerRemaining % 60).padStart(2,"0")}`}
