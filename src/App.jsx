@@ -2693,7 +2693,7 @@ export default function App() {
                   </div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
-                  <button className={`save-btn${saved ? " saved-state" : ""}`} onClick={saveLog} style={{ fontSize: 12, padding: "7px 16px", background: "linear-gradient(135deg,#d97706,#fbbf24)", boxShadow: "0 2px 12px #fbbf2430" }}>{saved ? "✓ Saved" : "Save Weigh-in"}</button>
+                  {isWeighInDay && <button className={`save-btn${saved ? " saved-state" : ""}`} onClick={saveLog} style={{ fontSize: 12, padding: "7px 16px", background: "linear-gradient(135deg,#d97706,#fbbf24)", boxShadow: "0 2px 12px #fbbf2430" }}>{saved ? "✓ Saved" : "Save Weigh-in"}</button>}
                 </div>
 
               </div>
@@ -2850,13 +2850,14 @@ export default function App() {
                                     {parseFloat(delta) > 0 ? "+" : ""}{delta}
                                   </span>
                                 )}
+                                {(() => { const tl = parseFloat((parseFloat(START_WEIGHT) - parseFloat(w.weight)).toFixed(1)); const tlCol = tl > 0 ? "#34d399" : tl < 0 ? "#f87171" : "#475569"; return <span style={{ fontSize: 9, color: tlCol, fontFamily: "'DM Mono',monospace", marginLeft: 4 }}>({tl > 0 ? "−" : tl < 0 ? "+" : ""}{Math.abs(tl)} total)</span>; })()}
                               </div>
                               <span style={{ fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{w.date}</span>
                             </div>
                             {(w.bodyFat || w.muscleMass) && (
                               <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
                                 {w.bodyFat && <span style={{ fontSize: 8, color: "#94a3b8", fontFamily: "'DM Mono',monospace" }}>BF {w.bodyFat}%</span>}
-                                {w.muscleMass && <span style={{ fontSize: 8, color: "#94a3b8", fontFamily: "'DM Mono',monospace" }}>Muscle {w.muscleMass}lb</span>}
+                                {w.muscleMass && <span style={{ fontSize: 8, color: "#94a3b8", fontFamily: "'DM Mono',monospace" }}>Muscle {w.muscleMass} lbs</span>}
                               </div>
                             )}
                           </div>
