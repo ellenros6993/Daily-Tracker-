@@ -1883,6 +1883,32 @@ export default function App() {
       onTouchMove={handleTouchMovePull}
       onTouchEnd={handleTouchEndPull}>
       {showConfetti && <canvas ref={confettiRef} style={{ position: "fixed", inset: 0, zIndex: 9999, pointerEvents: "none" }} />}
+      {/* Floating Rest Timer — rendered at root to avoid zoom:fontScale breaking position:fixed */}
+      {(restTimerActive || restTimerRemaining !== null) && (
+        <div style={{ position: "fixed", bottom: 170, right: 16, zIndex: 200, background: "rgba(11,13,21,0.95)", backdropFilter: "blur(16px)", border: `1px solid ${restTimerRemaining === 0 ? "#34d399" : "#10b98155"}`, borderRadius: 16, padding: "14px 20px", minWidth: 160, boxShadow: "0 8px 32px #00000066", animation: "fadeUp 0.2s ease" }}>
+          <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>REST TIMER</div>
+          <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 48, color: restTimerRemaining === 0 ? "#34d399" : restTimerRemaining <= 10 ? "#f87171" : "#60a5fa", lineHeight: 1, textAlign: "center" }}>
+            {restTimerRemaining === 0 ? "GO!" : `${Math.floor(restTimerRemaining / 60)}:${String(restTimerRemaining % 60).padStart(2,"0")}`}
+          </div>
+          {restTimerRemaining > 0 && (
+            <div style={{ marginTop: 8 }}>
+              <div style={{ height: 3, background: "#131929", borderRadius: 2, overflow: "hidden" }}>
+                <div style={{ height: "100%", background: restTimerRemaining <= 10 ? "#f87171" : "#60a5fa", width: `${(restTimerRemaining / restTimerPreset) * 100}%`, transition: "width 1s linear", borderRadius: 2 }} />
+              </div>
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 6, marginTop: 10, justifyContent: "center" }}>
+            {restTimerRemaining === 0 ? (
+              <button onClick={stopRestTimer} style={{ background: "linear-gradient(135deg,#1e3a5f,#60a5fa)", color: "#fff", border: "none", padding: "6px 16px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Done</button>
+            ) : (
+              <>
+                <button onClick={() => startRestTimer(restTimerPreset)} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "4px 10px", borderRadius: 6, fontSize: 10, cursor: "pointer" }}>↺</button>
+                <button onClick={stopRestTimer} style={{ background: "none", border: "1px solid #f8717133", color: "#f87171", padding: "4px 10px", borderRadius: 6, fontSize: 10, cursor: "pointer" }}>✕</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
       {shareImageUrl && (
         <div style={{ position: "fixed", inset: 0, zIndex: 10000, background: "rgba(0,0,0,0.92)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={() => setShareImageUrl(null)}>
           <div style={{ fontSize: 11, color: "#94a3b8", fontFamily: "'DM Mono',monospace", marginBottom: 12, textAlign: "center" }}>Long-press the image to save or share 👇</div>
@@ -3552,32 +3578,7 @@ export default function App() {
                 <div className="section-title" style={{ marginBottom: 0, color: "#60a5fa" }}>TRAINING LOG</div>
               </div>
 
-              {/* Floating Rest Timer */}
-              {(restTimerActive || restTimerRemaining !== null) && (
-                <div style={{ position: "fixed", bottom: 170, right: 16, zIndex: 200, background: "rgba(11,13,21,0.95)", backdropFilter: "blur(16px)", border: `1px solid ${restTimerRemaining === 0 ? "#34d399" : "#10b98155"}`, borderRadius: 16, padding: "14px 20px", minWidth: 160, boxShadow: "0 8px 32px #00000066", animation: "fadeUp 0.2s ease" }}>
-                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>REST TIMER</div>
-                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 48, color: restTimerRemaining === 0 ? "#34d399" : restTimerRemaining <= 10 ? "#f87171" : "#60a5fa", lineHeight: 1, textAlign: "center" }}>
-                    {restTimerRemaining === 0 ? "GO!" : `${Math.floor(restTimerRemaining / 60)}:${String(restTimerRemaining % 60).padStart(2,"0")}`}
-                  </div>
-                  {restTimerRemaining > 0 && (
-                    <div style={{ marginTop: 8 }}>
-                      <div style={{ height: 3, background: "#131929", borderRadius: 2, overflow: "hidden" }}>
-                        <div style={{ height: "100%", background: restTimerRemaining <= 10 ? "#f87171" : "#60a5fa", width: `${(restTimerRemaining / restTimerPreset) * 100}%`, transition: "width 1s linear", borderRadius: 2 }} />
-                      </div>
-                    </div>
-                  )}
-                  <div style={{ display: "flex", gap: 6, marginTop: 10, justifyContent: "center" }}>
-                    {restTimerRemaining === 0 ? (
-                      <button onClick={stopRestTimer} style={{ background: "linear-gradient(135deg,#1e3a5f,#60a5fa)", color: "#fff", border: "none", padding: "6px 16px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Done</button>
-                    ) : (
-                      <>
-                        <button onClick={() => startRestTimer(restTimerPreset)} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "4px 10px", borderRadius: 6, fontSize: 10, cursor: "pointer" }}>↺</button>
-                        <button onClick={stopRestTimer} style={{ background: "none", border: "1px solid #f8717133", color: "#f87171", padding: "4px 10px", borderRadius: 6, fontSize: 10, cursor: "pointer" }}>✕</button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
+
 
               {/* Circuit Timer */}
               {showCircuitTimer && (
