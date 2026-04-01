@@ -4434,42 +4434,35 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Nutrition — Calories + Protein combined */}
+              {/* Nutrition — Calories + Protein stacked */}
               <div className="stat-card">
-                <div className="section-title" style={{ fontSize: 14, margin: "0 0 10px 0", color: "#a855f7" }}>NUTRITION</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div className="section-title" style={{ fontSize: 14, margin: "0 0 12px 0", color: "#a855f7" }}>NUTRITION</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                   <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                      <div style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace", letterSpacing: 1, fontWeight: 700 }}>CALORIES</div>
-                      <div style={{ fontSize: 8, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{CALORIES_MIN}–{CALORIES_MAX}</div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                      <div style={{ fontSize: 13, color: "#a855f7", fontFamily: "'DM Mono',monospace", letterSpacing: 1, fontWeight: 700 }}>CALORIES</div>
+                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>target {CALORIES_MIN}–{CALORIES_MAX}</div>
                     </div>
                     <SummaryBar data={calData} color="#a855f7" unit="kcal" goal={CALORIES_MIN} />
                     <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
-                      <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {calData.filter(d=>d.val).length ? Math.round(calData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/calData.filter(d=>d.val).length) : "—"}</div>
-                      <div style={{ fontSize: 9, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>{calData.filter(d=>d.val>=CALORIES_MIN&&d.val<=CALORIES_MAX).length}d ✓</div>
+                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {calData.filter(d=>d.val).length ? Math.round(calData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/calData.filter(d=>d.val).length) : "—"} kcal</div>
+                      <div style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>{calData.filter(d=>d.val>=CALORIES_MIN&&d.val<=CALORIES_MAX).length} days on target</div>
                     </div>
                   </div>
-                  <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                      <div style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace", letterSpacing: 1, fontWeight: 700 }}>PROTEIN</div>
-                      <div style={{ fontSize: 8, color: "#475569", fontFamily: "'DM Mono',monospace" }}>≥{PROTEIN_MIN}g</div>
+                  <div style={{ borderTop: "1px solid #131929", paddingTop: 14 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                      <div style={{ fontSize: 13, color: "#a855f7", fontFamily: "'DM Mono',monospace", letterSpacing: 1, fontWeight: 700 }}>PROTEIN</div>
+                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>goal ≥{PROTEIN_MIN}g</div>
                     </div>
                     <SummaryBar data={proData} color="#a855f7" unit="g" goal={PROTEIN_MIN} />
                     <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
-                      <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {proData.filter(d=>d.val).length ? Math.round(proData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/proData.filter(d=>d.val).length) : "—"}g</div>
-                      <div style={{ fontSize: 9, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>{proData.filter(d=>d.val>=PROTEIN_MIN).length}d ✓</div>
+                      <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>avg {proData.filter(d=>d.val).length ? Math.round(proData.filter(d=>d.val).reduce((s,d)=>s+d.val,0)/proData.filter(d=>d.val).length) : "—"}g</div>
+                      <div style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>{proData.filter(d=>d.val>=PROTEIN_MIN).length} days hit goal</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="stat-card" style={{ padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#e2e8f0", marginBottom: 2 }}>Share your stats</div>
-                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>Generates a summary image card</div>
-                </div>
-                <button onClick={shareStats} style={{ background: "linear-gradient(135deg,#052e1c,#0a3d26)", border: "1px solid #065f3a44", color: "#34d399", padding: "8px 16px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>📤 Share</button>
-              </div>
 
             </div>
           );
