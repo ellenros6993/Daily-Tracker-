@@ -3680,6 +3680,7 @@ export default function App() {
                     </select>
                   </div>
                   <input type="text" placeholder="Session name (e.g. Push Day)" value={workoutForm.name} onChange={e => setWorkoutForm(f => ({ ...f, name: e.target.value }))} style={{ fontSize: 12, padding: "5px 8px", width: "100%" }} />
+                </div>
                 {(workoutForm.activityType || "strength") === "strength" ? (
                   <>
 
@@ -4026,7 +4027,7 @@ export default function App() {
                         const allSessions = workouts.filter(w => w.exercises.some(e => e.name.toLowerCase() === name));
                         return pr > 0 ? (
                           <div key={name} style={{ background: "#0f1623", border: "1px solid #131929", borderRadius: 6, padding: 8 }}>
-                            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}><div style={{ color: "#64748b", fontSize: 8, letterSpacing: 1, textTransform: "uppercase", overflow: "hidden", lineHeight: 1.3, flex: 1 }}>{name}</div><button onClick={() => { const updated = hiddenPRExercises.includes(name) ? hiddenPRExercises.filter(n => n !== name) : [...hiddenPRExercises, name]; setHiddenPRExercises(updated); localStorage.setItem("dat-hidden-pr", JSON.stringify(updated)); haptic("light"); }} style={{ background: "none", border: "none", color: "#334155", fontSize: 12, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0 }}>✕</div></div>
+                            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}><div style={{ color: "#64748b", fontSize: 8, letterSpacing: 1, textTransform: "uppercase", overflow: "hidden", lineHeight: 1.3, flex: 1 }}>{name}</div><button onClick={() => { const updated = hiddenPRExercises.includes(name) ? hiddenPRExercises.filter(n => n !== name) : [...hiddenPRExercises, name]; setHiddenPRExercises(updated); localStorage.setItem("dat-hidden-pr", JSON.stringify(updated)); haptic("light"); }} style={{ background: "none", border: "none", color: "#334155", fontSize: 12, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0 }}>✕</button></div>
                             <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: "#fbbf24", lineHeight: 1 }}>{pr}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div>
                             <button onClick={() => {
                               const canvas = document.createElement("canvas");
