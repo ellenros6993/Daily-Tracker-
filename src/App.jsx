@@ -3664,19 +3664,11 @@ export default function App() {
               {/* New workout form */}
               <div className="stat-card">
                 <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>LOG WORKOUT</div>
-                <div style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "flex-end", flexWrap: "nowrap" }}>
-                  <div style={{ flex: "0 0 auto" }}>
-                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>DATE</div>
-                    <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} style={{ width: "auto", fontSize: 12, padding: "5px 8px" }} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>SESSION NAME</div>
-                    <input type="text" placeholder="e.g. Push Day" value={workoutForm.name} onChange={e => setWorkoutForm(f => ({ ...f, name: e.target.value }))} style={{ fontSize: 12, padding: "5px 8px" }} />
-                  </div>
-                  <div style={{ flex: "0 0 auto" }}>
-                    <div className="field-label" style={{ marginBottom: 4, fontSize: 9 }}>TYPE</div>
-                    <select value={workoutForm.activityType || "strength"} onChange={e => setWorkoutForm(f => ({ ...f, activityType: e.target.value }))}
-                      style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 12, padding: "5px 8px", cursor: "pointer", outline: "none" }}>
+                <div style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "center" }}>
+                  <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} style={{ flex: "0 0 auto", width: "auto", fontSize: 12, padding: "5px 8px" }} />
+                  <input type="text" placeholder="Session name (e.g. Push Day)" value={workoutForm.name} onChange={e => setWorkoutForm(f => ({ ...f, name: e.target.value }))} style={{ flex: 1, fontSize: 12, padding: "5px 8px" }} />
+                  <select value={workoutForm.activityType || "strength"} onChange={e => setWorkoutForm(f => ({ ...f, activityType: e.target.value }))}
+                      style={{ flex: "0 0 auto", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 12, padding: "5px 8px", cursor: "pointer", outline: "none" }}>
                       <option value="strength">🏋️ Strength</option>
                       <option value="run">🏃 Run</option>
                       <option value="cycle">🚴 Cycle</option>
@@ -3686,7 +3678,6 @@ export default function App() {
                       <option value="other">⚡ Other</option>
                     </select>
                   </div>
-                </div>
                 {(workoutForm.activityType || "strength") === "strength" ? (
                   <>
 
@@ -4023,7 +4014,13 @@ export default function App() {
                 const allExerciseNames = [...new Set(workouts.flatMap(w => w.exercises.map(e => e.name.trim().toLowerCase())).filter(Boolean))];
                 return allExerciseNames.length > 0 ? (
                   <div className="stat-card">
-                    <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>🏆 PR BOARD</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                      <div className="section-title" style={{ fontSize: 16, color: "#60a5fa", marginBottom: 0 }}>🏆 PR BOARD</div>
+                      <select value={pbBoardFilter} onChange={e => setPbBoardFilter(e.target.value)} style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#60a5fa", fontSize: 11, padding: "4px 8px", outline: "none", cursor: "pointer" }}>
+                        <option value="all">All exercises</option>
+                        {[...new Set(workouts.flatMap(w => w.exercises.map(e => e.name.trim().toLowerCase())).filter(Boolean))].map(n => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
                       {allExerciseNames.filter(name => pbBoardFilter === "all" || name === pbBoardFilter).map(name => {
                         const pr = getPRForExercise(name);
@@ -4032,8 +4029,28 @@ export default function App() {
                           <div key={name} style={{ background: "#0f1623", border: "1px solid #131929", borderRadius: 6, padding: 8 }}>
                             <div style={{ color: "#64748b", fontSize: 8, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4, height: 24, overflow: "hidden", lineHeight: 1.3 }}>{name}</div>
                             <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: "#fbbf24", lineHeight: 1 }}>{pr}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div>
-                            <button onClick={() => { const t = name.toUpperCase() + " PR: " + pr + " lb"; navigator.share ? navigator.share({title:"PR",text:t}) : navigator.clipboard?.writeText(t); haptic("pr"); }} style={{ background: "none", border: "none", color: "#475569", fontSize: 9, cursor: "pointer", display: "block" }}>📤 share</button>
-                            <div style={{ color: "#334155", fontSize: 10, marginTop: 1 }}>{allSessions.length} session{allSessions.length !== 1 ? "s" : ""}</div>
+                            <button onClick={() => {
+                              const canvas = document.createElement("canvas");
+                              canvas.width = 320; canvas.height = 180;
+                              const ctx = canvas.getContext("2d");
+                              ctx.fillStyle = "#07080d"; ctx.fillRect(0,0,320,180);
+                              const g = ctx.createLinearGradient(0,0,320,0);
+                              g.addColorStop(0,"#1e3a5f"); g.addColorStop(1,"#07080d");
+                              ctx.fillStyle = g; ctx.fillRect(0,0,320,6);
+                              ctx.fillStyle = "#475569"; ctx.font = "10px monospace"; ctx.fillText("🏆 PERSONAL RECORD", 16, 32);
+                              ctx.fillStyle = "#fbbf24"; ctx.font = "bold 52px monospace"; ctx.fillText(pr + " lb", 16, 100);
+                              ctx.fillStyle = "#e2e8f0"; ctx.font = "bold 18px monospace"; ctx.fillText(name.toUpperCase(), 16, 130);
+                              ctx.fillStyle = "#334155"; ctx.font = "10px monospace"; ctx.fillText(allSessions.length + " sessions · dailytrack-ten.vercel.app", 16, 160);
+                              canvas.toBlob(blob => {
+                                if (!blob) return;
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement("a"); a.href = url; a.download = name + "-pr.png"; a.click();
+                                URL.revokeObjectURL(url);
+                                if (navigator.share) { canvas.toBlob(b2 => { const file = new File([b2], name+"-pr.png", {type:"image/png"}); navigator.share({title:"PR: "+name, files:[file]}); }, "image/png"); }
+                              }, "image/png");
+                              haptic("pr");
+                            }} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "none", color: "#60a5fa", fontSize: 9, cursor: "pointer", display: "block", borderRadius: 4, padding: "3px 8px", marginTop: 4, width: "100%", fontWeight: 600 }}>📤 Share PR</button>
+                                                        <div style={{ color: "#334155", fontSize: 10, marginTop: 1 }}>{allSessions.length} session{allSessions.length !== 1 ? "s" : ""}</div>
                           </div>
                         ) : null;
                       })}
