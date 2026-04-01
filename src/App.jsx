@@ -4702,6 +4702,25 @@ export default function App() {
                 ✓ Save Settings
               </button>
 
+              {/* ONE-TIME DATA RESTORE */}
+              {!localStorage.getItem("dat-restored-march-2026") && (
+                <div className="stat-card" style={{ borderColor: "#f59e0b55", background: "#1a1200" }}>
+                  <div style={{ fontSize: 9, color: "#fbbf24", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 10 }}>RESTORE YOUR DATA</div>
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 14, lineHeight: 1.5 }}>13 days of logs (Mar 19–31), 6 weigh-ins, and your settings are ready to restore.</div>
+                  <button onClick={() => {
+                    if (!window.confirm("Restore all data? This will overwrite any existing entries.")) return;
+                    localStorage.setItem("fat-loss-log-v1", JSON.stringify([{\"date\": \"2026-03-19\", \"calories\": \"1440\", \"protein\": \"128\", \"steps\": \"8353\", \"weight\": \"210\", \"bodyFat\": \"45.8\", \"muscleMass\": \"107.2\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 3}, {\"date\": \"2026-03-20\", \"calories\": \"1445\", \"protein\": \"126\", \"steps\": \"9100\", \"weight\": \"\", \"bodyFat\": \"\", \"muscleMass\": \"\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 3}, {\"date\": \"2026-03-21\", \"calories\": \"1874\", \"protein\": \"139\", \"steps\": \"9472\", \"weight\": \"205\", \"bodyFat\": \"44.6\", \"muscleMass\": \"107.2\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 2}, {\"date\": \"2026-03-22\", \"calories\": \"1508\", \"protein\": \"117\", \"steps\": \"8450\", \"weight\": \"\", \"bodyFat\": \"\", \"muscleMass\": \"\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 2}, {\"date\": \"2026-03-23\", \"calories\": \"1534\", \"protein\": \"120\", \"steps\": \"8096\", \"weight\": \"\", \"bodyFat\": \"\", \"muscleMass\": \"\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 3}, {\"date\": \"2026-03-24\", \"calories\": \"1430\", \"protein\": \"114\", \"steps\": \"8246\", \"weight\": \"202.8\", \"bodyFat\": \"43.8\", \"muscleMass\": \"107.2\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 2}, {\"date\": \"2026-03-25\", \"calories\": \"1209\", \"protein\": \"83\", \"steps\": \"9452\", \"weight\": \"\", \"bodyFat\": \"\", \"muscleMass\": \"\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 1}, {\"date\": \"2026-03-26\", \"calories\": \"1180\", \"protein\": \"80\", \"steps\": \"7306\", \"weight\": \"201\", \"bodyFat\": \"43.4\", \"muscleMass\": \"106.8\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 0}, {\"date\": \"2026-03-27\", \"calories\": \"1482\", \"protein\": \"113\", \"steps\": \"9691\", \"weight\": \"\", \"bodyFat\": \"\", \"muscleMass\": \"\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 2}, {\"date\": \"2026-03-28\", \"calories\": \"1405\", \"protein\": \"103\", \"steps\": \"6734\", \"weight\": \"200\", \"bodyFat\": \"43.2\", \"muscleMass\": \"107\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 1}, {\"date\": \"2026-03-29\", \"calories\": \"1974\", \"protein\": \"129\", \"steps\": \"7032\", \"weight\": \"\", \"bodyFat\": \"\", \"muscleMass\": \"\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 1}, {\"date\": \"2026-03-30\", \"calories\": \"1357\", \"protein\": \"91\", \"steps\": \"11417\", \"weight\": \"\", \"bodyFat\": \"\", \"muscleMass\": \"\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 1}, {\"date\": \"2026-03-31\", \"calories\": \"\", \"protein\": \"\", \"steps\": \"10466\", \"weight\": \"200.6\", \"bodyFat\": \"43.3\", \"muscleMass\": \"107\", \"visceralFat\": \"\", \"training\": \"\", \"score\": 1}]));
+                    localStorage.setItem("dat-settings", JSON.stringify({\"caloriesMin\": 1400, \"caloriesMax\": 1800, \"proteinMin\": 120, \"stepsMin\": 8000, \"startWeight\": 210, \"goalWeight\": 160, \"workoutsPerWeek\": 3, \"weighInDays\": [2, 4, 6]}));
+                    localStorage.setItem("dat-restored-march-2026", "1");
+                    haptic("success");
+                    alert("✓ Data restored! Reloading…");
+                    window.location.reload();
+                  }} style={{ width: "100%", background: "linear-gradient(135deg,#d97706,#fbbf24)", border: "none", color: "#000", padding: "12px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                    ⚡ Restore My Data
+                  </button>
+                </div>
+              )}
+
               {/* Data Backup & Restore */}
               <div className="stat-card">
                 <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 12 }}>DATA BACKUP & RESTORE</div>
