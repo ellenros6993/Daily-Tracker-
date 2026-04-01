@@ -286,29 +286,29 @@ function generateReportHTML(weekStart, weekLogs, allLogs) {
   <div class="card">
     <div class="label">Week Start</div>
     <div class="big cyan">${stats.startW || '—'}</div>
-    <div class="sub">lb</div>
+    <div class="sub">lbs</div>
   </div>
   <div class="card">
     <div class="label">Week End</div>
     <div class="big cyan">${stats.endW || '—'}</div>
-    <div class="sub">lb</div>
+    <div class="sub">lbs</div>
   </div>
   <div class="card">
     <div class="label">Week Loss</div>
     <div class="big ${stats.weekLoss && parseFloat(stats.weekLoss) > 0 ? 'green' : 'red'}">${stats.weekLoss ? (parseFloat(stats.weekLoss) > 0 ? '-' : '+') + Math.abs(stats.weekLoss) : '—'}</div>
-    <div class="sub">lb this week</div>
+    <div class="sub">lbs this week</div>
   </div>
 </div>
 <div class="grid2">
   <div class="card">
     <div class="label">Projected Aug 23</div>
     <div class="big ${projected && parseFloat(projected) <= GOAL_WEIGHT ? 'green' : projected && parseFloat(projected) <= GOAL_WEIGHT + 5 ? 'yellow' : 'red'}">${projected || '—'}</div>
-    <div class="sub">${projected ? (parseFloat(projected) <= GOAL_WEIGHT ? '✓ on track for 160' : `${(parseFloat(projected) - GOAL_WEIGHT).toFixed(1)} lb above goal`) : 'need more weigh-ins'}</div>
+    <div class="sub">${projected ? (parseFloat(projected) <= GOAL_WEIGHT ? '✓ on track for 160' : `${(parseFloat(projected) - GOAL_WEIGHT).toFixed(1)} lbs above goal`) : 'need more weigh-ins'}</div>
   </div>
   <div class="card">
     <div class="label">Total Lost Since Start</div>
     <div class="big green">${stats.endW ? (START_WEIGHT - stats.endW).toFixed(1) : '—'}</div>
-    <div class="sub">lb from ${START_WEIGHT} lb</div>
+    <div class="sub">lbs from ${START_WEIGHT} lbs</div>
   </div>
 </div>
 
@@ -387,7 +387,7 @@ function generateReportHTML(weekStart, weekLogs, allLogs) {
 </table>
 
 <div class="footer">
-  LOCKED IN · Generated ${new Date().toLocaleDateString()} · Goal: 210 → 160 lb by Aug 23, 2025
+  LOCKED IN · Generated ${new Date().toLocaleDateString()} · Goal: 210 → 160 lbs by Aug 23, 2025
 </div>
 </body>
 </html>`;
@@ -858,7 +858,7 @@ export default function App() {
     }
     try {
       const simplified = query
-        .replace(/\d+\s*(cup|cups|oz|g|ml|lb|tbsp|tsp|serving|piece|pieces|slice|slices|scoop|scoops)s?\b/gi, "")
+        .replace(/\d+\s*(cup|cups|oz|g|ml|lbs|tbsp|tsp|serving|piece|pieces|slice|slices|scoop|scoops)s?\b/gi, "")
         .replace(/\b(high|low|plain|original|classic|organic|natural|light|non.fat|nonfat|fat.free|sugar.free|whole|2%|0%|1%)\b/gi, "")
         .trim().split(/\s+/).slice(0, 4).join(" ");
 
@@ -2823,7 +2823,7 @@ export default function App() {
                         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
                           <div>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>AVG LOSS</div>
-                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#fbbf24" }}>{weeklyRate} <span style={{ fontSize: 10, color: "#475569" }}>lb/wk</span></div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "#fbbf24" }}>{weeklyRate} <span style={{ fontSize: 10, color: "#475569" }}>lbs/wk</span></div>
                           </div>
                           {goalDateStr ? <div style={{ textAlign: "right" }}>
                             <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>PROJECTED GOAL</div>
@@ -2850,7 +2850,7 @@ export default function App() {
                             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
                               <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                                 <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: isFirst ? 24 : 16, color: isFirst ? "#fbbf24" : "#64748b", lineHeight: 1 }}>{w.weight}</span>
-                                <span style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>lb</span>
+                                <span style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace" }}>lbs</span>
                                 {delta !== null && (
                                   <span style={{ fontSize: 10, fontFamily: "'Bebas Neue',sans-serif", color: deltaColor }}>
                                     {parseFloat(delta) > 0 ? "+" : ""}{delta}
@@ -3918,13 +3918,13 @@ export default function App() {
 
                         {ex.name && pr > 0 && (
                           <div style={{ color: "#fbbf24", fontSize: 10, letterSpacing: 1, marginBottom: 8 }}>
-                            🏆 PR: {pr} lb
-                            {lastSession && <><span style={{ color: "#475569", marginLeft: 12 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</span><button onClick={() => { setWorkoutForm(f => ({ ...f, exercises: f.exercises.map(e => e.id === ex.id ? { ...e, sets: lastSession.sets.map(s => ({ reps: s.reps, weight: s.weight, notes: s.notes || "" })) } : e) })); haptic("light"); }} style={{ marginLeft: 8, background: "none", border: "1px solid #1e3a5f", color: "#60a5fa", fontSize: 9, padding: "1px 7px", borderRadius: 4, cursor: "pointer", fontWeight: 600 }}>↙ Copy</button></>}
+                            🏆 PR: {pr} lbs
+                            {lastSession && <><span style={{ color: "#475569", marginLeft: 12 }}>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lbs`).join(", ")}</span><button onClick={() => { setWorkoutForm(f => ({ ...f, exercises: f.exercises.map(e => e.id === ex.id ? { ...e, sets: lastSession.sets.map(s => ({ reps: s.reps, weight: s.weight, notes: s.notes || "" })) } : e) })); haptic("light"); }} style={{ marginLeft: 8, background: "none", border: "1px solid #1e3a5f", color: "#60a5fa", fontSize: 9, padding: "1px 7px", borderRadius: 4, cursor: "pointer", fontWeight: 600 }}>↙ Copy</button></>}
                           </div>
                         )}
                         {ex.name && !pr && lastSession && (
                           <div style={{ color: "#475569", fontSize: 10, marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
-                            <span>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lb`).join(", ")}</span>
+                            <span>Last: {lastSession.sets.map(s => `${s.reps}×${s.weight}lbs`).join(", ")}</span>
                             <button onClick={() => { setWorkoutForm(f => ({ ...f, exercises: f.exercises.map(e => e.id === ex.id ? { ...e, sets: lastSession.sets.map(s => ({ reps: s.reps, weight: s.weight, notes: s.notes || "" })) } : e) })); haptic("light"); }} style={{ background: "none", border: "1px solid #1e3a5f", color: "#60a5fa", fontSize: 9, padding: "1px 7px", borderRadius: 4, cursor: "pointer", fontWeight: 600 }}>↙ Copy</button>
                           </div>
                         )}
@@ -3932,7 +3932,7 @@ export default function App() {
                         <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr auto", gap: 6, alignItems: "center", marginBottom: 6 }}>
                           <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>SET</div>
                           <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>REPS</div>
-                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>WEIGHT (lb)</div>
+                          <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>WEIGHT (lbs)</div>
                           <div style={{ color: "#475569", fontSize: 10, letterSpacing: 1 }}>NOTES</div>
                           <div />
                         </div>
@@ -4096,7 +4096,7 @@ export default function App() {
                     <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 8 }}>56-day volume heatmap — brighter = more weight lifted</div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(14, 1fr)", gap: 3 }}>
                       {cells.map(({ ds, vol, trained }) => (
-                        <div key={ds} className="train-heat-cell" title={`${ds}${trained ? ` · ${vol.toLocaleString()}lb` : " · rest"}`}
+                        <div key={ds} className="train-heat-cell" title={`${ds}${trained ? ` · ${vol.toLocaleString()}lbs` : " · rest"}`}
                           style={{ height: 12, background: heatColor(vol, trained), borderRadius: 3 }} />
                       ))}
                     </div>
@@ -4160,7 +4160,7 @@ export default function App() {
                                     {ex.supersetWith && <span style={{ background: "#046c4e22", color: "#60a5fa", fontSize: 9, padding: "1px 6px", borderRadius: 3, letterSpacing: 1 }}>Superset</span>}
                                     {ex.sets.map((s, si) => (
                                       <span key={si} className="chip" style={{ color: "#e2e8f0" }}>
-                                        {s.reps && s.weight ? `${s.reps} × ${s.weight}lb` : s.reps ? `${s.reps} reps` : `${s.weight}lb`}
+                                        {s.reps && s.weight ? `${s.reps} × ${s.weight}lbs` : s.reps ? `${s.reps} reps` : `${s.weight}lbs`}
                                       </span>
                                     ))}
                                   </div>
@@ -4192,7 +4192,7 @@ export default function App() {
                         return pr > 0 ? (
                           <div key={name} style={{ background: "#0f1623", border: "1px solid #131929", borderRadius: 6, padding: 8 }}>
                             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}><div style={{ color: "#64748b", fontSize: 8, letterSpacing: 1, textTransform: "uppercase", overflow: "hidden", lineHeight: 1.3, flex: 1 }}>{name}</div><button onClick={() => { const updated = hiddenPRExercises.includes(name) ? hiddenPRExercises.filter(n => n !== name) : [...hiddenPRExercises, name]; setHiddenPRExercises(updated); localStorage.setItem("dat-hidden-pr", JSON.stringify(updated)); haptic("light"); }} style={{ background: "none", border: "none", color: "#334155", fontSize: 12, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0 }}>✕</button></div>
-                            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: "#fbbf24", lineHeight: 1 }}>{pr}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div>
+                            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: "#fbbf24", lineHeight: 1 }}>{pr}<span style={{ fontSize: 11, color: "#475569" }}> lbs</span></div>
                             <button onClick={() => {
                               const canvas = document.createElement("canvas");
                               canvas.width = 320; canvas.height = 320;
@@ -4202,7 +4202,7 @@ export default function App() {
                               g.addColorStop(0,"#1e3a5f"); g.addColorStop(1,"#07080d");
                               ctx.fillStyle = g; ctx.fillRect(0,0,320,6);
                               ctx.fillStyle = "#475569"; ctx.font = "10px monospace"; ctx.fillText("🏆 PERSONAL RECORD", 16, 60);
-                              ctx.fillStyle = "#fbbf24"; ctx.font = "bold 52px monospace"; ctx.fillText(pr + " lb", 16, 150);
+                              ctx.fillStyle = "#fbbf24"; ctx.font = "bold 52px monospace"; ctx.fillText(pr + " lbs", 16, 150);
                               ctx.fillStyle = "#e2e8f0"; ctx.font = "bold 18px monospace"; ctx.fillText(name.toUpperCase(), 16, 210);
                               ctx.fillStyle = "#334155"; ctx.font = "10px monospace"; ctx.fillText(allSessions.length + " sessions", 16, 245)
                               ctx.fillStyle = "#1e2d40"; ctx.font = "9px monospace"; ctx.fillText("dailytrack-ten.vercel.app", 16, 300);
@@ -4369,7 +4369,7 @@ export default function App() {
                           <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: "#10b981", letterSpacing: 2 }}>{entry.date}</div>
                           {(() => {
                             const log = logs.find(l => l.date === entry.date);
-                            return log?.weight ? <div style={{ color: "#475569", fontSize: 11 }}>{log.weight} lb{log.bodyFat ? ` · ${log.bodyFat}% fat` : ""}</div> : null;
+                            return log?.weight ? <div style={{ color: "#475569", fontSize: 11 }}>{log.weight} lbs{log.bodyFat ? ` · ${log.bodyFat}% fat` : ""}</div> : null;
                           })()}
                         </div>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginBottom: entry.video ? 8 : 0 }}>
@@ -4518,7 +4518,7 @@ export default function App() {
                     <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center" }}>
                       <div style={{ textAlign: "center" }}>
                         <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>START</div>
-                        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 28, color: "#94a3b8", lineHeight: 1 }}>{startW}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div>
+                        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 28, color: "#94a3b8", lineHeight: 1 }}>{startW}<span style={{ fontSize: 11, color: "#475569" }}> lbs</span></div>
                         <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{periodWeights[0].date}</div>
                       </div>
                       <div style={{ textAlign: "center" }}>
@@ -4527,7 +4527,7 @@ export default function App() {
                       </div>
                       <div style={{ textAlign: "center" }}>
                         <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>NOW</div>
-                        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 28, color: "#fbbf24", lineHeight: 1 }}>{endW}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div>
+                        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 28, color: "#fbbf24", lineHeight: 1 }}>{endW}<span style={{ fontSize: 11, color: "#475569" }}> lbs</span></div>
                         <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>{periodWeights[periodWeights.length-1].date}</div>
                       </div>
                     </div>
