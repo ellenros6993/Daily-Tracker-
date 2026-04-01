@@ -1063,7 +1063,8 @@ export default function App() {
   const [workoutSaved, setWorkoutSaved] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [editingWorkoutId, setEditingWorkoutId] = useState(null);
-  const [pbBoardFilter, setPbBoardFilter] = useState("all");
+  const [hiddenPRExercises, setHiddenPRExercises] = useState(() => { try { return JSON.parse(localStorage.getItem("dat-hidden-pr") || "[]"); } catch { return []; } });
+  const [showHiddenPR, setShowHiddenPR] = useState(false);
   const [showShortcutModal, setShowShortcutModal] = useState(false);
   const [viewedDate, setViewedDate] = useState(getLocalDateStr());
   const [showManualSteps, setShowManualSteps] = useState(false);
@@ -3664,11 +3665,11 @@ export default function App() {
               {/* New workout form */}
               <div className="stat-card">
                 <div className="section-title" style={{ fontSize: 16, color: "#60a5fa" }}>LOG WORKOUT</div>
-                <div style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "center" }}>
-                  <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} style={{ flex: "0 0 auto", width: "auto", fontSize: 12, padding: "5px 8px" }} />
-                  <input type="text" placeholder="Session name (e.g. Push Day)" value={workoutForm.name} onChange={e => setWorkoutForm(f => ({ ...f, name: e.target.value }))} style={{ flex: 1, fontSize: 12, padding: "5px 8px" }} />
-                  <select value={workoutForm.activityType || "strength"} onChange={e => setWorkoutForm(f => ({ ...f, activityType: e.target.value }))}
-                      style={{ flex: "0 0 auto", background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 12, padding: "5px 8px", cursor: "pointer", outline: "none" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <input type="date" value={workoutForm.date} onChange={e => setWorkoutForm(f => ({ ...f, date: e.target.value }))} style={{ flex: "0 0 auto", width: "auto", fontSize: 12, padding: "5px 8px" }} />
+                    <select value={workoutForm.activityType || "strength"} onChange={e => setWorkoutForm(f => ({ ...f, activityType: e.target.value }))}
+                      style={{ flex: 1, background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#e2e8f0", fontSize: 12, padding: "5px 8px", cursor: "pointer", outline: "none" }}>
                       <option value="strength">🏋️ Strength</option>
                       <option value="run">🏃 Run</option>
                       <option value="cycle">🚴 Cycle</option>
@@ -3678,6 +3679,7 @@ export default function App() {
                       <option value="other">⚡ Other</option>
                     </select>
                   </div>
+                  <input type="text" placeholder="Session name (e.g. Push Day)" value={workoutForm.name} onChange={e => setWorkoutForm(f => ({ ...f, name: e.target.value }))} style={{ fontSize: 12, padding: "5px 8px", width: "100%" }} />
                 {(workoutForm.activityType || "strength") === "strength" ? (
                   <>
 
@@ -4016,31 +4018,29 @@ export default function App() {
                   <div className="stat-card">
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                       <div className="section-title" style={{ fontSize: 16, color: "#60a5fa", marginBottom: 0 }}>🏆 PR BOARD</div>
-                      <select value={pbBoardFilter} onChange={e => setPbBoardFilter(e.target.value)} style={{ background: "#0f1623", border: "1px solid #1e2d40", borderRadius: 7, color: "#60a5fa", fontSize: 11, padding: "4px 8px", outline: "none", cursor: "pointer" }}>
-                        <option value="all">All exercises</option>
-                        {[...new Set(workouts.flatMap(w => w.exercises.map(e => e.name.trim().toLowerCase())).filter(Boolean))].map(n => <option key={n} value={n}>{n}</option>)}
-                      </select>
+                      {hiddenPRExercises.length > 0 && <button onClick={() => setShowHiddenPR(v => !v)} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "3px 10px", borderRadius: 6, fontSize: 10, cursor: "pointer" }}>{showHiddenPR ? "Show active" : `${hiddenPRExercises.length} hidden`}</button>}
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-                      {allExerciseNames.filter(name => pbBoardFilter === "all" || name === pbBoardFilter).map(name => {
+                      {allExerciseNames.filter(name => showHiddenPR ? hiddenPRExercises.includes(name) : !hiddenPRExercises.includes(name)).map(name => {
                         const pr = getPRForExercise(name);
                         const allSessions = workouts.filter(w => w.exercises.some(e => e.name.toLowerCase() === name));
                         return pr > 0 ? (
                           <div key={name} style={{ background: "#0f1623", border: "1px solid #131929", borderRadius: 6, padding: 8 }}>
-                            <div style={{ color: "#64748b", fontSize: 8, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4, height: 24, overflow: "hidden", lineHeight: 1.3 }}>{name}</div>
+                            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}><div style={{ color: "#64748b", fontSize: 8, letterSpacing: 1, textTransform: "uppercase", overflow: "hidden", lineHeight: 1.3, flex: 1 }}>{name}</div><button onClick={() => { const updated = hiddenPRExercises.includes(name) ? hiddenPRExercises.filter(n => n !== name) : [...hiddenPRExercises, name]; setHiddenPRExercises(updated); localStorage.setItem("dat-hidden-pr", JSON.stringify(updated)); haptic("light"); }} style={{ background: "none", border: "none", color: "#334155", fontSize: 12, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0 }}>✕</div></div>
                             <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: "#fbbf24", lineHeight: 1 }}>{pr}<span style={{ fontSize: 11, color: "#475569" }}> lb</span></div>
                             <button onClick={() => {
                               const canvas = document.createElement("canvas");
-                              canvas.width = 320; canvas.height = 180;
+                              canvas.width = 320; canvas.height = 320;
                               const ctx = canvas.getContext("2d");
-                              ctx.fillStyle = "#07080d"; ctx.fillRect(0,0,320,180);
+                              ctx.fillStyle = "#07080d"; ctx.fillRect(0,0,320,320);
                               const g = ctx.createLinearGradient(0,0,320,0);
                               g.addColorStop(0,"#1e3a5f"); g.addColorStop(1,"#07080d");
                               ctx.fillStyle = g; ctx.fillRect(0,0,320,6);
-                              ctx.fillStyle = "#475569"; ctx.font = "10px monospace"; ctx.fillText("🏆 PERSONAL RECORD", 16, 32);
-                              ctx.fillStyle = "#fbbf24"; ctx.font = "bold 52px monospace"; ctx.fillText(pr + " lb", 16, 100);
-                              ctx.fillStyle = "#e2e8f0"; ctx.font = "bold 18px monospace"; ctx.fillText(name.toUpperCase(), 16, 130);
-                              ctx.fillStyle = "#334155"; ctx.font = "10px monospace"; ctx.fillText(allSessions.length + " sessions · dailytrack-ten.vercel.app", 16, 160);
+                              ctx.fillStyle = "#475569"; ctx.font = "10px monospace"; ctx.fillText("🏆 PERSONAL RECORD", 16, 60);
+                              ctx.fillStyle = "#fbbf24"; ctx.font = "bold 52px monospace"; ctx.fillText(pr + " lb", 16, 150);
+                              ctx.fillStyle = "#e2e8f0"; ctx.font = "bold 18px monospace"; ctx.fillText(name.toUpperCase(), 16, 210);
+                              ctx.fillStyle = "#334155"; ctx.font = "10px monospace"; ctx.fillText(allSessions.length + " sessions", 16, 245)
+                              ctx.fillStyle = "#1e2d40"; ctx.font = "9px monospace"; ctx.fillText("dailytrack-ten.vercel.app", 16, 300);
                               canvas.toBlob(blob => {
                                 if (!blob) return;
                                 const url = URL.createObjectURL(blob);
