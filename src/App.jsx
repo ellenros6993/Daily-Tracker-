@@ -2487,6 +2487,7 @@ export default function App() {
                     ].map(({ label, val, check, unit }) => {
                       const hit = val ? check(val) : null;
                       const isSteps = label === "Steps";
+                      const isTraining = label === "Training";
                       const tileCol = label === "Cal" || label === "Protein" ? "#a855f7" : label === "Steps" || label === "Training" ? "#60a5fa" : "#10b981";
                       return (
                         <div key={label} onClick={() => isSteps && !val && setShowManualSteps(v => !v)}
@@ -2496,9 +2497,9 @@ export default function App() {
                             <span className="label" style={{ marginBottom: 0, fontSize: 8 }}>{label}</span>
                             {isSteps && val && <span onClick={e => { e.stopPropagation(); setShowManualSteps(v => !v); }} style={{ fontSize: 7, color: "#334155", cursor: "pointer", marginLeft: 2 }}>✏️</span>}
                           </div>
-                          <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: val ? tileCol : "#1e2d40", lineHeight: 1 }}>{val || (isSteps ? <span style={{ fontSize: 11, color: "#334155" }}>tap</span> : "—")}</div>
+                          <div style={{ fontSize: 22, fontFamily: "'Bebas Neue', sans-serif", color: val ? tileCol : "#1e2d40", lineHeight: 1 }}>{isTraining ? (() => { const wt = getWeekLogs(logs, getCurrentWeekStart()).filter(l => (l.training && l.training.trim() !== "") || workouts.some(w => w.date === l.date)).length; return val ? `${wt}/${WORKOUTS_PER_WEEK}` : "\u2014"; })() : val || (isSteps ? <span style={{ fontSize: 11, color: "#334155" }}>tap</span> : "\u2014")}</div>
                           {unit && val && <div style={{ color: "#334155", fontSize: 9, marginTop: 2, fontFamily: "'DM Mono',monospace" }}>{unit}</div>}
-                          {val && label !== "Training" && (() => { const pct = label === "Cal" ? Math.min(100, Math.round(parseInt(val) / CALORIES_MAX * 100)) : label === "Protein" ? Math.min(100, Math.round(parseInt(val) / PROTEIN_MIN * 100)) : Math.min(100, Math.round(parseInt(val) / STEPS_MIN * 100)); return <div style={{ position: "absolute", top: 4, right: 5, fontSize: 8, color: tileCol, fontFamily: "'DM Mono',monospace" }}>{pct}%</div>; })()}
+                          {val && label !== "Training" && (() => { const pct = label === "Cal" ? Math.round(parseInt(val) / CALORIES_MAX * 100) : label === "Protein" ? Math.round(parseInt(val) / PROTEIN_MIN * 100) : Math.round(parseInt(val) / STEPS_MIN * 100); return <div style={{ position: "absolute", top: 4, right: 5, fontSize: 8, color: tileCol, fontFamily: "'DM Mono',monospace" }}>{pct}%</div>; })()}
                         </div>
                       );
                     })}
@@ -2532,11 +2533,32 @@ export default function App() {
                   </div>
                 </>
               ) : (
-                <div className="empty-state">
-                  <Zap size={28} />
-                  <p>No log for today yet</p>
-                  <button onClick={() => navigateTo("Nutrition")}>Start logging <ChevronRight size={12} style={{ display: "inline" }} /></button>
-                </div>
+                <>
+                  <div className="today-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                    {["Cal","Protein","Steps","Training"].map(label => {
+                      const isSteps = label === "Steps";
+                      return (
+                        <div key={label} onClick={() => isSteps && setShowManualSteps(v => !v)}
+                          style={{ background: "#0f1623", borderRadius: 8, padding: "10px 8px", textAlign: "center", border: "1px solid #131929", cursor: isSteps ? "pointer" : "default", position: "relative" }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, marginBottom: 5 }}>
+                            <span className="status-indicator si-gray" style={{ width: 6, height: 6 }} />
+                            <span className="label" style={{ marginBottom: 0, fontSize: 8 }}>{label}</span>
+                          </div>
+                          <div style={{ fontSize: isSteps ? 11 : 22, fontFamily: "'Bebas Neue', sans-serif", color: isSteps ? "#334155" : "#1e2d40", lineHeight: 1 }}>{isSteps ? "tap" : "—"}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {showManualSteps && (
+                    <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                      <input type="number" placeholder="Enter steps..." value={manualStepsInput} onChange={e => setManualStepsInput(e.target.value)} style={{ flex: 1, fontSize: 16, padding: "6px 10px" }} />
+                      <button onClick={() => { if (!manualStepsInput) return; const tod = viewedDate; setLogs(ls => { const existing = ls.find(l => l.date === tod); if (existing) { return ls.map(l => l.date === tod ? { ...l, steps: manualStepsInput } : l); } return [...ls, { date: tod, steps: manualStepsInput, calories: "", protein: "", training: "", weight: "", bodyFat: "", muscleMass: "", visceralFat: "" }]; }); setManualStepsInput(""); setShowManualSteps(false); haptic("light"); }} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #60a5fa44", color: "#60a5fa", fontSize: 11, fontWeight: 700, padding: "6px 14px", borderRadius: 6, cursor: "pointer" }}>SAVE</button>
+                    </div>
+                  )}
+                  <div style={{ marginTop: 8, textAlign: "center" }}>
+                    <button onClick={() => navigateTo("Nutrition")} style={{ background: "none", border: "none", color: "#10b981", fontSize: 10, fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 2, cursor: "pointer" }}>Start logging nutrition <ChevronRight size={11} style={{ display: "inline" }} /></button>
+                  </div>
+                </>
               )}
             </div>
             );})()}
