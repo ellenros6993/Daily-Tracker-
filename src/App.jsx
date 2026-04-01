@@ -4412,16 +4412,27 @@ export default function App() {
 
               {/* Training Adherence + Steps combined */}
               <div className="stat-card">
-                {(() => { const expected = Math.max(1, Math.round(days / 7 * WORKOUTS_PER_WEEK)); const adherePct = Math.min(100, Math.round(daysTrained / expected * 100)); return (<>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                    <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#60a5fa" }}>TRAINING ADHERENCE</div>
-                    <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#60a5fa" }}>{daysTrained}<span style={{ fontSize: 12, color: "#475569" }}>/{expected}</span></div>
-                  </div>
-                  <div className="bar-bg">
-                    <div className="bar-fill" style={{ width: `${adherePct}%`, background: "#60a5fa" }} />
-                  </div>
-                  <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 4 }}>{adherePct}% training adherence</div>
-                </>); })()}
+                {(() => {
+                  const today2 = new Date(); const dow2 = today2.getDay(); const dfm = dow2 === 0 ? 6 : dow2 - 1;
+                  const thisMonday = new Date(today2); thisMonday.setDate(today2.getDate() - dfm);
+                  const weeksInPeriod = summaryPeriod === "all"
+                    ? (workouts.length > 0 ? Math.max(1, Math.ceil((getDaysBetween(workouts.reduce((a,w) => a.date < w.date ? a : w).date, getLocalDateStr()) + 1) / 7)) : 1)
+                    : Math.max(1, Math.round(days / 7));
+                  const periodMonday = new Date(thisMonday); periodMonday.setDate(thisMonday.getDate() - (weeksInPeriod - 1) * 7);
+                  const periodStartStr = getLocalDateStr(periodMonday);
+                  const weekAlignedTrained = workouts.filter(w => w.date >= periodStartStr).length;
+                  const expected = weeksInPeriod * WORKOUTS_PER_WEEK;
+                  const adherePct = Math.min(100, Math.round(weekAlignedTrained / expected * 100));
+                  return (<>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#60a5fa" }}>TRAINING ADHERENCE</div>
+                      <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#60a5fa" }}>{weekAlignedTrained}<span style={{ fontSize: 12, color: "#475569" }}>/{expected}</span></div>
+                    </div>
+                    <div className="bar-bg">
+                      <div className="bar-fill" style={{ width: `${adherePct}%`, background: "#60a5fa" }} />
+                    </div>
+                    <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 4 }}>{adherePct}% training adherence</div>
+                  </>); })()}
                 <div style={{ borderTop: "1px solid #131929", margin: "12px 0" }} />
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div className="section-title" style={{ fontSize: 14, margin: 0, color: "#60a5fa" }}>STEPS</div>
