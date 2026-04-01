@@ -568,34 +568,33 @@ export default function App() {
 
   // Water unit helpers
   const WATER_UNITS = [
-    { id: "halfL", label: "½L", ml: 500 },
-    { id: "L",     label: "L",  ml: 1000 },
-    { id: "gal",   label: "gal",ml: 3785 },
+    { id: "mL",    label: "250mL", ml: 250 },
+    { id: "oz",    label: "8oz",   ml: 237 },
+    { id: "halfL", label: "500mL", ml: 500 },
+    { id: "L",     label: "1L",    ml: 1000 },
+    { id: "gal",   label: "gal",   ml: 3785 },
   ];
   // Water goal stored in ml (default 2000ml = 2L)
   const [waterGoalMlState, setWaterGoalMlState] = useState(() => parseInt(localStorage.getItem("dat-water-goal-ml") || "2000"));
   function saveWaterGoalMl(ml) { setWaterGoalMlState(ml); localStorage.setItem("dat-water-goal-ml", ml); }
   function waterUnitMl() { return WATER_UNITS.find(u => u.id === waterUnit)?.ml || 1000; }
   function waterTotalMl() { return waterCups * waterUnitMl(); }
-  function waterGoalDisplay() {
-    const ml = waterGoalMlState;
-    if (waterUnit === "halfL") return parseFloat((ml / 500).toFixed(1));
-    if (waterUnit === "L")     return parseFloat((ml / 1000).toFixed(2));
-    if (waterUnit === "gal")   return parseFloat((ml / 3785).toFixed(2));
+  function mlToUnitDisplay(ml) {
+    const u = waterUnit;
+    if (u === "mL")    return parseFloat((ml / 250).toFixed(1));
+    if (u === "oz")    return parseFloat((ml / 237).toFixed(1));
+    if (u === "halfL") return parseFloat((ml / 500).toFixed(1));
+    if (u === "L")     return parseFloat((ml / 1000).toFixed(2));
+    if (u === "gal")   return parseFloat((ml / 3785).toFixed(2));
     return ml;
   }
-  function waterDisplayVal() {
-    const ml = waterTotalMl();
-    if (waterUnit === "halfL") return parseFloat((ml / 500).toFixed(1));
-    if (waterUnit === "L")     return parseFloat((ml / 1000).toFixed(2));
-    if (waterUnit === "gal")   return parseFloat((ml / 3785).toFixed(2));
-    return ml;
-  }
+  function waterGoalDisplay() { return mlToUnitDisplay(waterGoalMlState); }
+  function waterDisplayVal() { return mlToUnitDisplay(waterTotalMl()); }
   function addWater() {
     const next = Math.min(waterCups + 1, 40);
     setWaterCups(next);
     const all = JSON.parse(localStorage.getItem("dat-water") || "{}");
-    all[getLocalDateStr()] = next;
+    all[nutritionDate] = next;
     localStorage.setItem("dat-water", JSON.stringify(all));
     haptic("light");
   }
@@ -603,7 +602,7 @@ export default function App() {
     const next = Math.max(waterCups - 1, 0);
     setWaterCups(next);
     const all = JSON.parse(localStorage.getItem("dat-water") || "{}");
-    all[getLocalDateStr()] = next;
+    all[nutritionDate] = next;
     localStorage.setItem("dat-water", JSON.stringify(all));
   }
   const [mealUploads, setMealUploads] = useState({ lunch: null, dinner: null, anchor: null });
@@ -674,6 +673,11 @@ export default function App() {
       const stored = localStorage.getItem(`dat-meal-foods-${newDate}`);
       setMealFoods(stored ? JSON.parse(stored) : {});
     } catch { setMealFoods({}); }
+    // Load water for the new date
+    try {
+      const w = JSON.parse(localStorage.getItem("dat-water") || "{}");
+      setWaterCups(w[newDate] || 0);
+    } catch {}
   }
   const [editingFood, setEditingFood] = useState(null); // { slot, id, grams }
   const [pendingGrams, setPendingGrams] = useState(100); // grams before adding
@@ -2880,8 +2884,11 @@ export default function App() {
           const proPct = Math.min(100, Math.round((totalPro / PROTEIN_MIN) * 100));
           const calColor = totalCals >= CALORIES_MIN && totalCals <= CALORIES_MAX ? "#a855f7" : totalCals > CALORIES_MAX ? "#f87171" : "#c084fc";
           const proColor = totalPro >= PROTEIN_MIN ? "#a855f7" : "#c084fc";
-          const totalCarbs = Math.round(MEAL_SLOTS.reduce((s, slot) => s + (mealFoods[slot] || []).reduce((ms, f) => ms + (f.carbs || 0), 0), 0));
-          const totalFat = Math.round(MEAL_SLOTS.reduce((s, slot) => s + (mealFoods[slot] || []).reduce((ms, f) => ms + (f.fat || 0), 0), 0));
+          const _manualNow = getManualToday(nutritionDate);
+          const totalCarbs = Math.round(MEAL_SLOTS.reduce((s, slot) => s + (mealFoods[slot] || []).reduce((ms, f) => ms + (f.carbs || 0), 0), 0) + (parseInt(_manualNow.carbs) || 0));
+          const totalFat = Math.round(MEAL_SLOTS.reduce((s, slot) => s + (mealFoods[slot] || []).reduce((ms, f) => ms + (f.fat || 0), 0), 0) + (parseInt(_manualNow.fat) || 0));
+          const totalFiber = Math.round(MEAL_SLOTS.reduce((s, slot) => s + (mealFoods[slot] || []).reduce((ms, f) => ms + (f.fiber || f.fibre || 0), 0), 0) + (parseInt(_manualNow.fiber) || 0));
+          const nutritionMacros = settings.nutritionMacros || ["calories", "protein", "carbs", "fat", "fibre"];
           const recentFoods = getRecentFoods();
           return (
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -2903,8 +2910,8 @@ export default function App() {
               {/* Daily goal ring */}
               <div className="stat-card" style={{ borderColor: "#a855f722", flex: 1, minWidth: 0 }}>
                 <div className="section-title" style={{ fontSize: 14, color: "#a855f7", marginBottom: 12 }}>DAILY TOTALS</div>
-                {/* Top row: calories | ring | protein (highlighted) */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, alignItems: "center" }}>
+                {/* Top row: calories | ring | protein */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 12, alignItems: "center" }}>
                   <div style={{ textAlign: "center" }}>
                     <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 26, color: darkMode ? "#e2e8f0" : "#0f172a", lineHeight: 1 }}>{totalCals.toLocaleString()}</div>
                     <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>CALORIES</div>
@@ -2913,6 +2920,7 @@ export default function App() {
                   {(() => {
                     const R = 42, CIRC = 2 * Math.PI * R;
                     const dash = (calPct / 100) * CIRC;
+                    const overAmt = totalCals - CALORIES_MAX;
                     return (
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                         <svg width={90} height={90}>
@@ -2920,42 +2928,51 @@ export default function App() {
                           <circle cx="45" cy="45" r={R} fill="none" stroke={calColor} strokeWidth="7"
                             strokeDasharray={`${dash} ${CIRC}`} transform="rotate(-90 45 45)"
                             strokeLinecap="round" style={{ transition: "stroke-dasharray 0.6s cubic-bezier(0.34,1.56,0.64,1)" }} />
-                          <text x="45" y="40" textAnchor="middle" dominantBaseline="central" fill={calColor} fontSize="16" fontFamily="'Bebas Neue',sans-serif">{calRemaining > 0 ? calRemaining.toLocaleString() : "0"}</text>
+                          <text x="45" y="40" textAnchor="middle" dominantBaseline="central" fill={calColor} fontSize="15" fontFamily="'Bebas Neue',sans-serif">{calRemaining > 0 ? calRemaining.toLocaleString() : `−${overAmt.toLocaleString()}`}</text>
                           <text x="45" y="56" textAnchor="middle" fill="#475569" fontSize="8" fontFamily="'DM Mono',monospace">{calRemaining > 0 ? "remaining" : "over"}</text>
                         </svg>
                         <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>BUDGET {CALORIES_MAX}</div>
                       </div>
                     );
                   })()}
-                </div>
-
-                {/* Carbs + Fat row */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 12, paddingTop: 12, borderTop: "1px solid #131929" }}>
-                  <div style={{ textAlign: "center", background: "#1a0a2e", borderRadius: 10, padding: "8px 6px", border: `1px solid ${proColor}33` }}>
-                    <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: proColor, lineHeight: 1 }}>{Math.round(totalPro)}g</div>
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 26, color: proColor, lineHeight: 1 }}>{Math.round(totalPro)}g</div>
                     <div style={{ fontSize: 9, color: proColor, fontFamily: "'DM Mono',monospace", fontWeight: 600 }}>PROTEIN</div>
                     <div style={{ fontSize: 9, color: "#334155", fontFamily: "'DM Mono',monospace" }}>goal {PROTEIN_MIN}g</div>
                   </div>
-                  <div style={{ textAlign: "center" }}>
-                    <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: "#fbbf24", lineHeight: 1 }}>{totalCarbs}g</div>
-                    <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>CARBS</div>
-                  </div>
-                  <div style={{ textAlign: "center" }}>
-                    <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: "#f97316", lineHeight: 1 }}>{totalFat}g</div>
-                    <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>FAT</div>
-                  </div>
                 </div>
 
-                <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", width: 50 }}>PROTEIN</span>
-                    <div className="bar-bg" style={{ flex: 1 }}><div className="bar-fill" style={{ width: `${proPct}%`, background: proColor }} /></div>
-                    <span style={{ fontSize: 9, color: proColor, fontFamily: "'DM Mono',monospace", width: 40, textAlign: "right" }}>{Math.round(totalPro)}/{PROTEIN_MIN}g</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", width: 50 }}>CALORIES</span>
-                    <div className="bar-bg" style={{ flex: 1 }}><div className="bar-fill" style={{ width: `${calPct}%`, background: calColor }} /></div>
-                    <span style={{ fontSize: 9, color: calColor, fontFamily: "'DM Mono',monospace", width: 60, textAlign: "right" }}>{totalCals}/{CALORIES_MAX}</span>
+                {/* Macro bars — configurable */}
+                <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #131929", display: "flex", flexDirection: "column", gap: 6 }}>
+                  {[
+                    { key: "calories", label: "CALORIES", val: totalCals,       goal: CALORIES_MAX, refMax: CALORIES_MAX * 1.2, color: calColor,   disp: `${totalCals}/${CALORIES_MAX}` },
+                    { key: "protein",  label: "PROTEIN",  val: totalPro,        goal: PROTEIN_MIN,  refMax: PROTEIN_MIN * 1.5,  color: proColor,   disp: `${Math.round(totalPro)}/${PROTEIN_MIN}g` },
+                    { key: "carbs",    label: "CARBS",    val: totalCarbs,      goal: null,         refMax: 350,                color: "#fbbf24",  disp: `${totalCarbs}g` },
+                    { key: "fat",      label: "FAT",      val: totalFat,        goal: null,         refMax: 120,                color: "#f97316",  disp: `${totalFat}g` },
+                    { key: "fibre",    label: "FIBRE",    val: totalFiber,      goal: null,         refMax: 40,                 color: "#a78bfa",  disp: `${totalFiber}g` },
+                  ].filter(m => nutritionMacros.includes(m.key)).map(m => {
+                    const pct = Math.min(100, Math.round((m.val / (m.goal || m.refMax)) * 100));
+                    return (
+                      <div key={m.key} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace", width: 50 }}>{m.label}</span>
+                        <div className="bar-bg" style={{ flex: 1 }}><div className="bar-fill" style={{ width: `${pct}%`, background: m.color }} /></div>
+                        <span style={{ fontSize: 9, color: m.color, fontFamily: "'DM Mono',monospace", width: 66, textAlign: "right" }}>{m.disp}</span>
+                      </div>
+                    );
+                  })}
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 2, gap: 4, flexWrap: "wrap" }}>
+                    {[{key:"calories",label:"Cal"},{key:"protein",label:"Pro"},{key:"carbs",label:"Carbs"},{key:"fat",label:"Fat"},{key:"fibre",label:"Fibre"}].map(({ key, label }) => {
+                      const active = nutritionMacros.includes(key);
+                      return (
+                        <button key={key} onClick={() => {
+                          const next = active ? nutritionMacros.filter(k => k !== key) : [...nutritionMacros, key];
+                          if (next.length === 0) return;
+                          saveSettings({ ...settings, nutritionMacros: next });
+                        }} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, border: `1px solid ${active ? "#a855f7" : "#1e2d40"}`, background: active ? "#3b1f6a" : "none", color: active ? "#c084fc" : "#334155", cursor: "pointer" }}>
+                          {label}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
                 <div style={{ marginTop: 4, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "right" }}>✓ Auto-saved</div>
@@ -2966,14 +2983,9 @@ export default function App() {
                   <Droplets size={14} style={{ color: "#60a5fa" }} />
                   <div style={{ fontSize: 12, fontWeight: 600 }}>Water</div>
                 </div>
-                <div style={{ display: "flex", gap: 3, marginBottom: 5 }}>
-                  {WATER_UNITS.map(u => (
-                    <button key={u.id} onClick={() => { const curMl = waterTotalMl(); const newUnitMl = u.ml; const newCount = Math.round(curMl / newUnitMl); setWaterUnit(u.id); setWaterCups(newCount); const all = JSON.parse(localStorage.getItem("dat-water") || "{}"); all[getLocalDateStr()] = newCount; localStorage.setItem("dat-water", JSON.stringify(all)); localStorage.setItem("dat-water-unit", u.id); }}
-                      style={{ flex: 1, background: waterUnit === u.id ? "#1d4ed8" : "#0f1623", border: "1px solid " + (waterUnit === u.id ? "#3b82f6" : "#1e2d40"), color: waterUnit === u.id ? "#fff" : "#475569", padding: "2px 1px", borderRadius: 5, fontSize: 9, cursor: "pointer" }}>
-                      {u.label}
-                    </button>
-                  ))}
-                </div>
+                <select value={waterUnit} onChange={e => { const u = WATER_UNITS.find(x => x.id === e.target.value); if (!u) return; const curMl = waterTotalMl(); const newCount = Math.round(curMl / u.ml); setWaterUnit(u.id); setWaterCups(newCount); const all = JSON.parse(localStorage.getItem("dat-water") || "{}"); all[nutritionDate] = newCount; localStorage.setItem("dat-water", JSON.stringify(all)); localStorage.setItem("dat-water-unit", u.id); }} style={{ width: "100%", marginBottom: 6, fontSize: 11, padding: "3px 6px", background: "#0f1623", border: "1px solid #1e2d40", color: "#7dd3fc", borderRadius: 6 }}>
+                  {WATER_UNITS.map(u => <option key={u.id} value={u.id}>{u.label}</option>)}
+                </select>
                 <div style={{ display: "flex", alignItems: "center", gap: 3, marginBottom: 8 }}>
                   <span style={{ fontSize: 9, color: "#475569" }}>GOAL:</span>
                   {WATER_UNITS.map(u => (
@@ -3014,7 +3026,7 @@ export default function App() {
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 14 }}>✏️</span>
                     <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? "#e2e8f0" : "#0f172a" }}>Manual Macro Entry</div>
-                    {Object.keys(getManualToday(nutritionDate)).length > 0 && <span style={{ fontSize: 10, color: "#34d399", fontFamily: "'DM Mono',monospace" }}>✓ Entered</span>}
+                    {Object.keys(getManualToday(nutritionDate)).length > 0 && <span style={{ fontSize: 10, color: "#a855f7", fontFamily: "'DM Mono',monospace" }}>✓ Entered</span>}
                   </div>
                   <span style={{ color: "#475569", fontSize: 14, transition: "transform 0.2s", display: "inline-block", transform: showManualMacros ? "rotate(90deg)" : "rotate(0deg)" }}>›</span>
                 </div>
@@ -3485,57 +3497,178 @@ export default function App() {
                 );
               })}
 
+              {/* Macro Calculator */}
+              {(() => {
+                const [mcOpen, setMcOpen] = React.useState(false);
+                const [mc, setMc] = React.useState({ sex: "male", age: "", weight: "", heightFt: "", heightIn: "", activity: "moderate", goal: "maintain" });
+                const mcResult = React.useMemo(() => {
+                  const w = parseFloat(mc.weight); const age = parseInt(mc.age);
+                  const ft = parseInt(mc.heightFt) || 0; const inch = parseInt(mc.heightIn) || 0;
+                  if (!w || !age || (!ft && !inch)) return null;
+                  const kg = w * 0.453592; const cm = ft * 30.48 + inch * 2.54;
+                  const bmr = mc.sex === "male" ? 10*kg + 6.25*cm - 5*age + 5 : 10*kg + 6.25*cm - 5*age - 161;
+                  const actM = { sedentary:1.2, light:1.375, moderate:1.55, active:1.725, veryActive:1.9 }[mc.activity] || 1.55;
+                  const tdee = bmr * actM;
+                  const goalCals = Math.round(mc.goal === "cut" ? tdee * 0.8 : mc.goal === "bulk" ? tdee * 1.1 : tdee);
+                  const protein = Math.round(w * (mc.goal === "cut" ? 1.0 : 0.85));
+                  const fat = Math.round(goalCals * 0.28 / 9);
+                  const carbs = Math.round((goalCals - protein * 4 - fat * 9) / 4);
+                  return { calories: goalCals, protein, fat, carbs };
+                }, [mc]);
+                return (
+                  <div className="stat-card" style={{ padding: 0, overflow: "hidden" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer" }} onClick={() => setMcOpen(v => !v)}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 14 }}>🧮</span>
+                        <div style={{ fontSize: 13, fontWeight: 600 }}>Macro Calculator</div>
+                      </div>
+                      <span style={{ color: "#475569", fontSize: 14, transition: "transform 0.2s", display: "inline-block", transform: mcOpen ? "rotate(90deg)" : "rotate(0deg)" }}>›</span>
+                    </div>
+                    {mcOpen && (
+                      <div style={{ padding: "0 16px 16px", borderTop: "1px solid #131929" }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
+                          <div>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>SEX</div>
+                            <select value={mc.sex} onChange={e => setMc(m => ({ ...m, sex: e.target.value }))} style={{ width: "100%", fontSize: 12, padding: "5px 8px", background: "#0f1623", border: "1px solid #1e2d40", color: "#e2e8f0", borderRadius: 6 }}>
+                              <option value="male">Male</option><option value="female">Female</option>
+                            </select>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>AGE</div>
+                            <input type="number" placeholder="25" value={mc.age} onChange={e => setMc(m => ({ ...m, age: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>WEIGHT (lbs)</div>
+                            <input type="number" placeholder="150" value={mc.weight} onChange={e => setMc(m => ({ ...m, weight: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>HEIGHT</div>
+                            <div style={{ display: "flex", gap: 4 }}>
+                              <input type="number" placeholder="5ft" value={mc.heightFt} onChange={e => setMc(m => ({ ...m, heightFt: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
+                              <input type="number" placeholder="8in" value={mc.heightIn} onChange={e => setMc(m => ({ ...m, heightIn: e.target.value }))} style={{ width: "100%", boxSizing: "border-box" }} />
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>ACTIVITY</div>
+                            <select value={mc.activity} onChange={e => setMc(m => ({ ...m, activity: e.target.value }))} style={{ width: "100%", fontSize: 11, padding: "5px 8px", background: "#0f1623", border: "1px solid #1e2d40", color: "#e2e8f0", borderRadius: 6 }}>
+                              <option value="sedentary">Sedentary (desk job)</option>
+                              <option value="light">Light (1-3×/wk)</option>
+                              <option value="moderate">Moderate (3-5×/wk)</option>
+                              <option value="active">Active (6-7×/wk)</option>
+                              <option value="veryActive">Very Active (2× daily)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginBottom: 4 }}>GOAL</div>
+                            <select value={mc.goal} onChange={e => setMc(m => ({ ...m, goal: e.target.value }))} style={{ width: "100%", fontSize: 12, padding: "5px 8px", background: "#0f1623", border: "1px solid #1e2d40", color: "#e2e8f0", borderRadius: 6 }}>
+                              <option value="cut">Cut (−20% deficit)</option>
+                              <option value="maintain">Maintain</option>
+                              <option value="bulk">Bulk (+10% surplus)</option>
+                            </select>
+                          </div>
+                        </div>
+                        {mcResult && (
+                          <div style={{ marginTop: 14, background: "#0a0d15", borderRadius: 10, padding: "12px 14px", border: "1px solid #a855f733" }}>
+                            <div style={{ fontSize: 9, color: "#a855f7", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 10 }}>RECOMMENDED MACROS</div>
+                            <div style={{ display: "flex", justifyContent: "space-around" }}>
+                              {[
+                                { label: "Calories", val: `${mcResult.calories}`, color: "#a855f7" },
+                                { label: "Protein",  val: `${mcResult.protein}g`,  color: "#c084fc" },
+                                { label: "Carbs",    val: `${mcResult.carbs}g`,    color: "#fbbf24" },
+                                { label: "Fat",      val: `${mcResult.fat}g`,      color: "#f97316" },
+                              ].map(({ label, val, color }) => (
+                                <div key={label} style={{ textAlign: "center" }}>
+                                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color, lineHeight: 1 }}>{val}</div>
+                                  <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{label}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {!mcResult && <div style={{ marginTop: 10, fontSize: 10, color: "#334155", fontFamily: "'DM Mono',monospace", textAlign: "center" }}>Fill in all fields to see recommendations</div>}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
               {/* Macro history + daily summary */}
               {(() => {
                 const last7 = Array.from({ length: 7 }, (_, i) => {
                   const d = new Date(); d.setDate(d.getDate() - (6 - i));
                   const ds = getLocalDateStr(d);
-                  let cal = 0, pro = 0;
+                  let cal = 0, pro = 0, carbs = 0, fat = 0, fiber = 0;
                   try {
                     const mf = JSON.parse(localStorage.getItem(`dat-meal-foods-${ds}`) || "{}");
                     const foods = Object.values(mf).flat();
                     if (foods.length > 0) {
-                      cal = foods.reduce((s, f) => s + (f.calories || 0), 0);
-                      pro = foods.reduce((s, f) => s + (f.protein || 0), 0);
+                      cal   = foods.reduce((s, f) => s + (f.calories || 0), 0);
+                      pro   = foods.reduce((s, f) => s + (f.protein  || 0), 0);
+                      carbs = Math.round(foods.reduce((s, f) => s + (f.carbs || 0), 0));
+                      fat   = Math.round(foods.reduce((s, f) => s + (f.fat   || 0), 0));
+                      fiber = Math.round(foods.reduce((s, f) => s + (f.fiber || f.fibre || 0), 0));
                     }
                   } catch {}
                   if (cal === 0 && pro === 0) {
                     const log = logs.find(l => l.date === ds);
                     if (log) { cal = parseInt(log.calories) || 0; pro = parseInt(log.protein) || 0; }
                   }
-                  return { date: ds, cal, pro };
+                  const man = getManualToday(ds);
+                  return { date: ds, cal: cal + (parseInt(man.calories)||0), pro: pro + (parseInt(man.protein)||0), carbs: carbs + (parseInt(man.carbs)||0), fat: fat + (parseInt(man.fat)||0), fiber: fiber + (parseInt(man.fiber)||0) };
                 }).reverse(); // most recent first
 
-                const today = last7[0];
+                const today7 = last7[0];
                 const hasAnyData = last7.some(d => d.cal > 0 || d.pro > 0);
+                const historyMacros = settings.historyMacros || ["calories", "protein"];
+
+                const histCols = [
+                  { key: "calories", label: "Calories", render: r => { const hit = r.cal >= CALORIES_MIN && r.cal <= CALORIES_MAX; const over = r.cal > CALORIES_MAX; return <><span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 17, color: hit ? "#a855f7" : over ? "#f87171" : "#fbbf24", lineHeight: 1 }}>{r.cal}</span><span style={{ fontSize: 9, color: "#334155", marginLeft: 3 }}>{hit ? "✓" : over ? "↑" : "↓"}</span></>; } },
+                  { key: "protein",  label: "Protein",  render: r => { const hit = r.pro >= PROTEIN_MIN; return <><span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 17, color: hit ? "#a855f7" : "#fbbf24", lineHeight: 1 }}>{Math.round(r.pro)}g</span><span style={{ fontSize: 9, color: "#334155", marginLeft: 3 }}>{hit ? "✓" : "↓"}</span></>; } },
+                  { key: "carbs",    label: "Carbs",    render: r => <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 17, color: "#fbbf24" }}>{r.carbs}g</span> },
+                  { key: "fat",      label: "Fat",      render: r => <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 17, color: "#f97316" }}>{r.fat}g</span> },
+                  { key: "fibre",    label: "Fibre",    render: r => <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 17, color: "#a78bfa" }}>{r.fiber}g</span> },
+                ].filter(c => historyMacros.includes(c.key));
 
                 return (
                   <div className="stat-card">
-                    <div className="section-title" style={{ marginBottom: 12, fontSize: 14, color: "#a855f7" }}>7-DAY HISTORY</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 6 }}>
+                      <div className="section-title" style={{ fontSize: 14, color: "#a855f7", margin: 0 }}>7-DAY HISTORY</div>
+                      <div style={{ display: "flex", gap: 4 }}>
+                        {[{key:"calories",label:"Cal"},{key:"protein",label:"Pro"},{key:"carbs",label:"Carbs"},{key:"fat",label:"Fat"},{key:"fibre",label:"Fibre"}].map(({ key, label }) => {
+                          const active = historyMacros.includes(key);
+                          return (
+                            <button key={key} onClick={() => {
+                              const next = active ? historyMacros.filter(k => k !== key) : [...historyMacros, key];
+                              if (next.length === 0) return;
+                              saveSettings({ ...settings, historyMacros: next });
+                            }} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, border: `1px solid ${active ? "#a855f7" : "#1e2d40"}`, background: active ? "#3b1f6a" : "none", color: active ? "#c084fc" : "#334155", cursor: "pointer" }}>
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
 
                     {/* Today's summary */}
-                    {(today.cal > 0 || today.pro > 0) && (() => {
-                      const todayCarbs = Math.round(MEAL_SLOTS.reduce((s, slot) => s + (mealFoods[slot] || []).reduce((ms, f) => ms + (f.carbs || 0), 0), 0));
-                      const todayFat = Math.round(MEAL_SLOTS.reduce((s, slot) => s + (mealFoods[slot] || []).reduce((ms, f) => ms + (f.fat || 0), 0), 0));
-                      return (
-                        <div style={{ background: "#0a2118", border: "1px solid #10b98133", borderRadius: 10, padding: "10px 14px", marginBottom: 14 }}>
-                          <div style={{ fontSize: 9, color: "#10b981", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 8 }}>TODAY'S SUMMARY</div>
-                          <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-                            {[
-                              { label: "Calories", val: `${today.cal}`, color: today.cal >= CALORIES_MIN && today.cal <= CALORIES_MAX ? "#34d399" : today.cal > CALORIES_MAX ? "#f87171" : "#fbbf24" },
-                              { label: "Protein", val: `${Math.round(today.pro)}g`, color: today.pro >= PROTEIN_MIN ? "#34d399" : "#fbbf24" },
-                              { label: "Carbs", val: `${todayCarbs}g`, color: "#fbbf24" },
-                              { label: "Fat", val: `${todayFat}g`, color: "#f97316" },
-                            ].map(({ label, val, color }) => (
-                              <div key={label}>
-                                <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color, lineHeight: 1 }}>{val}</div>
-                                <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{label}</div>
-                              </div>
-                            ))}
-                          </div>
+                    {(today7.cal > 0 || today7.pro > 0) && (
+                      <div style={{ background: "#1a0a2e", border: "1px solid #a855f733", borderRadius: 10, padding: "10px 14px", marginBottom: 14 }}>
+                        <div style={{ fontSize: 9, color: "#a855f7", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 8 }}>TODAY'S SUMMARY</div>
+                        <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+                          {[
+                            { label: "Calories", val: `${today7.cal}`, color: today7.cal >= CALORIES_MIN && today7.cal <= CALORIES_MAX ? "#a855f7" : today7.cal > CALORIES_MAX ? "#f87171" : "#fbbf24" },
+                            { label: "Protein",  val: `${Math.round(today7.pro)}g`,  color: today7.pro >= PROTEIN_MIN ? "#a855f7" : "#fbbf24" },
+                            { label: "Carbs",    val: `${today7.carbs}g`, color: "#fbbf24" },
+                            { label: "Fat",      val: `${today7.fat}g`,   color: "#f97316" },
+                            { label: "Fibre",    val: `${today7.fiber}g`, color: "#a78bfa" },
+                          ].map(({ label, val, color }) => (
+                            <div key={label}>
+                              <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color, lineHeight: 1 }}>{val}</div>
+                              <div style={{ fontSize: 9, color: "#475569", fontFamily: "'DM Mono',monospace" }}>{label}</div>
+                            </div>
+                          ))}
                         </div>
-                      );
-                    })()}
+                      </div>
+                    )}
 
                     {/* Table */}
                     {hasAnyData ? (
@@ -3543,7 +3676,7 @@ export default function App() {
                         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                           <thead>
                             <tr style={{ borderBottom: "1px solid #131929" }}>
-                              {["Date", "Calories", "Protein"].map(h => (
+                              {["Date", ...histCols.map(c => c.label)].map(h => (
                                 <th key={h} style={{ padding: "6px 10px", color: "#475569", fontWeight: 400, letterSpacing: 1, fontSize: 9, textTransform: "uppercase", textAlign: h === "Date" ? "left" : "center", fontFamily: "'DM Mono',monospace" }}>{h}</th>
                               ))}
                             </tr>
@@ -3551,27 +3684,19 @@ export default function App() {
                           <tbody>
                             {last7.filter(r => r.cal > 0 || r.pro > 0).map((row, i) => {
                               const isToday = row.date === getLocalDateStr();
-                              const calHit = row.cal >= CALORIES_MIN && row.cal <= CALORIES_MAX;
-                              const calOver = row.cal > CALORIES_MAX;
-                              const proHit = row.pro >= PROTEIN_MIN;
                               const dayStr = new Date(row.date + "T12:00:00").toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
                               return (
-                                <tr key={row.date} style={{ borderBottom: "1px solid #0f162388", background: isToday ? "#0a2118" : i % 2 === 0 ? "#0b0d15" : "#0c0e18" }}
+                                <tr key={row.date} style={{ borderBottom: "1px solid #0f162388", background: isToday ? "#1a0a2e" : i % 2 === 0 ? "#0b0d15" : "#0c0e18" }}
                                   onClick={() => navigateNutritionDate(row.date)} className="cursor-pointer">
                                   <td style={{ padding: "9px 10px" }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                      {isToday && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 6px #10b981", flexShrink: 0 }} />}
-                                      <span style={{ color: isToday ? "#10b981" : "#94a3b8", fontWeight: isToday ? 600 : 400, fontFamily: "'DM Mono',monospace", fontSize: 11 }}>{isToday ? "Today" : dayStr}</span>
+                                      {isToday && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#a855f7", boxShadow: "0 0 6px #a855f7", flexShrink: 0 }} />}
+                                      <span style={{ color: isToday ? "#a855f7" : "#94a3b8", fontWeight: isToday ? 600 : 400, fontFamily: "'DM Mono',monospace", fontSize: 11 }}>{isToday ? "Today" : dayStr}</span>
                                     </div>
                                   </td>
-                                  <td style={{ padding: "9px 10px", textAlign: "center" }}>
-                                    <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 17, color: calHit ? "#34d399" : calOver ? "#f87171" : "#fbbf24", lineHeight: 1 }}>{row.cal}</span>
-                                    <span style={{ fontSize: 9, color: "#334155", marginLeft: 3 }}>{calHit ? "✓" : calOver ? "↑" : "↓"}</span>
-                                  </td>
-                                  <td style={{ padding: "9px 10px", textAlign: "center" }}>
-                                    <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 17, color: proHit ? "#34d399" : "#fbbf24", lineHeight: 1 }}>{Math.round(row.pro)}g</span>
-                                    <span style={{ fontSize: 9, color: "#334155", marginLeft: 3 }}>{proHit ? "✓" : "↓"}</span>
-                                  </td>
+                                  {histCols.map(c => (
+                                    <td key={c.key} style={{ padding: "9px 10px", textAlign: "center" }}>{c.render(row)}</td>
+                                  ))}
                                 </tr>
                               );
                             })}
