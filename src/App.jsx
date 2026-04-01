@@ -3901,6 +3901,7 @@ export default function App() {
                           <div style={{ fontSize: 10, color: "#475569", fontFamily: "'DM Mono',monospace", marginTop: 2 }}>{t.exercises.length} exercise{t.exercises.length !== 1 ? "s" : ""}</div>
                         </div>
                         <div style={{ display: "flex", gap: 8 }}>
+                          <button onClick={() => { setWorkoutForm(f => ({ ...f, exercises: [...f.exercises, ...t.exercises.map(e => ({ ...e, id: Date.now() + Math.random(), sets: e.sets.map(s => ({ reps: s.reps, weight: "" })) }))] })); haptic("light"); }} style={{ background: "none", border: "1px solid #1e3a5f", color: "#60a5fa", padding: "5px 10px", borderRadius: 7, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>+ Add</button>
                           <button onClick={() => loadTemplate(t)} style={{ background: "linear-gradient(135deg,#1e3a5f,#3b82f6)", border: "1px solid #065f3a44", color: "#60a5fa", padding: "5px 12px", borderRadius: 7, fontSize: 11, fontWeight: 600 }}>Load</button>
                           <button onClick={() => deleteTemplate(t.id)} style={{ background: "none", border: "1px solid #1e2d40", color: "#475569", padding: "5px 8px", borderRadius: 7, fontSize: 11, display: "flex", alignItems: "center" }}><Trash2 size={12} /></button>
                         </div>
@@ -3971,7 +3972,10 @@ export default function App() {
                               {w.activityType && w.activityType !== "strength" ? `${w.activityType}${w.duration ? " 00b7 " + w.duration + (w.durationUnit || "min") : ""}${w.intensity ? " 00b7 " + w.intensity : ""}` : `${w.exercises.length} exercise${w.exercises.length !== 1 ? "s" : ""} 00b7 ${w.exercises.reduce((s, e) => s + e.sets.length, 0)} sets`}
                             </div>
                           </div>
-                          <span style={{ color: "#334155", fontSize: 14 }}>{selectedWorkout === (w.id || i) ? "▲" : "▼"}</span>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <button onClick={(e) => { e.stopPropagation(); setWorkoutForm({ ...w }); window.scrollTo({ top: 0, behavior: "smooth" }); haptic("light"); }} style={{ background: "none", border: "1px solid #1e3a5f", color: "#60a5fa", fontSize: 10, padding: "3px 10px", borderRadius: 6, cursor: "pointer", fontWeight: 600 }}>Edit</button>
+                            <span style={{ color: "#334155", fontSize: 14 }}>{selectedWorkout === (w.id || i) ? "▲" : "▼"}</span>
+                          </div>
                         </div>
 
                         {selectedWorkout === (w.id || i) && (
